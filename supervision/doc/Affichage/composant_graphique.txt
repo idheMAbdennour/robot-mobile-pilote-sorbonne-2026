@@ -1,0 +1,81 @@
+Ecran géneral :
+
+L'écran de supervision 1080x1920 est composé de 3 sous-écrans.
+Chaque sous-écran sera identifié par un onglet attaché au coin supérieur gauche :
+- Rectangle gris 50%
+- Contour orange 
+- Texte blanc :
+    - Premier écran (en haut) : "VUE DU SYSTEME"
+    - Deuxième écran (au millieu) : "GESTIONNAIRE DE MISSION"
+    - Troisième écran (en bas) : "LISTE ROBOTS"
+
+Les écrans sont séparé par une ligne noir qui prolonge le contour orange supérieur de l'onglet de l'écran inférieur à la ligne noir.
+
+----
+
+Sous-écran 1 : "VUE DU SYSTEME" :
+
+Ce sous-écran représente un circuit en forme de 8 allongé (signe infini). Pour des raisons d'ergonomie, ce 8 allongé est stylisé comme suit :
+- La partie centrale du 8 est représentée par une forme en Y orange : 
+    - A son extremité supérieure gauche se trouve le nombre 102 en noir
+    - A son extremité superieure droite se trouve le numéro 103 en noir
+    - A gauche de son extrémité inférieure se trouve le numéro 104 en noir
+    - A droite de son extrémité inférieure se trouve le numéro 105 en noir
+- De chaque coté du Y orange, les boucles du 8 allongé sont representé par une ligne noire en forme de rectangle privés de leur cotés adjacent au Y. Leur coins sont legerement arrondies.
+- Sur chaque boucles, des traits perpendiculaires à la ligne, régulièrement espacés tout le long du trait noir. Il represente des "postes".     
+- Au dessus de chaque postes (traits) il y a un label noir de la forme PNN avec NN le numéro du poste (de 01 à 99). Ce label est du coté exterieur du rectangle de boucle, toujours écrit dans l'orientation normal du texte.
+- Au dessous de chaque postes (traits) il y a une flèche verte :
+    - Avec un contour noir. 
+    - Un peu épaisse pour être visible 
+    - Du coté intérieur du rectangle de boucle
+    - Peut être alternativement visible et invisible
+    - A deux orientation possible :
+        - orienté suivant le circuit de l'extremité haute du Y vers son extremité basse.
+
+Le Y doit être contenue comme entre parenthèse par les boucles, comme celà : [Y]
+
+Sur ce circuit, il y a plusieurs élements mobiles representant les "robots" :
+- Un robot est un rectangle au contour noir sur fond blanc.
+- Il contient une jauge composée de 5 barres representant sa vitesse et son status: 
+    - 1 barre = 20%, 5 barres = 80%, la jauge se remplit de gauche à droite. 
+    - Les barres de la jauge sont toute de la même couleurs. Il y a 4 couleurs possible : VERT, ROUGE, BLEU, FUSCHIA.
+
+- A coté de chaque rectangle se trouve un label orange de la forme RNN avec NN le numéro du robot (de 01 à 99). Ce label est du coté exterieur du rectangle de boucle, toujours écrit dans l'orientation normal du texte.
+
+Les robots ont trois emplacements possibles :
+- Sur le circuit entre deux traits de postes, long coté perpendiculaire au circuit 
+- En dehors du circuit, coté exterieur, long coté perpendiculaire au circuit à coté d'un trait de poste (ne peut se superposer à un label de poste)
+- Aligné de chaque coté du Y orange, orienté à l'horizontale.
+
+La longueur d'un trait de poste est égale à la longueur du coté long du rectangle d'un robot.
+
+----
+
+Sous-écran 2 : "GESTIONNAIRE DE MISSION" :
+
+Ce sous-écran représente un tableau dynamique (le nombre de ligne est variable) à 5 colonnes :
+- La première ligne contient les noms de colonnes sur fond gris 25%.
+- Première colonne "Trajet" : chaque case contient une chaine de caractère de la forme "PXX --> PYY" avec XX et YY des numéros de postes.
+- Deuxième colonne "Robot" : chaque case contient soit :
+    - une chaine de caractère de la forme "NN" avec NN un numéro de robot
+    - un point d'interrogation bleu gras. Dans ce cas la case a un contour gras et bleu. Une telle case peut être cliqué, dans cet état elle est sur fond bleu opaque à 75%.
+- Troisième colonne "Code Livreur" : chaque case contient un caractère : "A", "B", "C" ou "D" en noir
+- Quatrième colonne "Status" : chaque case contient un caractère en gras: "L" en vert, "E" en rouge, "C" en fuschia, "D" en bleu.
+- Cinquième colonne "Vitesse" : chaque case contient une liste déroulante :
+    - avec les items "20%", "40%", "60%" et "80%" en noir dans cet ordre de haut en bas si la liste est déroulée
+Le contour exterieur du tableau est épais, la séparation entre la première et la deuxième ligne est épaisse, les séparations entres les colonnes sont épaisse, les séparations entre les lignes sont fines.
+
+----
+
+Sous-écran 3 : "LISTE ROBOT" :
+
+Dans l'espace restant, ce dernier sous-écran contient un tableau où chaque case represente l'état d'un robot:
+- Chaque case contient une chaine de caractère noir de la forme "RNN" avec NN un numéro de robot (de 01 à 99)
+- Chaque case est soit sur fond vert, soit sur fond rouge, et opaque à 50%.
+
+----
+
+Dans chaque sous-écran les élements doivent prendre toute la place disponible en largeur en gardant un espace sur le bord.
+La taille du circuit doit être suffisante pour que tout les élements qu'il contient soit visible.
+La hauteur du deuxième sous-écran doit être suffisante pour contenir le tableau dynamique qui peut changer de taille. Le sous écran est de taille fixe.
+La hauteur du troisième sous-écran dépend du nombre de robot du système. Nombre de robot max = 99.

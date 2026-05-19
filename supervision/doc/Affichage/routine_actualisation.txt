@@ -1,0 +1,1 @@
+L'interface graphique doit s'actualiser au moins toutes les secondes.

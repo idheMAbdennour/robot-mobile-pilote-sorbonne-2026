@@ -1,0 +1,8 @@
+- test_affichage
+    Prompt :   "Je souhaite créer en processing 2.1.2 une interface de supervision pour un système de robot mobile piloté. 
+                J'ai écrit une description textuelle de l'interface graphique dans composant_graphique.txt et dessiner un 
+                exemple de l'interface que j'imagine dans exemple_interface.jpg. A partir de ces documents, rédige moi un 
+                sketch processing remplissant le cahier des charges." 
+    Documents : composant_graphique.txt
+                exemple_interface.jpg
+
