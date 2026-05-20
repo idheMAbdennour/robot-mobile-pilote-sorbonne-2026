@@ -1,0 +1,6 @@
+L'opérateur peut intéragir avec trois élements de l'interface graphique :
+    - Les cases au contour bleu contenant un point d'interrogation dans la colonne "Robot" du sous-écran 2 "GESTIONNAIRE DE MISSION" : Case attribution.
+    - Les cases/listes déroulantes de la colonne "Status" du sous-écran 2 "GESTIONNAIRE DE MISSION" : Case vitesse.
+    - Les cases de la matrice de robots du sous-écran 3 "LISTE ROBOTS" : Case robot.
+
+Ces cases sont des élements clickable.

@@ -1,5 +1,7 @@
 Le programme de supervision conserve dans des classes un certain nombre de données qu'il extrait des messages reçue par la liaison série, en provenance de la centrale. 
 
+Les messages sont stockés dans une liste FIFO de chaines de caractères : StringList fifo_messages;
+
 Classe ROBOT:
     - Un robot possède un identifiant : int id_robot;
     - Un robot possède une position sur le circuit, donnée par l'id du dernier poste à l'avoir vu : int id_last_poste;
