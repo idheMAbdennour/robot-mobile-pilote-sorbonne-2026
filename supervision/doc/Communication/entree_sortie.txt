@@ -1,29 +1,31 @@
 Le logiciel de supervision fait l'interface entre un opérateur humain et une centrale de contrôle numérique.
 La supervision communique avec la centrale via une liaison série.
 
-Quatre types de messages sont possible :
+Quatre types de messages sont possibles :
     - Entrée :
         - Message de type 1 : Observations des robots par un poste
-            - Format : chaine de caractère "PnnRxxVS0x0A0x0D"
+            - Format : chaine de caractère "PnnRxxVS"
             - Pnn est un numero de poste ("P" est un caractère et n represente un des caractères des nombres de 0 à 9)
             - Rxx est un numero de robot ("R" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - V est un char (8 bits) valant entre 0x00 et 0x0F et code la vitesse du robot
             - S est un caractère parmis les lettres "L", "E", "C" et "D" et code le status du robot.
         
         - Message de type 2 : Ordre de mission venant d'un poste
-            - Format : chaine de caractère "PxxLPyy0x0A0x0D"
+            - Format : chaine de caractère "PxxLPyy0x"
             - Pxx est le numéro du poste expediteur ("P" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - L represente un caractère parmis les lettres "A", "B", "C" et "D" et code le code livreur
             - Pyy est le numéro du poste expediteur ("P" est un caractère et y represente un des caractères des nombres de 0 à 9)
     
     - Sortie :
         - Message de type 3 : Attribution de mission
-            - Format : chaine de caractère "RnnPxxPyy0x0A0x0D"
+            - Format : chaine de caractère "RnnPxxPyy"
             - Rnn est un numero de robot ("R" est un caractère et n represente un des caractères des nombres de 0 à 9)
             - Pxx est le numéro du poste expediteur ("P" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - Pyy est le numéro du poste expediteur ("P" est un caractère et y represente un des caractères des nombres de 0 à 9)
         
         - Message de type 4 : Ordre de vitesse
-            - Format : chaine de caractère "RxxVyy0x0A0x0D"
+            - Format : chaine de caractère "RxxVyy"
             - Rxx est un numero de robot ("R" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - Vyy est une valeur de vitesse ("V" est un caractère et y represente un des caractères des nombres de 0 à 9)
+
+Les messages se terminent tous par les caractères 0x0A et 0x0D (caractères de fin de ligne et de retour chariot).

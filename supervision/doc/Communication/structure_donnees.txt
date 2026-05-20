@@ -1,0 +1,20 @@
+Le programme de supervision conserve dans des classes un certain nombre de données qu'il extrait des messages reçue par la liaison série, en provenance de la centrale. 
+
+Classe ROBOT:
+    - Un robot possède un identifiant : int id_robot;
+    - Un robot possède une position sur le circuit, donnée par l'id du dernier poste à l'avoir vu : int id_last_poste;
+    - Un robot possède une vitesse : int vitesse;
+    - Un robot possède un status : char status;
+    - Un robot possède une situation, soit sur le circuit, soit garé à coté d'un poste : boolean gare;
+    - Un robot possède une disponibilité : boolean dispo;
+
+Classe POSTE:
+    - Un poste possède un identifiant : int id_poste;
+    - Un poste possède un indicateur de robot vu : boolean robot_vu;
+    - Un poste possède un indicateur de robot garé : boolean robot_gare;
+    
+Classe MISSION:
+    - Une mission a un poste de départ désigné par son id : int p_depart; 
+    - Une mission a un poste d'arrivé désigné par son id : int p_arrive;
+    - Une mission a un robot livreur attribué désigné par son id : int id_livreur;  
+
