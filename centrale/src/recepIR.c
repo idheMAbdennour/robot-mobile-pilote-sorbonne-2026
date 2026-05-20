@@ -7,7 +7,7 @@ int statusRobot = -1;
 
 
 char estValide = 0;
-char state = 0; // 0 -> entête, 1 numRobot, 2 vitesse, 3 status, 4 checksum
+char state = 0; // 0 -> entete, 1 numRobot, 2 vitesse, 3 status, 4 checksum
 
 char bitNb = 0;
 char bitObtenus[4];
@@ -72,14 +72,14 @@ void changeTimerTauRecepIR(int newTau) {
 		state = 0;
 	}
 	
-	// Reset le timer si nouveau tau < val actuel
+	// Reset le timer si nouveau tau < val actuel (en deux temps)
 	if ( captures[1] > newTau )
 		LPC_TIM0->TCR  |= 1 >> 1;
 	
 	// Mettre le nouveau tau
 	LPC_TIM0->MR0 = newTau; 
 	
-	// Reset le timer si nouveau tau < val actuel
+	// Reset le timer si nouveau tau < val actuel (deuxiÃ¨me temps)
 	if ( captures[1] > newTau )
 		LPC_TIM0->TCR  &= ~(1 >> 1);
 }
@@ -94,7 +94,7 @@ void interuptGPIORecepIR () {
 	captures[0] = captures[1];
 	captures[1] = LPC_TIM0->CR0;
 
-	// Calucle du tau
+	// Calcule du tau
 		int newTau = 0;
 	if (captures[1] > captures[0]) {
 		newTau = captures[1] - captures[0];
@@ -108,11 +108,11 @@ void interuptGPIORecepIR () {
 	changeTimerTauRecepIR(newTau);
 }
 
-// Réception + Décodage
+// Reception + Decodage
 void TIM0_IRQHandler() {
 	// 101 -> entete 10
-	// 110 -> reçoit 1
-	// 100 -> reçoit 0
+	// 110 -> recoit 1
+	// 100 -> recoit 0
 	
 	buffer[bufferIndex] = (LPC_GPIO0->FIOPIN & (1 << 21)) > 0;
 	
@@ -156,7 +156,7 @@ void TIM0_IRQHandler() {
 		}
 	}
 	
-	if (bitNb == 5) {
+	if (bitNb == 4) {
 		bitNb = 0;
 		
 		int valTemp = bitObtenus[0] + 2 * (bitObtenus[1] + 2 * (bitObtenus[2] + 2 * bitObtenus[3]) );
@@ -170,12 +170,16 @@ void TIM0_IRQHandler() {
 		else if (state == 4) {
 			checksumTemp = valTemp;
 			
-			// Verif du checksum à FAIRE < ------------------------------------------------------
-			if (estValide == 1) {
-				numeroRobot = numRobotTemp;
-				vitesseRobot = vitesseTemp;
-				statusRobot = statusTemp;
-				
+			// Verif du checksum
+			int sum4bits = (numRobotTemp + vitesseTemp + statusTemp) & 0x0F;	// Calcul de la somme sur 4 bits des 3 quartets d'informations
+			
+			if(checksumTemp == ((sum4bits ^ 0x0F) + 1)){ 		// Comparaison du complÃ©ment Ã  2 avec le checksum	 
+				if (estValide == 1)
+					numeroRobot = numRobotTemp;
+					vitesseRobot = vitesseTemp;
+					statusRobot = statusTemp;
+					
+				}
 			}
 		}
 		
