@@ -2,11 +2,15 @@
 
 Le fichier de configuration donne le nombre de robot et de postes du système. Ces valeurs sont stockées dans des variables globales :
 - Le nombre de robots : int nb_robot;
-- Le nombre de postes : int nb_poste;  
+- Le nombre de postes de la branche nord (103 - 105): int nb_poste_nord;  
+- Le nombre de postes de la branche sud (102 - 104): int nb_poste_sud;  
 
 Les autres variables globales de l'application sont : 
 - Le numéro de la mission sélectionnée dans le tableau du sous-écran 2 : int numero_mission_select;
 - Le numéro du robot associé à la mission selectionnée dans le tableau du sous-écran 2 : int num_robot_select;
+- Le nombre de poste : int nb_poste;
+- Le numéro du dernier poste de la branche nord (103 - 105) : int id_last_poste_nord;
+- le numéro du dernier poste de la branche sud (102 - 104) : int id_last_poste_sud;
 
 Le programme de supervision conserve dans des classes un certain nombre de données qu'il extrait des messages reçue par la liaison série, en provenance de la centrale. 
 
