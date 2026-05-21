@@ -35,23 +35,16 @@ char DTMF_TABLE[16] =
 
 void init_dtmf()
 {
-    // 1. Configuration des entrées du HT9170D sur le Port 0 
-    LPC_PINCON->PINMODE1 |= (0x3FF << 0);  // Mode Pull-down sur P0.16 à P0.20
-    LPC_PINCON->PINSEL1 &= ~(0x3FF << 0);  // Fonctions GPIO pour P0.16 à P0.20
-    LPC_GPIO0->FIODIR &= ~(0x1F << 16);    // Configurer P0.16 à P0.20 en entrées
+    LPC_PINCON->PINMODE1 |= (0x3FF << 0);
+    LPC_PINCON->PINSEL1 &= ~(0x3FF << 0);
+    LPC_GPIO0->FIODIR &= ~(0x1F << 16);
     
-    // 2. Configuration des LEDs sur le Port 2 (P2.8 et P2.9) 
-    // PINSEL4 contrôle les fonctions des broches P2.0 à P2.15 (2 bits par broche)
-    // Bits 17:16 pour P2.8 et Bits 19:18 pour P2.9. On les met à 00 pour le mode GPIO.
     LPC_PINCON->PINSEL4 &= ~((3 << 16) | (3 << 18)); 
     
-    // Configurer P2.8 et P2.9 en sorties
     LPC_GPIO2->FIODIR |= (LED_CONCERNED_PIN | LED_STATUS_PIN);
     
-    // Éteindre les LEDs par défaut au démarrage
     LPC_GPIO2->FIOCLR = (LED_CONCERNED_PIN | LED_STATUS_PIN); 
     
-    // 3. Interruption sur front montant de P0.20 (DV - Data Valid du HT9170D) 
     LPC_GPIOINT->IO0IntEnR |= (1 << 20);
     NVIC_EnableIRQ(EINT3_IRQn);
 }

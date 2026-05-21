@@ -184,7 +184,6 @@ void TIM0_IRQHandler() {
 		}
 		
 		state = (state + 1) % 5;
-	}
 	
 
 }
