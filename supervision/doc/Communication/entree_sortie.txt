@@ -1,3 +1,5 @@
+// Ce fichier décrit le type et le format des messages en provenance de la centrale et ceux devant être formé par l'application à destination de la centrale
+
 Le logiciel de supervision fait l'interface entre un opérateur humain et une centrale de contrôle numérique.
 La supervision communique avec la centrale via une liaison série.
 
@@ -11,7 +13,7 @@ Quatre types de messages sont possibles :
             - S est un caractère parmis les lettres "L", "E", "C" et "D" et code le status du robot.
         
         - Message de type 2 : Ordre de mission venant d'un poste
-            - Format : chaine de caractère "PxxLPyy0x"
+            - Format : chaine de caractère "PxxLPyy"
             - Pxx est le numéro du poste expediteur ("P" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - L represente un caractère parmis les lettres "A", "B", "C" et "D" et code le code livreur
             - Pyy est le numéro du poste expediteur ("P" est un caractère et y represente un des caractères des nombres de 0 à 9)

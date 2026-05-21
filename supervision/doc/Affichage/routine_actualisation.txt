@@ -1,1 +1,5 @@
+// Ce fichier décrit l'algorithme d'actualisation et d'animation de l'interface
+
 L'interface graphique doit s'actualiser au moins toutes les secondes.
+
+Animation erreur selection : La case attribution de la ligne numero_mission_select du tableau du sous-écran 2 clignote trois fois brièvement en rouge avant de revenir à sa couleur initiale.
