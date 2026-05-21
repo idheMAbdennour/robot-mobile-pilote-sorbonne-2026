@@ -1,0 +1,6 @@
+// Ce fichier décrit la structure du fichier de configuration de l'application de supervision
+
+Le fichier config.txt contient trois lignes de texte :
+- La première ligne contient un nombre entier : c'est le nombre de robots
+- La deuxième ligne contient un nombre entier : c'est le nombre de poste dans la branche nord
+- la deuxième ligne contient un nombre entier : c'est le nombre de poste dans la branche sud

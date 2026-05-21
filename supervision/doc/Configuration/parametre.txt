@@ -1,0 +1,17 @@
+// Ce fichier décrit les paramètres initialisés par le fichier config.txt
+
+- Le nombre de robots :
+    - Point de vue logique :
+        - Déclarer le tableau d'instance de la classe Robot à la bonne taille.
+        - Instancier autant de robot de la classe Robot que nécessaire pour initialiser ce tableau.
+    - Point de vue graphique : 
+        - Determiner les dimensions de la matrice de robots du sous-écran 3
+
+- Le nombre de postes branche nord et poste sud:
+    - Point de vue logique :   
+        - Déclarer le tableau d'instance de la classe Poste à la bonne taille.
+        - Instancier autant de robot de la classe Poste que nécessaire pour initialiser ce tableau.
+    - Point de vue graphique :
+        - Determiner le nombre de poste à dessiner sur chaque branche du circuit
+        - Puis determiner l'espacement entre chaque poste pour chaque branche 
+  
