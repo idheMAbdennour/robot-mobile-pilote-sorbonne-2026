@@ -401,14 +401,14 @@
               <FilePath>.\src\status.h</FilePath>
             </File>
             <File>
-              <FileName>dtmf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\dtmf.h</FilePath>
-            </File>
-            <File>
               <FileName>dtmf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\dtmf.c</FilePath>
+              <FilePath>.\src\dtmf.c</FilePath>
+            </File>
+            <File>
+              <FileName>dtmf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\dtmf.h</FilePath>
             </File>
           </Files>
         </Group>
