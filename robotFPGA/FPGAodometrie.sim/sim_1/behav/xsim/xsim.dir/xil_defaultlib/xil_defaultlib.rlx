@@ -1,0 +1,7 @@
+0.7
+2020.2
+Oct 13 2023
+20:47:58
+C:/Users/21302088/Downloads/FPGAodometrie/FPGAodometrie.srcs/sim_1/new/testSPI.vhd,1779435653,vhdl,,,,testspi,,,,,,,,
+C:/Users/21302088/Downloads/FPGAodometrie/FPGAodometrie.srcs/sources_1/new/SPI.vhd,1779435131,vhdl,C:/Users/21302088/Downloads/FPGAodometrie/FPGAodometrie.srcs/sim_1/new/testSPI.vhd,,,spi,,,,,,,,
+C:/Users/21302088/Downloads/FPGAodometrie/FPGAodometrie.srcs/sources_1/new/Timer50foisParSec.vhd,1779375604,vhdl,C:/Users/21302088/Downloads/FPGAodometrie/FPGAodometrie.srcs/sources_1/new/SPI.vhd,,,timer50foisparsec,,,,,,,,
