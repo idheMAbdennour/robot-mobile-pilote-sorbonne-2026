@@ -1,0 +1,31 @@
+// Ce fichier décrit la routine d'initialisation de l'application de supervision
+
+Au démarrage de l'application  :
+
+Routine d'initialisation 1 (logique):
+    Etape 1 : l'application ouvre le fichier dont le chemin est : "/data/idhem/Documents/Sorbonne/L3/robot-mobile-pilote-sorbonne-2026/supervision/bin/config.txt"
+    Etape 2 : l'application parse le contenu de ce fichier :
+        - Le nombre écrit dans la première ligne est stocké dans la variable globales nb_robot
+        - Le nombre écrit dans la deuxième ligne est stocké dans la variable globales nb_poste_nord
+        - Le nombre écrit dans la troisième ligne est stocké dans la variable globales nb_poste_sud
+    Etape 3 : l'application ferme le fichier config.txt
+    Etape 4 : la variable globale nb_poste est initialisée à la valeur de nb_poste_nord + nb_poste_sud    
+    Etape 5 : Déclaration du tableau d'instance de la classe Robot de taille nb_robot et instanciation de nb_robot de la classe Robot pour initialiser ce tableau.     
+    Etape 6 : Déclaration du tableau d'instance de la classe Poste de taille nb_poste et instanciation de nb_poste de la classe Poste pour initialiser ce tableau.
+    Etape 7 : Déclarer et initialiser la liste fifo_messages
+
+Routine d'initialisation 2 (graphique):
+    Etape 1 : Dessiner le circuit dans le premier sous-écran :
+        - Placer les poste en fonction du nombre de postes dans chaque branche grâce à nb_poste_nord et nb_poste_sud 
+        - La branche nord est celle desinée à droite du Y
+        - La branche sud est celle dessinée à gauche du Y 
+        - Les postes doivent être répartie le long d'une branche à intervalle régulier.
+        - Chaque poste possède une flèche verte.
+    Etape 2 : Dessiner la matrice du troisième sous-écran :
+        - Découper en autant de ligne et colonne que nécessaire en gardant la taille de chaque case cliquable individuellement sur un écran de 14 pouces de diagonale.
+        - Le bas de la matrice doit être proche du bas de l'écran afin de laisser de la place au dessus de ce sous-écran, pour le tableau dynamique
+        - Si le nombre de robots est impair, laisser le coin inférieur droit vide
+    Etape 3 : Dessiner le tableau dynamique du deuxième sous-écran :
+        - Dans l'espace restant au millieu de l'écran dessiner autant de ligne que possible. Ce nombre de ligne dessinée est rangé dans la variable taille_tab_mission
+        - Mettre en place les élements nécessaire pour que le tableau devienne éventuellement scrollable
+         

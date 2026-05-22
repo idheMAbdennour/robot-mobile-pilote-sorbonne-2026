@@ -32,7 +32,8 @@ Ce sous-écran représente un circuit en forme de 8 allongé (signe infini). Pou
     - Du coté intérieur du rectangle de boucle
     - Peut être alternativement visible et invisible
     - A deux orientation possible :
-        - orienté suivant le circuit de l'extremité haute du Y vers son extremité basse.
+        - orienté suivant le circuit de l'extremité haute du Y vers son extremité basse (flèche de déplacement).
+        - orienté perpendiculairement au circuit, pointe vers un poste (flèche de parking).
 
 Le Y doit être contenue comme entre parenthèse par les boucles, comme celà : [Y]
 
@@ -70,6 +71,7 @@ Ce sous-écran représente un tableau dynamique (le nombre de ligne est variable
     - un point d'interrogation noir.
 Le contour exterieur du tableau est épais, la séparation entre la première et la deuxième ligne est épaisse, les séparations entres les colonnes sont épaisses, les séparations entre les lignes sont fines.
 
+A l'initialisation, ce tableau remplira l'espace disponible dans son sous-écran, et aura donc un certain nombre de ligne finie
 ----
 
 Sous-écran 3 : "LISTE ROBOT" :

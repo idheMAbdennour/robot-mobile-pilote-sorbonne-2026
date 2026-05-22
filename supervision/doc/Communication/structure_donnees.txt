@@ -10,7 +10,9 @@ Les autres variables globales de l'application sont :
 - Le numéro du robot associé à la mission selectionnée dans le tableau du sous-écran 2 : int num_robot_select;
 - Le nombre de poste : int nb_poste;
 - Le numéro du dernier poste de la branche nord (103 - 105) : int id_last_poste_nord;
-- le numéro du dernier poste de la branche sud (102 - 104) : int id_last_poste_sud;
+- Le numéro du dernier poste de la branche sud (102 - 104) : int id_last_poste_sud;
+- La taille en nombre de ligne du tableau dynamique affiché dans sous-écran 2 : int taille_tab_mission;
+- Le nombre de mission actuellement dans la liste.
 
 Le programme de supervision conserve dans des classes un certain nombre de données qu'il extrait des messages reçue par la liaison série, en provenance de la centrale. 
 
