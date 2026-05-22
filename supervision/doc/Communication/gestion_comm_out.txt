@@ -1,0 +1,18 @@
+// Ce fichier décrit la gestion des messages sortant
+
+L'application doit envoyer des messages sur une liaison série en direction d'un port USB de l'ordinateur suivant le protocole UART
+
+Routine d'envoi de message 1 :
+    - On envoie un message de type 3
+    - "R" suivi de la valeur de listeMission[num_mission_select].id_livreur;
+    - "P" suivi de la valeur de listeMission[num_mission_select].p_depart;
+    - "P" suivi de la valeur de listeMission[num_mission_select].p_arrive;
+    - On ajoute les caractères 0x0A et 0x0D à la fin
+    - Le message est envoyé sur la liaison série
+
+Routine d'envoi de message 2 :
+    - On envoie un message de type 4
+    - "R" suivi de la valeur de listeRobot[num_robot_select].id_robot;
+    - "V" suivi de la valeur de listeMission[num_robot_select].vitesse;
+    - On ajoute les caractères 0x0A et 0x0D à la fin
+    - Le message est envoyé sur la liaison série

@@ -8,6 +8,7 @@ Routine d'interaction 1 :
             - Si le robot cliqué a sa variable dispo égale à True, alors : 
                 - Sa variable dispo devient False
                 - Sa variable id_robot est stocké dans listeMission[num_mission_select].id_livreur
+                - La routine d'envoi de message 1 est lancée.
             - Sinon on sort de la routine d'interaction 1 en déclanchant l'animation erreur selection.
         - Si l'utilisateur clique sur une autre case d'attribution, on retourne à l'étape 2 de la routine d'interaction 1 avec la nouvelle case.
         - Si l'utilisateur clique ailleurs sur l'écran, alors la case attribution reprend son aspect original et on sort de la routine d'interaction 1.
@@ -19,3 +20,4 @@ Routine d'interaction 2 :
     Etape 4 - La liste se déroule et présente les items "20%", "40%", "60%" et "80%" en noir dans cet ordre de haut en bas
     Etape 5 - L'utilisateur selectionne la valeur souhaitée
     Etape 6 - La variable listeRobot[num_robot_select].vitesse prend la valeur selectionnée
+    Etape 7 - La routine d'envoi de message 2 est lancée.

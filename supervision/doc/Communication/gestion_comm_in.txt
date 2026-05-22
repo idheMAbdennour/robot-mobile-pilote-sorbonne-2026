@@ -1,0 +1,20 @@
+// Ce fichier décrit la gestion des message entrant
+
+L'application doit lire des messages sur une liaison série en provenance d'un port USB de l'ordinateur suivant le protocole UART
+
+Routine de lecture de message :
+    - Les messages reçues sont stockés dans la liste FIFO fifo_message.
+    - Les messages entrants sont de type 1 et 2. L'application parse les messages et detecte les informations transmises :
+        - Type 1 : numero_poste, numero_robot, new_vitesse, new_status
+        - Type 2 : numero_poste_expediteur, code_livreur, numero_poste_destinataire
+    - Les structures de données correspondantes sont mise à jour :
+        - Type 1 : Mettre à jour le robot correspondant dans listeRobot :
+            - listeRobot[numero_robot].id_last_poste = numero_poste;
+            - listeRobot[numero_robot].vitesse = new_vitesse;
+            - listeRobot[numero_robot].status = new_status;
+        - Type 2 : Créer et initialiser une nouvelle mission dans listeMission :
+            - new_mission.p_depart = numero_poste_expediteur;
+            - new_mission.p_arrive = numero_poste_destinataire;
+            - new_mission.code_livreur = code_livreur;
+            - new_mission.id_livreur = NULL; 
+            

@@ -40,11 +40,12 @@ Classe MISSION:
     - Une mission a un poste de départ désigné par son id : int p_depart; 
     - Une mission a un poste d'arrivé désigné par son id : int p_arrive;
     - Une mission a un robot livreur attribué désigné par son id : int id_livreur;  
+    - Une mission a un code livreur : int code_livreur;
 
 ----
 
 L'application de supervision garde en mémoire l'ensemble des postes et robots existant dans le système tel que spécifié dans le fichier de configuration :
-- Chaque robot du système est une instance de la classe ROBOT. Ils sont stockées dans un tableau de ROBOT dont la taille est nb_robot : Robot[] listeRobot;
-- Chaque poste du système est une instance de la classe POSTE. Ils sont stockées dans un tableau de POSTE dont la taille est nb_poste : Poste[] listePoste;
+- Chaque robot du système est une instance de la classe ROBOT. Ils sont stockées dans un tableau de ROBOT à l'indice id_robot dont la taille est nb_robot : Robot[] listeRobot;
+- Chaque poste du système est une instance de la classe POSTE. Ils sont stockées dans un tableau de POSTE à l'indice id_poste dont la taille est nb_poste : Poste[] listePoste;
 
 Chaque mission reçus via un message est une instance de la classe MISSION. Elles sont stockés dans un tableau dynamique de MISSION : Mission[] listeMission;. 

@@ -71,7 +71,10 @@ Ce sous-écran représente un tableau dynamique (le nombre de ligne est variable
     - un point d'interrogation noir.
 Le contour exterieur du tableau est épais, la séparation entre la première et la deuxième ligne est épaisse, les séparations entres les colonnes sont épaisses, les séparations entre les lignes sont fines.
 
-A l'initialisation, ce tableau remplira l'espace disponible dans son sous-écran, et aura donc un certain nombre de ligne finie
+A l'initialisation, ce tableau remplira l'espace disponible dans son sous-écran, et aura donc un certain nombre de ligne : 
+    - Si le nombre de mission est inférieure à ce nombre de ligne alors les cases des lignes vides restent blanche
+    - Si le nombre de mission est supérieure à ce nombre de ligne alors le tableau devra être scrollable
+
 ----
 
 Sous-écran 3 : "LISTE ROBOT" :

@@ -11,19 +11,21 @@ Quatre types de messages sont possibles :
             - Rxx est un numero de robot ("R" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - V est un char (8 bits) valant entre 0x00 et 0x0F et code la vitesse du robot
             - S est un caractère parmis les lettres "L", "E", "C" et "D" et code le status du robot.
+            - Taille totale : 8 char (64 bits)
         
         - Message de type 2 : Ordre de mission venant d'un poste
             - Format : chaine de caractère "PxxLPyy"
             - Pxx est le numéro du poste expediteur ("P" est un caractère et x represente un des caractères des nombres de 0 à 9)
             - L represente un caractère parmis les lettres "A", "B", "C" et "D" et code le code livreur
-            - Pyy est le numéro du poste expediteur ("P" est un caractère et y represente un des caractères des nombres de 0 à 9)
+            - Pyy est le numéro du poste destinataire("P" est un caractère et y represente un des caractères des nombres de 0 à 9)
+            - Taille totale : 7 char (56 bits)
     
     - Sortie :
         - Message de type 3 : Attribution de mission
             - Format : chaine de caractère "RnnPxxPyy"
             - Rnn est un numero de robot ("R" est un caractère et n represente un des caractères des nombres de 0 à 9)
             - Pxx est le numéro du poste expediteur ("P" est un caractère et x represente un des caractères des nombres de 0 à 9)
-            - Pyy est le numéro du poste expediteur ("P" est un caractère et y represente un des caractères des nombres de 0 à 9)
+            - Pyy est le numéro du poste destinataire ("P" est un caractère et y represente un des caractères des nombres de 0 à 9)
         
         - Message de type 4 : Ordre de vitesse
             - Format : chaine de caractère "RxxVyy"
