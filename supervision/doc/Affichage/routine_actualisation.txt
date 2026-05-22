@@ -2,4 +2,32 @@
 
 L'interface graphique doit s'actualiser au moins toutes les secondes.
 
+Routine actualisation : 
+    - Après réception d'un message :
+        - Si message de type 1 alors:
+            - Mettre à jour l'emplacement du robot correspondant sur le circuit du sous-écran 1 selon sa variable id_last_poste :
+                - Si id_last_poste correspond à id_last_poste_nord ou id_last_poste_sud, alors le robot est dessiné le long du Y du coté de son id_last_poste
+                - Sinon, si gare est True, alors le robot est dessinée en possition garé à son id_last_poste
+                - Sinon, le robot est dessiné sur le circuit entre son id_laste_poste et le suivant, dans un ordre logique avec les autres robots dessinés sur cette section
+            - Mettre à jour la couleur de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable status
+            - Mettre à jour le nombre de barre de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable vitesse
+            - Mettre à jour la flèche correspondant au id_last_poste :
+                - Si gare est True, en orientation garé (pointant vers le poste depuis l'interieur du circuit)
+                - Sinon, pointant le poste suivant
+            - Après une seconde, la flèche disparait
+            - Mettre à jour les cases de la ligne de ce robot dans le tableau du sous-écran 2 :
+                - Colonne Status : changer la lettre de cette case avec celle correspondant a sa variable status
+                - Colonne Vitesse : changer la valeur affichée avec celle de sa variable vitesse.
+            - Si sa variable dispo est False, mettre sa case dans la matrice du sous-écran 3 en couleur rouge et remplacer son numéro robot dans la case par la chaine "----"
+            - Si sa variable dispo est True, mettre sa case dans la matrice du sous-écran 3 en couleur verte et remplacer la chaine "----" dans la case par son numéro robot
+        - Si message de type 2 alors :
+            - Mettre à jour le tableau dynamique du sous-écran 2 avec la nouvelle mission.
+    
+    - Après routine d'interaction 1 qui débouche sur l'envoi d'un message :
+        - Mise à jour du tableau de mission du sous-écran 2
+
 Animation erreur selection : La case attribution de la ligne numero_mission_select du tableau du sous-écran 2 clignote trois fois brièvement en rouge avant de revenir à sa couleur initiale.
+
+Si un robot n'est pas signalé par un message pendant plus de 2 minutes :
+    - il disparait du circuit du sous-écran 1
+    - sa case dans la matrice de robot du sous-écran 3 devient rouge mais conserve son numéro de robot. 
