@@ -1,0 +1,134 @@
+--> composant_graphique.txt
+// Ce fichier décrit l'apparence visuel de l'interface graphique de l'application de supervision 
+
+Ecran géneral :
+
+L'écran de supervision 1080x1920 est composé de 3 sous-écrans.
+Chaque sous-écran sera identifié par un onglet attaché au coin supérieur gauche (ses cotés gauche et supérieur sont collé aux bord correspondant du sous-écran):
+- Rectangle gris 50%
+- Contour orange 
+- Texte blanc :
+    - Premier écran (en haut) : "VUE DU SYSTEME"
+    - Deuxième écran (au millieu) : "GESTIONNAIRE DE MISSION"
+    - Troisième écran (en bas) : "LISTE ROBOTS"
+
+Les écrans sont séparé par une ligne noir qui prolonge le contour orange supérieur de l'onglet de l'écran inférieur à la ligne noir.
+
+----
+
+Sous-écran 1 : "VUE DU SYSTEME" :
+
+Ce sous-écran représente un circuit en forme de 8 allongé (signe infini). Pour des raisons d'ergonomie, ce 8 allongé est stylisé comme suit :
+- La partie centrale du 8 est représentée par une forme en Y orange
+- De chaque coté du Y orange, les boucles du 8 allongé sont representées par une ligne noire en forme de rectangle privés de leur cotés adjacent au Y (en forme de paranthèse, [ à gauche du Y, et ] à sa droite). Leur coins sont legerement arrondies. 
+- Sur chaque boucles, des traits perpendiculaires à la ligne, régulièrement espacés tout le long du trait noir. Il represente des "postes". Il se trouvent aussi bien sur les portions verticales qu'horizontales de chaque cotés. Dans le cas où ce trait doit être dessiné dans un coin d'une boucle, il sera dessiné à + ou - 45°.
+- Au dessus de chaque postes (traits) il y a un label noir de la forme PNN avec NN le numéro du poste (de 01 à 99). Ce label est du coté exterieur du rectangle de boucle, toujours écrit dans l'orientation normal du texte.
+- Au dessous de chaque postes (traits) il y a une flèche verte :
+    - Avec un contour noir. 
+    - Un peu épaisse pour être visible 
+    - Du coté intérieur du rectangle de boucle
+    - Peut être alternativement visible et invisible. Elles sont invisible au démarrage de l'application.
+    - A deux orientation possible :
+        - orienté suivant le circuit de l'extremité haute du Y vers son extremité basse (flèche de déplacement).
+        - orienté perpendiculairement au circuit, pointe vers un poste (flèche de parking).
+
+Le Y doit être contenue comme entre parenthèse par les boucles.
+
+Sur ce circuit, il y a plusieurs élements mobiles representant les "robots" roulant le long du trait noir de chaque coté du Y, comme des trains sur des rails:
+- Un robot est un rectangle au contour noir sur fond blanc.
+- Il contient une jauge composée de 5 barres representant sa vitesse et son status: 
+    - 1 barre = 20%, 2 barres = 40%, 3 barres = 60% 4 barres = 80%, 5 barres = 100%, la jauge se remplit de gauche à droite. 
+    - Les barres de la jauge sont toute de la même couleurs. Il y a 4 couleurs possible : VERT, ROUGE, BLEU, FUSCHIA.
+- A coté de chaque rectangle se trouve un label orange de la forme RNN avec NN le numéro du robot (de 01 à 99). Ce label est du coté exterieur du rectangle de boucle, toujours écrit dans l'orientation normal du texte.
+
+Les robots ont trois emplacements possibles :
+- Sur le circuit, entre deux traits de postes, long coté perpendiculaire au circuit. Dans ce cas, le robot n'est jamais superposé a un trait de poste 
+- En dehors du circuit, coté exterieur, long coté perpendiculaire au circuit à coté d'un trait de poste (ne peut se superposer à un label de poste)
+- Aligné de chaque coté du Y orange, orienté à l'horizontale.
+
+Au démarrage aucun robot n'est dessiné, ils sont rajouté au fur et à mesures que leur position est detecté dans un message entrant.
+
+La longueur d'un trait de poste est égale à la longueur du coté long du rectangle d'un robot.
+
+----
+
+Sous-écran 2 : "GESTIONNAIRE DE MISSION" :
+
+Ce sous-écran représente un tableau dynamique (le nombre de ligne est variable) à 5 colonnes :
+- La première ligne contient les noms de colonnes sur fond gris 25%.
+- Première colonne "Trajet" : chaque case contient une chaine de caractère de la forme "PXX --> PYY" avec XX et YY des numéros de postes.
+- Deuxième colonne "Robot" : chaque case contient soit :
+    - une chaine de caractère de la forme "NN" avec NN un numéro de robot
+    - un point d'interrogation bleu gras. Dans ce cas la case a un contour gras et bleu. Une telle case peut être cliqué, dans cet état elle est sur fond bleu opaque à 75%.
+- Troisième colonne "Code Livreur" : chaque case contient un caractère : "A", "B", "C" ou "D" en noir
+- Quatrième colonne "Status" : chaque case contient soit :
+    - un caractère en gras: "L" en vert, "E" en rouge, "C" en fuschia, "D" en bleu.
+    - un point d'interrogation noir.
+- Cinquième colonne "Vitesse" : chaque case contient soit :
+    - une liste déroulante avec les items "20%", "40%", "60%" et "80%" en noir dans cet ordre de haut en bas si la liste est déroulée, la valeur actuelle sinon
+    - un point d'interrogation noir.
+Le contour exterieur du tableau est épais, la séparation entre la première et la deuxième ligne est épaisse, les séparations entres les colonnes sont épaisses, les séparations entre les lignes sont fines.
+
+A l'initialisation, ce tableau remplira l'espace disponible dans son sous-écran, et aura donc un certain nombre de ligne : 
+    - Si le nombre de mission est inférieure à ce nombre de ligne alors les cases des lignes vides restent blanche
+    - Si le nombre de mission est supérieure à ce nombre de ligne alors le tableau devra être scrollable
+
+Le textes des nom de colonnes (première ligne) sont écrit en gras.
+Les chaines de caractères dans la première colonne doivent toutes avoir la même taille de police.
+
+----
+
+Sous-écran 3 : "LISTE ROBOT" :
+
+Ce dernier sous-écran contient un tableau où chaque case represente l'état d'un robot:
+- Chaque case contient soit :
+    - une chaine de caractère noir de la forme "RNN" avec NN un numéro de robot (de 01 à 99)
+    - la chaine de caractère noir "----"
+- Chaque case est soit sur fond vert, soit sur fond rouge, et opaque à 50%.
+
+----
+
+Dans chaque sous-écran les elements doivent prendre toute la place disponible en largeur en gardant un espace sur le bord.
+La taille du circuit doit être suffisante pour que tout les élements qu'il contient soit visible. Ce sous-écran est dessiné en partant du haut de l'écran.
+La hauteur du troisième sous-écran dépend du nombre de robot du système. Nombre de robot max = 99. Ce sous-écran est dessiné en partant du bas de l'écran.
+La hauteur du deuxième sous-écran doit être suffisante pour contenir le tableau dynamique qui peut changer de taille. Ce sous-écran est dessiné dans l'espace restant.
+
+--> routine_actualisation.txt
+// Ce fichier décrit l'algorithme d'actualisation et d'animation de l'interface
+
+Routine actualisation : 
+    - Après réception d'un message :
+        - Si message de type 1 alors:
+            - Mettre à jour l'emplacement du robot correspondant sur le circuit du sous-écran 1 selon sa variable id_last_poste :
+                - Si id_last_poste correspond à id_last_poste_nord ou id_last_poste_sud, alors le robot est dessiné juste à coté du Y du coté de son id_last_poste
+                - Sinon, si gare est True, alors le robot est dessinée en possition garé à son id_last_poste
+                - Sinon, le robot est dessiné sur le circuit entre son id_laste_poste et le suivant, dans un ordre logique avec les autres robots dessinés sur cette section
+            - Mettre à jour la couleur de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable status
+            - Mettre à jour le nombre de barre de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable vitesse :
+                - Cette variable peut prendre les valeurs entières entre 0x0 ( 0 à l'arrêt) et 0xF ( 15, maximale) :
+                    - Si sa vitesse vaut 0, afficher 0 barre (0%)
+                    - Si sa vitesse vaut 1, 2 ou 3, afficher 1 barre (20%)
+                    - Si sa vitesse vaut 4, 5 ou 6, afficher 2 barres (40%)
+                    - Si sa vitesse vaut 7, 8 ou 9, afficher 3 barres (60%)
+                    - Si sa vitesse vaut 10, 11 ou 12, afficher 4 barres (80%)
+                    - Si sa vitesse vaut 13, 14 ou 15, afficher 5 barres  (100%)
+            - Mettre à jour la flèche correspondant au id_last_poste :
+                - Si gare est True, en orientation garé (pointant vers le poste depuis l'interieur du circuit)
+                - Sinon, pointant le poste suivant
+            - Après une seconde, la flèche disparait
+            - Mettre à jour les cases de la ligne de ce robot dans le tableau du sous-écran 2 :
+                - Colonne Status : changer la lettre de cette case avec celle correspondant a sa variable status
+                - Colonne Vitesse : changer la valeur affichée avec celle de sa variable vitesse.
+            - Si sa variable dispo est False, mettre sa case dans la matrice du sous-écran 3 en couleur rouge et remplacer son numéro robot dans la case par la chaine "----"
+            - Si sa variable dispo est True, mettre sa case dans la matrice du sous-écran 3 en couleur verte et remplacer la chaine "----" dans la case par son numéro robot
+        - Si message de type 2 alors :
+            - Mettre à jour le tableau dynamique du sous-écran 2 avec la nouvelle mission.
+    
+    - Après routine d'interaction 1 qui débouche sur l'envoi d'un message :
+        - Mise à jour du tableau de mission du sous-écran 2
+
+Animation erreur selection : La case attribution de la ligne numero_mission_select du tableau du sous-écran 2 clignote trois fois brièvement en rouge avant de revenir à sa couleur initiale.
+
+Si un robot n'est pas signalé par un message pendant plus de 2 minutes :
+    - il disparait du circuit du sous-écran 1
+    - sa case dans la matrice de robot du sous-écran 3 devient rouge mais conserve son numéro de robot. 

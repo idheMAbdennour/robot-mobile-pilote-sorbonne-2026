@@ -1,0 +1,34 @@
+--> user_input.txt
+// Ce fichier décrit les elements interactifs de l'interface de l'application de supervision
+
+L'opérateur peut intéragir avec trois elements de l'interface graphique :
+    - Les cases au contour bleu contenant un point d'interrogation dans la colonne "Robot" du sous-écran 2 "GESTIONNAIRE DE MISSION" : Case attribution. (Les cases de cette colonne contenant un numero NE SONT PAS CLIQUABLE)
+    - Les cases contenant une liste déroulante de la colonne "Status" du sous-écran 2 "GESTIONNAIRE DE MISSION" : Case vitesse. (Les cases de cette colonne contenant un point d'interrogation NE SONT PAS CLIQUABLE)
+    - Les cases de la matrice de robots du sous-écran 3 "LISTE ROBOTS" : Case robot.
+
+Ces cases sont des élements clickable.
+
+--> routine.txt
+// Ce fichier décrit l'algorithme d'interaction homme/interface
+
+Routine d'interaction 1 :
+    Etape 1 - L'utilisateur clique sur une case attribution (point d'interrogation bleu)
+    Etape 2 - L'application le detecte et range le numéro de la ligne de cette case du tableau du sous-écran 2 dans num_mission_select. 
+    Etape 3 - L'application scrute la prochaine action de l'utilisateur :
+        - Si l'utilisateur clique sur une case robot du sous-écran 3 alors :
+            - Si le robot cliqué a sa variable dispo égale à True, alors : 
+                - Sa variable dispo devient False
+                - Sa variable id_robot est stocké dans listeMission[num_mission_select].id_livreur
+                - La routine d'envoi de message 1 est lancée.
+            - Sinon on sort de la routine d'interaction 1 en déclanchant l'animation erreur selection.
+        - Si l'utilisateur clique sur une autre case d'attribution, on retourne à l'étape 2 de la routine d'interaction 1 avec la nouvelle case.
+        - Si l'utilisateur clique ailleurs sur l'écran, alors la case attribution reprend son aspect original et on sort de la routine d'interaction 1.
+
+Routine d'interaction 2 : 
+    Etape 1 - L'utilisateur clique sur une case vitesse (liste déroulante)
+    Etape 2 - L'application le detecte et range le numéro de la ligne de cette case du tableau du sous-écran 2 dans num_mission_select. 
+    Etape 3 - num_robot_select prend la valeur listeMission[num_mission_select].id_livreur
+    Etape 4 - La liste se déroule et présente les items "20%", "40%", "60%" et "80%" en noir dans cet ordre de haut en bas
+    Etape 5 - L'utilisateur selectionne la valeur souhaitée
+    Etape 6 - La variable listeRobot[num_robot_select].vitesse prend la valeur selectionnée
+    Etape 7 - La routine d'envoi de message 2 est lancée.
