@@ -6,6 +6,8 @@ volatile uint8_t seq_index = 0;
 volatile uint8_t seq_length = 0;
 volatile uint8_t frame_counter = 0;
 
+uint16_t payload;
+
 // Fonction pour préparer la séquence d'enveloppe IR
 void preparer_trame(uint8_t id, uint8_t vitesse, uint8_t status) {
     // Sécurité: sortie anticipée si les valeurs dépassent 4 bits (> 15)
@@ -18,7 +20,7 @@ void preparer_trame(uint8_t id, uint8_t vitesse, uint8_t status) {
     uint8_t checksum = ((~somme) + 1) & 0x0F;
 
     // Payload concaténé sur 16 bits
-    uint16_t payload = (id << 12) | (vitesse << 8) | (status << 4) | checksum;
+    payload = (id << 12) | (vitesse << 8) | (status << 4) | checksum;
 
     uint8_t idx = 0;
 
