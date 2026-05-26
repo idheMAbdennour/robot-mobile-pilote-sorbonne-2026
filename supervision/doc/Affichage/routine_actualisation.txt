@@ -10,7 +10,14 @@ Routine actualisation :
                 - Sinon, si gare est True, alors le robot est dessinée en possition garé à son id_last_poste
                 - Sinon, le robot est dessiné sur le circuit entre son id_laste_poste et le suivant, dans un ordre logique avec les autres robots dessinés sur cette section
             - Mettre à jour la couleur de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable status
-            - Mettre à jour le nombre de barre de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable vitesse
+            - Mettre à jour le nombre de barre de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable vitesse :
+                - Cette variable peut prendre les valeurs entières entre 0x0 ( 0 à l'arrêt) et 0xF ( 15, maximale) :
+                    - Si sa vitesse vaut 0, afficher 0 barre (0%)
+                    - Si sa vitesse vaut 1, 2 ou 3, afficher 1 barre (20%)
+                    - Si sa vitesse vaut 4, 5 ou 6, afficher 2 barres (40%)
+                    - Si sa vitesse vaut 7, 8 ou 9, afficher 3 barres (60%)
+                    - Si sa vitesse vaut 10, 11 ou 12, afficher 4 barres (80%)
+                    - Si sa vitesse vaut 13, 14 ou 15, afficher 5 barres  (100%)
             - Mettre à jour la flèche correspondant au id_last_poste :
                 - Si gare est True, en orientation garé (pointant vers le poste depuis l'interieur du circuit)
                 - Sinon, pointant le poste suivant
