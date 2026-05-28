@@ -38,13 +38,24 @@ void init_uart0(void)
 
 void uart0_send_string(const char *str)
 {
+    // Configure P0.0 as GPIO output for a debug toggle (non-intrusive)
+    LPC_PINCON->PINSEL0 &= ~(3 << 0); // P0.0 function = GPIO
+    LPC_GPIO0->FIODIR |= (1 << 0);
+
     while (*str)
     {
         // Attendre que le registre de transmission soit vide (Flag THRE)
         while (!(LPC_UART0->LSR & 0x20));
 
+        // Toggle P0.0 high to indicate a byte transmit start
+        LPC_GPIO0->FIOSET = (1 << 0);
+
         // Transmettre le caractère
         LPC_UART0->THR = *str++;
+
+        // Small software delay (couple cycles) then clear the toggle
+        for (volatile int i = 0; i < 50; ++i) { __NOP(); }
+        LPC_GPIO0->FIOCLR = (1 << 0);
     }
 }
 
