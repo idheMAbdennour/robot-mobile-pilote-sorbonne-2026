@@ -20,13 +20,12 @@ int main() {
 	init_Timer_Enveloppe(250); // Lance le Timer 0 à 250us (un temps 't')
 
     // Initialisations UART et Debug
-    init_uart3();
+    init_uart0();
     init_microswitchs();
     init_capteur_inductif();
 
-    // Configuration SysTick pour 50Hz (Période = 20ms)
-    // CoreClock supposée à 100MHz (divisé par 50 pour avoir 20ms si ticks/s)
-    SysTick_Config(SystemCoreClock / 50);
+    // Configuration SysTick pour 100Hz (Période = 10ms)
+    SysTick_Config(SystemCoreClock / 100);
 
     // Initialisation forcée de l'état de debug pour les tests
     set_debug_uart_enabled(1);
@@ -54,19 +53,19 @@ int main() {
                     int32_t pg, pd;
                     get_motor_pwms(&pg, &pd);
                     sprintf(buffer, "G %d D %d\r\n", (int)pg, (int)pd);
-                    uart3_send_string(buffer);
+                    uart0_send_string(buffer);
                 }
                 else if (sw == 1) { // '01' : Vitesse moyenne
                     int32_t vmoy, wang;
                     get_motor_speeds(&vmoy, &wang);
                     sprintf(buffer, "V %dcm /s\r\n", (int)vmoy);
-                    uart3_send_string(buffer);
+                    uart0_send_string(buffer);
                 }
                 else if (sw == 0) { // '00' : Vitesse angulaire
                     int32_t vmoy, wang;
                     get_motor_speeds(&vmoy, &wang);
                     sprintf(buffer, "W %ddeg/s\r\n", (int)wang);
-                    uart3_send_string(buffer);
+                    uart0_send_string(buffer);
                 }
             }
         }
