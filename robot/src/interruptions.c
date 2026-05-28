@@ -5,6 +5,17 @@
 #include "capteurInductif.h"
 #include "emissionIR.h"
 #include "recepSPI.h"
+#include "microswitchs.h"
+
+extern volatile uint8_t flag_50hz;
+
+// ==============================================================================
+// GESTION DU SYSTICK - Utilisé pour cadence le main à 50Hz
+// ==============================================================================
+void SysTick_Handler(void) 
+{
+    flag_50hz = 1;
+}
 
 // ==============================================================================
 // GESTION DES INTERRUPTIONS EXTERNES PARTAGEES SUR LE PORT 0 ET PORT 2 (EINT3)
@@ -16,6 +27,9 @@ void EINT3_IRQHandler(void)
     
     // --- Routine Capteur Inductif (P0.27 et P0.28) ---
     capteurInductif_interrupt_routine();
+
+    // --- Routine Microswitchs (P0.29 et P0.30) ---
+    microswitchs_interrupt_routine();
 }
 
 // ==============================================================================
