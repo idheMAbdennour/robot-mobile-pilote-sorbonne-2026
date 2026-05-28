@@ -1,114 +1,75 @@
-----------------------------------------------------------------------------------
--- Company: ouais
--- Engineer: ouais
--- 
--- Create Date: 21.05.2026 15:48:48
--- Design Name: Alexandre
--- Module Name: SPI - Behavioral
--- Project Name: Projet L3 - Groupe Mehdi
--- Target Devices: FPGA
--- Tool Versions: ouais
--- Description: ouais
--- 
--- Dependencies: ouais
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.std_logic_unsigned.ALL;
 
 entity SPI is
 port ( 
-    clk100KHz: in std_logic; -- Aussi à sortir avec le xdc
-    cs: in std_logic_vector(3 downto 0);
-    MISO: out std_logic := '0';
-    Vg, Vd, Pg, Pd: in std_logic_vector(7 downto 0)
+    clk100, rst: in std_logic;
+    CS: in std_logic_vector(3 downto 0);
+    SCK: in std_logic;
+    MISO: out std_logic;
+    Vg, Vd: in std_logic_vector(27 downto 0);
+    Pg, Pd: in std_logic_vector(7 downto 0)
 );
 end SPI;
 
 architecture Behavioral of SPI is
-    signal resTimer: std_logic := '0';
-    signal toSendTimerRes: std_logic := '0';
-    
-    signal nbBitToSend: natural;
-    signal bitsToSend: std_logic_vector (64 downto 0) := (others => '0');
-    signal readPosBitToSend: natural;
-    signal writePosBitToSend: natural;
-    
-    signal misoTemp: std_logic := '0';
+    type state_t is (IDLE, START, SEND, STOP);
+    signal state: state_t := IDLE;
+
+    signal cs_reg: std_logic_vector(3 downto 0);
+    signal sck_reg, sck_reg_prec: std_logic;
+    signal sdo_reg: std_logic_vector (31 downto 0) := (others => '0');
+    signal bit_count: std_logic_vector (5 downto 0) := (others => '0');
 begin
-    -- Timer 50 fois par sec à '1'
-    timerDiv2000: entity work.Timer50foisParSec(Behavioral)
-        port map (clk50kHz => clk100KHz, res => resTimer);
-    
-    clkChanged: process (clk100KHz)
-        variable temp: natural;
-    begin
-        
-        if (rising_edge(clk100KHz)) then
-            misoTemp <= '0';
-            
-            -- Send message
-            if (not(nbBitToSend = 0)) then
-                nbBitToSend <= nbBitToSend - 1;
-                misoTemp <= bitsToSend(readPosBitToSend);
-                readPosBitToSend <= readPosBitToSend + 1;
-                 if (readPosBitToSend = 64) then
-                    readPosBitToSend <= 0;
+
+  process(clk100, rst) begin
+    if rst = '1' then
+        state <= IDLE;
+        cs_reg <= "1111";
+        sck_reg <= '0';
+        sck_reg_prec <= '0';
+        sdo_reg <= (others => '0');
+        bit_count <= (others => '0');
+    elsif rising_edge(clk100) then
+        cs_reg <= CS;
+        sck_reg_prec <= sck_reg;
+        sck_reg <= SCK;
+        case state is 
+            when IDLE => 
+                state <= START;
+                bit_count <= (others => '0');
+                case cs_reg is 
+                    when "1110" => sdo_reg <= "0000" & Vg;
+                    when "1101" => sdo_reg <= "0000" & Vd;
+                    when "1011" => sdo_reg <=  X"000000" & Pg;
+                    when "0111" => sdo_reg <=  X"000000" & Pd;
+                    when others => state <= IDLE;
+                end case;
+            when START =>
+                state <= SEND;
+                MISO <= sdo_reg(conv_integer(bit_count));
+                bit_count <= bit_count + 1;
+            when SEND =>
+                state <= SEND;
+                if CS = "1111" then
+                    state <= STOP;
                 end if;
-            end if;
-            
-            -- Nouvelle information -> informer le FPGA
-            if( resTimer = '1' or toSendTimerRes = '1') then
-                if (nbBitToSend = 0) then -- Envoie rien
-                    if ( cs = "0000" ) then -- Rien n'est demander
-                        misoTemp <= '1';
-                        toSendTimerRes <= '0';
+                -- Sample on rising edge on master end, will change when fall
+                if sck_reg = '0' and sck_reg_prec = '1' then
+                    if bit_count <= 31 then
+                        MISO <= sdo_reg(conv_integer(bit_count));
+                        bit_count <= bit_count + 1;
                     else
-                        toSendTimerRes <= '1';
+                        state <= STOP;
                     end if;
-                else
-                    toSendTimerRes <= '1';
                 end if;
-            end if;
-            
-            -- Le LPC fait une demande
-            if (cs(0) = '1') then
-                for i in 0 to 7 loop
-                    bitsToSend(writePosBitToSend + i) <= Vg(i);
-                end loop;
-            elsif (cs(1) = '1') then
-                for i in 0 to 7 loop
-                    bitsToSend(writePosBitToSend + i) <= Vd(i);
-                end loop;
-            elsif (cs(2) = '1') then
-                for i in 0 to 7 loop
-                    bitsToSend(writePosBitToSend + i) <= Pg(i);
-                end loop;
-            elsif (cs(3) = '1') then
-                for i in 0 to 7 loop
-                    bitsToSend(writePosBitToSend + i) <= Pd(i);
-                end loop;
-            end if;
-            
-            if (not(cs = 0)) then
-                writePosBitToSend <= writePosBitToSend + 8;
-                nbBitToSend <= nbBitToSend + 8;
-                if (writePosBitToSend = 56) then
-                    writePosBitToSend <= 0;
-                end if;
-            end if;
-            
-            miso <= misoTemp;
-        end if;
-        
-    end process;
-    
-    
+            when STOP =>
+                state <= IDLE;
+                MISO <= 'Z';
+        end case;
+    end if;
+  
+  end process;
 
 end Behavioral;

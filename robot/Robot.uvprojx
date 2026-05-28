@@ -410,6 +410,16 @@
               <FileType>5</FileType>
               <FilePath>.\src\dtmf.h</FilePath>
             </File>
+            <File>
+              <FileName>moteur.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\moteur.c</FilePath>
+            </File>
+            <File>
+              <FileName>moteur.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\moteur.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

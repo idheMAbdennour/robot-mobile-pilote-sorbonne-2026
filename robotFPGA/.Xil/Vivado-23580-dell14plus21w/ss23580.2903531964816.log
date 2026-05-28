@@ -1,0 +1,33 @@
+srcscan starts
+=============== Using vdb files for VHDL std libs ===========
+INFO: VHDL library search path for library "std" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/std" (VHDL-1505)
+INFO: VHDL library search path for library "synopsys" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/synopsys" (VHDL-1505)
+INFO: VHDL library search path for library "ieee" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/ieee" (VHDL-1505)
+INFO: VHDL library search path for library "unimacro" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/unimacro" (VHDL-1505)
+INFO: VHDL library search path for library "unisim" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/unisim" (VHDL-1505)
+INFO: VHDL library search path for library "vl" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/vl" (VHDL-1505)
+INFO: VHDL library search path for library "xpm" is now "C:/Xilinx/Vivado/2023.2/data/precomp_hsv/vhdl/xpm" (VHDL-1505)
+-- Analyzing VHDL file "C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/Timer50foisParSec.vhd" into library xil_defaultlib (VHDL-9003)
+INFO: analyzing entity 'timer50' (VHDL-1012)
+INFO: analyzing architecture 'Behavioral' of entity 'timer50' (VHDL-9006)
+-- Analyzing VHDL file "C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/SPI.vhd" into library xil_defaultlib (VHDL-9003)
+INFO: analyzing entity 'SPI' (VHDL-1012)
+INFO: analyzing architecture 'Behavioral' of entity 'spi' (VHDL-9006)
+-- Analyzing VHDL file "C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/imports/new/move.vhd" into library xil_defaultlib (VHDL-9003)
+-- Analyzing VHDL file "C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/odometre.vhd" into library xil_defaultlib (VHDL-9003)
+INFO: analyzing entity 'compteur_tour' (VHDL-1012)
+INFO: analyzing architecture 'Behavioral' of entity 'compteur_tour' (VHDL-9006)
+-- Analyzing VHDL file "C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/top.vhd" into library xil_defaultlib (VHDL-9003)
+INFO: analyzing entity 'top_compteur' (VHDL-1012)
+INFO: analyzing architecture 'Behavioral' of entity 'top_compteur' (VHDL-9006)
+Listing tops:
+VHDLTop: library:xil_defaultlib entity:spi arch:
+VHDLTop: library:xil_defaultlib entity:spi arch:
+VHDLTop: library:xil_defaultlib entity:top_compteur arch:
+VHDLTop: library:xil_defaultlib entity:top_compteur arch:
+END of tops
+C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/SPI.vhd(5): INFO: processing 'SPI_default(Behavioral)' (VHDL-1067)
+C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/Timer50foisParSec.vhd(5): INFO: processing 'timer50_default(Behavioral)' (VHDL-1067)
+C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/top.vhd(5): INFO: processing 'top_compteur_default(Behavioral)' (VHDL-1067)
+C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/odometre.vhd(5): INFO: processing 'compteur_tour_default(Behavioral)' (VHDL-1067)
+srcscan exits with return value 0

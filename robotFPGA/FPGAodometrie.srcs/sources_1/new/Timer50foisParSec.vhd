@@ -1,51 +1,36 @@
-----------------------------------------------------------------------------------
--- Company: ouais
--- Engineer: ouais
--- 
--- Create Date: 21.05.2026 15:48:48
--- Design Name: Alexandre
--- Module Name: div 2000 clk - Behavioral
--- Project Name: Projet L3 - Groupe Mehdi
--- Target Devices: FPGA
--- Tool Versions: ouais
--- Description: ouais
--- 
--- Dependencies: ouais
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.std_logic_unsigned.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity Timer50foisParSec is
-Port (  clk50kHz: in std_logic;
-        res: out std_logic
- );
-end Timer50foisParSec;
+entity timer50 is
+    Port ( 
+        clk100, rst: in  std_logic;
+        top50: out std_logic
+    );
+end timer50;
 
-architecture Behavioral of Timer50foisParSec is
-    signal cpt: std_logic_vector(10 downto 0) := (others => '0');
+architecture Behavioral of timer50 is
+    signal cpt : std_logic_vector(20 downto 0) := (others => '0');
 begin
-    
-    process (clk50kHz)
+
+    process (clk100)
     begin
-        if (rising_edge(clk50kHz)) then
-        
-            if cpt = 2000 then
-                 cpt <= (others => '0');
+        if rising_edge(clk100) then
+            if rst = '1' then
+                cpt <= (others => '0');
             else
-                cpt <= cpt + 1;
+                if cpt = 1999999 then
+                    cpt <= (others => '0');
+                    top50 <= '1'; 
+                else
+                    cpt <= cpt + 1;
+                    
+                    if cpt = 99999 then 
+                        top50 <= '0';
+                    end if;
+                end if;
             end if;
-            
         end if;
     end process;
-    
-    res <= '1' when cpt = 2000 else '0';
 
 end Behavioral;

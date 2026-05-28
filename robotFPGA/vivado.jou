@@ -3,62 +3,124 @@
 # SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
 # IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
 # SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
-# Start of session at: Fri May 22 08:40:45 2026
-# Process ID: 3140
-# Current directory: C:/Users/21302088/Downloads/FPGAodometrie
-# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent15928 C:\Users\21302088\Downloads\FPGAodometrie\FPGAodometrie.xpr
-# Log file: C:/Users/21302088/Downloads/FPGAodometrie/vivado.log
-# Journal file: C:/Users/21302088/Downloads/FPGAodometrie\vivado.jou
-# Running On: SE103-12, OS: Windows, CPU Frequency: 2112 MHz, CPU Physical cores: 20, Host memory: 16851 MB
+# Start of session at: Tue May 26 11:18:52 2026
+# Process ID: 23580
+# Current directory: C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent23572 C:\msys64\home\jesui\robot-mobile-pilote-sorbonne-2026\robotFPGA\FPGAodometrie.xpr
+# Log file: C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/vivado.log
+# Journal file: C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA\vivado.jou
+# Running On: dell14plus21w, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 8, Host memory: 16749 MB
 #-----------------------------------------------------------
 start_gui
-open_project C:/Users/21302088/Downloads/FPGAodometrie/FPGAodometrie.xpr
-update_compile_order -fileset sources_1update_compile_order -fileset sources_1
+open_project C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.xpr
+update_compile_order -fileset sources_1
+close [ open C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/odometre.vhd w ]
+add_files C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/odometre.vhd
+close [ open C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/top.vhd w ]
+add_files C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/sources_1/new/top.vhd
+update_compile_order -fileset sources_1
+import_files -norecurse C:/Users/jesui/Downloads/console/console.srcs/sources_1/new/move.vhd
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
-launch_simulation
-source testSPI.tcl
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-close_sim
-launch_simulation
-source testSPI.tcl
-relaunch_sim
-relaunch_sim
-relaunch_sim
-relaunch_sim
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-relaunch_sim
-relaunch_sim
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-relaunch_sim
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-run 10 us
-close_sim
+file mkdir C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/constrs_1
+file mkdir C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/constrs_1/new
+close [ open C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/constrs_1/new/top.xdc w ]
+add_files -fileset constrs_1 C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.srcs/constrs_1/new/top.xdc
+launch_runs impl_1 -jobs 8
+wait_on_run impl_1
+open_hw_manager
+close_hw_manager
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top top_compteur [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+reset_run impl_1
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+open_hw_manager
+connect_hw_server -allow_non_jtag
+disconnect_hw_server localhost:3121
+connect_hw_server -allow_non_jtag
+open_hw_target
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices xc7a35t_0] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs impl_1 -jobs 8
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+open_run impl_1
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+update_compile_order -fileset sources_1
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top top_compteur [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+close_design
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+open_run impl_1
+close_design
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {C:/msys64/home/jesui/robot-mobile-pilote-sorbonne-2026/robotFPGA/FPGAodometrie.runs/impl_1/top_compteur.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]

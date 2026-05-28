@@ -4,18 +4,39 @@ Component: Arm Compiler for Embedded 6.24 Tool: armlink [5f371500]
 
 Section Cross References
 
-    main.o(.text.main) refers to status.o(.text.initLedChangementStatus) for initLedChangementStatus
-    main.o(.text.main) refers to dtmf.o(.text.init_dtmf) for init_dtmf
+    main.o(.ARM.exidx.text.Delay_ms) refers to main.o(.text.Delay_ms) for [Anonymous Symbol]
+    main.o(.text.main) refers to system_lpc17xx.o(.text.SystemInit) for SystemInit
+    main.o(.text.main) refers to moteur.o(.text.Init_Moteur_PWM) for Init_Moteur_PWM
+    main.o(.text.main) refers to moteur.o(.text.Changer_PWM_Moteurs) for Changer_PWM_Moteurs
     main.o(.ARM.exidx.text.main) refers to main.o(.text.main) for [Anonymous Symbol]
     status.o(.ARM.exidx.text.delay) refers to status.o(.text.delay) for [Anonymous Symbol]
     status.o(.ARM.exidx.text.initLedChangementStatus) refers to status.o(.text.initLedChangementStatus) for [Anonymous Symbol]
     status.o(.ARM.exidx.text.changementDeStatus) refers to status.o(.text.changementDeStatus) for [Anonymous Symbol]
     status.o(.ARM.exidx.text.mainTestStatusLED) refers to status.o(.text.mainTestStatusLED) for [Anonymous Symbol]
     dtmf.o(.ARM.exidx.text.init_dtmf) refers to dtmf.o(.text.init_dtmf) for [Anonymous Symbol]
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.bss.new_dtmf_flag) for new_dtmf_flag
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.data.dtmf_char) for dtmf_char
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.bss.process_dtmf_commands.current_state) for process_dtmf_commands.current_state
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.bss.process_dtmf_commands.parsed_robot_id) for process_dtmf_commands.parsed_robot_id
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.bss.ROBOT_NUMBER) for ROBOT_NUMBER
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.data.process_dtmf_commands.parsed_action) for process_dtmf_commands.parsed_action
+    dtmf.o(.text.process_dtmf_commands) refers to dtmf.o(.data.robot_status) for robot_status
+    dtmf.o(.ARM.exidx.text.process_dtmf_commands) refers to dtmf.o(.text.process_dtmf_commands) for [Anonymous Symbol]
+    dtmf.o(.text.update_status_leds) refers to dtmf.o(.data.robot_status) for robot_status
+    dtmf.o(.text.update_status_leds) refers to dtmf.o(.bss.blink_counter) for blink_counter
+    dtmf.o(.ARM.exidx.text.update_status_leds) refers to dtmf.o(.text.update_status_leds) for [Anonymous Symbol]
     dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.bss.dtmf_tone) for dtmf_tone
     dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.data.DTMF_TABLE) for DTMF_TABLE
     dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.data.dtmf_char) for dtmf_char
+    dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.bss.new_dtmf_flag) for new_dtmf_flag
+    dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.text.process_dtmf_commands) for process_dtmf_commands
+    dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.data.robot_status) for robot_status
+    dtmf.o(.text.EINT3_IRQHandler) refers to dtmf.o(.bss.blink_counter) for blink_counter
     dtmf.o(.ARM.exidx.text.EINT3_IRQHandler) refers to dtmf.o(.text.EINT3_IRQHandler) for [Anonymous Symbol]
+    moteur.o(.ARM.exidx.text.Init_Moteur_PWM) refers to moteur.o(.text.Init_Moteur_PWM) for [Anonymous Symbol]
+    moteur.o(.ARM.exidx.text.Changer_PWM_Gauche) refers to moteur.o(.text.Changer_PWM_Gauche) for [Anonymous Symbol]
+    moteur.o(.ARM.exidx.text.Changer_PWM_Droite) refers to moteur.o(.text.Changer_PWM_Droite) for [Anonymous Symbol]
+    moteur.o(.ARM.exidx.text.Changer_PWM_Moteurs) refers to moteur.o(.text.Changer_PWM_Moteurs) for [Anonymous Symbol]
     startup_lpc17xx.o(STACK) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup_lpc17xx.o(HEAP) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
     startup_lpc17xx.o(RESET) refers (Special) to heapauxi.o(.text) for __use_two_region_memory
@@ -150,26 +171,40 @@ Section Cross References
 Removing Unused input sections from the image.
 
     Removing main.o(.text), (0 bytes).
+    Removing main.o(.text.Delay_ms), (68 bytes).
+    Removing main.o(.ARM.exidx.text.Delay_ms), (8 bytes).
     Removing main.o(.ARM.exidx.text.main), (8 bytes).
     Removing main.o(.ARM.use_no_argv), (4 bytes).
     Removing status.o(.text), (0 bytes).
     Removing status.o(.text.delay), (48 bytes).
     Removing status.o(.ARM.exidx.text.delay), (8 bytes).
+    Removing status.o(.text.initLedChangementStatus), (90 bytes).
     Removing status.o(.ARM.exidx.text.initLedChangementStatus), (8 bytes).
     Removing status.o(.text.changementDeStatus), (102 bytes).
     Removing status.o(.ARM.exidx.text.changementDeStatus), (8 bytes).
     Removing status.o(.text.mainTestStatusLED), (310 bytes).
     Removing status.o(.ARM.exidx.text.mainTestStatusLED), (8 bytes).
     Removing dtmf.o(.text), (0 bytes).
+    Removing dtmf.o(.text.init_dtmf), (94 bytes).
     Removing dtmf.o(.ARM.exidx.text.init_dtmf), (8 bytes).
+    Removing dtmf.o(.ARM.exidx.text.process_dtmf_commands), (8 bytes).
+    Removing dtmf.o(.text.update_status_leds), (84 bytes).
+    Removing dtmf.o(.ARM.exidx.text.update_status_leds), (8 bytes).
     Removing dtmf.o(.ARM.exidx.text.EINT3_IRQHandler), (8 bytes).
+    Removing moteur.o(.text), (0 bytes).
+    Removing moteur.o(.ARM.exidx.text.Init_Moteur_PWM), (8 bytes).
+    Removing moteur.o(.text.Changer_PWM_Gauche), (34 bytes).
+    Removing moteur.o(.ARM.exidx.text.Changer_PWM_Gauche), (8 bytes).
+    Removing moteur.o(.text.Changer_PWM_Droite), (34 bytes).
+    Removing moteur.o(.ARM.exidx.text.Changer_PWM_Droite), (8 bytes).
+    Removing moteur.o(.ARM.exidx.text.Changer_PWM_Moteurs), (8 bytes).
     Removing system_lpc17xx.o(.text), (0 bytes).
     Removing system_lpc17xx.o(.text.SystemCoreClockUpdate), (210 bytes).
     Removing system_lpc17xx.o(.ARM.exidx.text.SystemCoreClockUpdate), (8 bytes).
     Removing system_lpc17xx.o(.ARM.exidx.text.SystemInit), (8 bytes).
     Removing system_lpc17xx.o(.data.SystemCoreClock), (4 bytes).
 
-19 unused section(s) (total 750 bytes) removed from the image.
+33 unused section(s) (total 1210 bytes) removed from the image.
 
 ==============================================================================
 
@@ -241,6 +276,7 @@ Image Symbol Table
     dc.s                                     0x00000000   Number         0  dc.o ABSOLUTE
     dtmf.c                                   0x00000000   Number         0  dtmf.o ABSOLUTE
     main.c                                   0x00000000   Number         0  main.o ABSOLUTE
+    moteur.c                                 0x00000000   Number         0  moteur.o ABSOLUTE
     status.c                                 0x00000000   Number         0  status.o ABSOLUTE
     system_LPC17xx.c                         0x00000000   Number         0  system_lpc17xx.o ABSOLUTE
     RESET                                    0x00000000   Section      204  startup_lpc17xx.o(RESET)
@@ -299,18 +335,27 @@ Image Symbol Table
     .text                                    0x0000023c   Section        0  sys_exit.o(.text)
     .text                                    0x00000248   Section        2  use_no_semi.o(.text)
     .text                                    0x0000024a   Section        0  indicate_semi.o(.text)
-    [Anonymous Symbol]                       0x0000024c   Section        0  dtmf.o(.text.EINT3_IRQHandler)
-    [Anonymous Symbol]                       0x00000294   Section        0  status.o(.text.initLedChangementStatus)
-    [Anonymous Symbol]                       0x000002f0   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x0000024c   Section        0  moteur.o(.text.Changer_PWM_Moteurs)
+    [Anonymous Symbol]                       0x00000280   Section        0  moteur.o(.text.Init_Moteur_PWM)
     .ARM.__at_0x02FC                         0x000002fc   Section        4  startup_lpc17xx.o(.ARM.__at_0x02FC)
-    [Anonymous Symbol]                       0x00000300   Section        0  system_lpc17xx.o(.text.SystemInit)
-    [Anonymous Symbol]                       0x000003cc   Section        0  dtmf.o(.text.init_dtmf)
+    [Anonymous Symbol]                       0x00000300   Section        0  dtmf.o(.text.EINT3_IRQHandler)
+    [Anonymous Symbol]                       0x00000390   Section        0  system_lpc17xx.o(.text.SystemInit)
+    [Anonymous Symbol]                       0x0000045c   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x000004bc   Section        0  dtmf.o(.text.process_dtmf_commands)
+    process_dtmf_commands.parsed_action      0x10000011   Data           1  dtmf.o(.data.process_dtmf_commands.parsed_action)
+    [Anonymous Symbol]                       0x10000011   Section        0  dtmf.o(.data.process_dtmf_commands.parsed_action)
     .bss                                     0x10000018   Section       96  libspace.o(.bss)
-    Heap_Mem                                 0x10000080   Data           0  startup_lpc17xx.o(HEAP)
-    Stack_Mem                                0x10000080   Data         512  startup_lpc17xx.o(STACK)
-    HEAP                                     0x10000080   Section        0  startup_lpc17xx.o(HEAP)
-    STACK                                    0x10000080   Section      512  startup_lpc17xx.o(STACK)
-    __initial_sp                             0x10000280   Data           0  startup_lpc17xx.o(STACK)
+    blink_counter                            0x1000007c   Data           4  dtmf.o(.bss.blink_counter)
+    [Anonymous Symbol]                       0x1000007c   Section        0  dtmf.o(.bss.blink_counter)
+    process_dtmf_commands.current_state      0x10000082   Data           1  dtmf.o(.bss.process_dtmf_commands.current_state)
+    [Anonymous Symbol]                       0x10000082   Section        0  dtmf.o(.bss.process_dtmf_commands.current_state)
+    process_dtmf_commands.parsed_robot_id    0x10000083   Data           1  dtmf.o(.bss.process_dtmf_commands.parsed_robot_id)
+    [Anonymous Symbol]                       0x10000083   Section        0  dtmf.o(.bss.process_dtmf_commands.parsed_robot_id)
+    Heap_Mem                                 0x10000088   Data           0  startup_lpc17xx.o(HEAP)
+    Stack_Mem                                0x10000088   Data         512  startup_lpc17xx.o(STACK)
+    HEAP                                     0x10000088   Section        0  startup_lpc17xx.o(HEAP)
+    STACK                                    0x10000088   Section      512  startup_lpc17xx.o(STACK)
+    __initial_sp                             0x10000288   Data           0  startup_lpc17xx.o(STACK)
 
     Global Symbols
 
@@ -455,18 +500,22 @@ Image Symbol Table
     __I$use$semihosting                      0x00000249   Thumb Code     0  use_no_semi.o(.text)
     __use_no_semihosting_swi                 0x00000249   Thumb Code     2  use_no_semi.o(.text)
     __semihosting_library_function           0x0000024b   Thumb Code     0  indicate_semi.o(.text)
-    EINT3_IRQHandler                         0x0000024d   Thumb Code    70  dtmf.o(.text.EINT3_IRQHandler)
-    initLedChangementStatus                  0x00000295   Thumb Code    90  status.o(.text.initLedChangementStatus)
-    main                                     0x000002f1   Thumb Code    10  main.o(.text.main)
-    SystemInit                               0x00000301   Thumb Code   204  system_lpc17xx.o(.text.SystemInit)
-    init_dtmf                                0x000003cd   Thumb Code    72  dtmf.o(.text.init_dtmf)
-    Region$$Table$$Base                      0x00000414   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00000434   Number         0  anon$$obj.o(Region$$Table)
+    Changer_PWM_Moteurs                      0x0000024d   Thumb Code    52  moteur.o(.text.Changer_PWM_Moteurs)
+    Init_Moteur_PWM                          0x00000281   Thumb Code    98  moteur.o(.text.Init_Moteur_PWM)
+    EINT3_IRQHandler                         0x00000301   Thumb Code   144  dtmf.o(.text.EINT3_IRQHandler)
+    SystemInit                               0x00000391   Thumb Code   204  system_lpc17xx.o(.text.SystemInit)
+    main                                     0x0000045d   Thumb Code    88  main.o(.text.main)
+    process_dtmf_commands                    0x000004bd   Thumb Code   218  dtmf.o(.text.process_dtmf_commands)
+    Region$$Table$$Base                      0x00000598   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x000005b8   Number         0  anon$$obj.o(Region$$Table)
     DTMF_TABLE                               0x10000000   Data          16  dtmf.o(.data.DTMF_TABLE)
     dtmf_char                                0x10000010   Data           1  dtmf.o(.data.dtmf_char)
+    robot_status                             0x10000012   Data           1  dtmf.o(.data.robot_status)
     __libspace_start                         0x10000018   Data          96  libspace.o(.bss)
+    ROBOT_NUMBER                             0x10000078   Data           1  dtmf.o(.bss.ROBOT_NUMBER)
     __temporary_stack_top$libspace           0x10000078   Data           0  libspace.o(.bss)
-    dtmf_tone                                0x10000078   Data           1  dtmf.o(.bss.dtmf_tone)
+    dtmf_tone                                0x10000080   Data           1  dtmf.o(.bss.dtmf_tone)
+    new_dtmf_flag                            0x10000081   Data           1  dtmf.o(.bss.new_dtmf_flag)
 
 
 
@@ -476,102 +525,110 @@ Memory Map of the image
 
   Image Entry point : 0x00000195
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00000448, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x000005cc, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000434, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x000005b8, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x00000000   0x00000000   0x000000cc   Data   RO           42    RESET               startup_lpc17xx.o
-    0x000000cc   0x000000cc   0x00000008   Code   RO           70  * !!!main             c_w.l(__main.o)
-    0x000000d4   0x000000d4   0x0000005c   Code   RO          245    !!!scatter          c_w.l(__scatter.o)
-    0x00000130   0x00000130   0x0000001a   Code   RO          249    !!handler_copy      c_w.l(__scatter_copy.o)
+    0x00000000   0x00000000   0x000000cc   Data   RO           73    RESET               startup_lpc17xx.o
+    0x000000cc   0x000000cc   0x00000008   Code   RO          101  * !!!main             c_w.l(__main.o)
+    0x000000d4   0x000000d4   0x0000005c   Code   RO          276    !!!scatter          c_w.l(__scatter.o)
+    0x00000130   0x00000130   0x0000001a   Code   RO          280    !!handler_copy      c_w.l(__scatter_copy.o)
     0x0000014a   0x0000014a   0x00000002   PAD
-    0x0000014c   0x0000014c   0x00000002   Code   RO          246    !!handler_null      c_w.l(__scatter.o)
+    0x0000014c   0x0000014c   0x00000002   Code   RO          277    !!handler_null      c_w.l(__scatter.o)
     0x0000014e   0x0000014e   0x00000002   PAD
-    0x00000150   0x00000150   0x0000001c   Code   RO          251    !!handler_zi        c_w.l(__scatter_zi.o)
-    0x0000016c   0x0000016c   0x00000002   Code   RO          107    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          120    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          122    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          124    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          127    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          129    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          131    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          134    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          136    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          138    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          140    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          142    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          144    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          146    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          148    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          150    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          152    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          154    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          158    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          160    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          162    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          164    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
-    0x0000016e   0x0000016e   0x00000002   Code   RO          165    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
-    0x00000170   0x00000170   0x00000002   Code   RO          200    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
-    0x00000172   0x00000172   0x00000000   Code   RO          228    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
-    0x00000172   0x00000172   0x00000000   Code   RO          230    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
-    0x00000172   0x00000172   0x00000000   Code   RO          233    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
-    0x00000172   0x00000172   0x00000000   Code   RO          236    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
-    0x00000172   0x00000172   0x00000000   Code   RO          238    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
-    0x00000172   0x00000172   0x00000000   Code   RO          241    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
-    0x00000172   0x00000172   0x00000002   Code   RO          242    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
-    0x00000174   0x00000174   0x00000000   Code   RO           72    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
-    0x00000174   0x00000174   0x00000000   Code   RO           78    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
-    0x00000174   0x00000174   0x00000006   Code   RO           90    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
-    0x0000017a   0x0000017a   0x00000000   Code   RO           80    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
-    0x0000017a   0x0000017a   0x00000004   Code   RO           81    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
-    0x0000017e   0x0000017e   0x00000000   Code   RO           83    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
-    0x0000017e   0x0000017e   0x00000008   Code   RO           84    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
-    0x00000186   0x00000186   0x00000002   Code   RO          111    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
-    0x00000188   0x00000188   0x00000000   Code   RO          171    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
-    0x00000188   0x00000188   0x00000004   Code   RO          172    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
-    0x0000018c   0x0000018c   0x00000006   Code   RO          173    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
+    0x00000150   0x00000150   0x0000001c   Code   RO          282    !!handler_zi        c_w.l(__scatter_zi.o)
+    0x0000016c   0x0000016c   0x00000002   Code   RO          138    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          151    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          153    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          155    .ARM.Collect$$libinit$$00000006  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          158    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          160    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          162    .ARM.Collect$$libinit$$00000010  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          165    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          167    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          169    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          171    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          173    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          175    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          177    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          179    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          181    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          183    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          185    .ARM.Collect$$libinit$$00000027  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          189    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          191    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          193    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          195    .ARM.Collect$$libinit$$00000034  c_w.l(libinit2.o)
+    0x0000016e   0x0000016e   0x00000002   Code   RO          196    .ARM.Collect$$libinit$$00000035  c_w.l(libinit2.o)
+    0x00000170   0x00000170   0x00000002   Code   RO          231    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
+    0x00000172   0x00000172   0x00000000   Code   RO          259    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
+    0x00000172   0x00000172   0x00000000   Code   RO          261    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
+    0x00000172   0x00000172   0x00000000   Code   RO          264    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
+    0x00000172   0x00000172   0x00000000   Code   RO          267    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
+    0x00000172   0x00000172   0x00000000   Code   RO          269    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
+    0x00000172   0x00000172   0x00000000   Code   RO          272    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
+    0x00000172   0x00000172   0x00000002   Code   RO          273    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
+    0x00000174   0x00000174   0x00000000   Code   RO          103    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
+    0x00000174   0x00000174   0x00000000   Code   RO          109    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
+    0x00000174   0x00000174   0x00000006   Code   RO          121    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
+    0x0000017a   0x0000017a   0x00000000   Code   RO          111    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
+    0x0000017a   0x0000017a   0x00000004   Code   RO          112    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
+    0x0000017e   0x0000017e   0x00000000   Code   RO          114    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
+    0x0000017e   0x0000017e   0x00000008   Code   RO          115    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
+    0x00000186   0x00000186   0x00000002   Code   RO          142    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
+    0x00000188   0x00000188   0x00000000   Code   RO          202    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
+    0x00000188   0x00000188   0x00000004   Code   RO          203    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
+    0x0000018c   0x0000018c   0x00000006   Code   RO          204    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
     0x00000192   0x00000192   0x00000002   PAD
-    0x00000194   0x00000194   0x0000003c   Code   RO           44  * .text               startup_lpc17xx.o
-    0x000001d0   0x000001d0   0x00000006   Code   RO           68    .text               c_w.l(heapauxi.o)
-    0x000001d6   0x000001d6   0x0000004a   Code   RO           94    .text               c_w.l(sys_stackheap_outer.o)
-    0x00000220   0x00000220   0x00000012   Code   RO           96    .text               c_w.l(exit.o)
+    0x00000194   0x00000194   0x0000003c   Code   RO           75  * .text               startup_lpc17xx.o
+    0x000001d0   0x000001d0   0x00000006   Code   RO           99    .text               c_w.l(heapauxi.o)
+    0x000001d6   0x000001d6   0x0000004a   Code   RO          125    .text               c_w.l(sys_stackheap_outer.o)
+    0x00000220   0x00000220   0x00000012   Code   RO          127    .text               c_w.l(exit.o)
     0x00000232   0x00000232   0x00000002   PAD
-    0x00000234   0x00000234   0x00000008   Code   RO          108    .text               c_w.l(libspace.o)
-    0x0000023c   0x0000023c   0x0000000c   Code   RO          166    .text               c_w.l(sys_exit.o)
-    0x00000248   0x00000248   0x00000002   Code   RO          189    .text               c_w.l(use_no_semi.o)
-    0x0000024a   0x0000024a   0x00000000   Code   RO          191    .text               c_w.l(indicate_semi.o)
+    0x00000234   0x00000234   0x00000008   Code   RO          139    .text               c_w.l(libspace.o)
+    0x0000023c   0x0000023c   0x0000000c   Code   RO          197    .text               c_w.l(sys_exit.o)
+    0x00000248   0x00000248   0x00000002   Code   RO          220    .text               c_w.l(use_no_semi.o)
+    0x0000024a   0x0000024a   0x00000000   Code   RO          222    .text               c_w.l(indicate_semi.o)
     0x0000024a   0x0000024a   0x00000002   PAD
-    0x0000024c   0x0000024c   0x00000046   Code   RO           29    .text.EINT3_IRQHandler  dtmf.o
-    0x00000292   0x00000292   0x00000002   PAD
-    0x00000294   0x00000294   0x0000005a   Code   RO           13    .text.initLedChangementStatus  status.o
-    0x000002ee   0x000002ee   0x00000002   PAD
-    0x000002f0   0x000002f0   0x0000000a   Code   RO            2    .text.main          main.o
-    0x000002fa   0x000002fa   0x00000002   PAD
-    0x000002fc   0x000002fc   0x00000004   Code   RO           43    .ARM.__at_0x02FC    startup_lpc17xx.o
-    0x00000300   0x00000300   0x000000cc   Code   RO           55    .text.SystemInit    system_lpc17xx.o
-    0x000003cc   0x000003cc   0x00000048   Code   RO           27    .text.init_dtmf     dtmf.o
-    0x00000414   0x00000414   0x00000020   Data   RO          244    Region$$Table       anon$$obj.o
+    0x0000024c   0x0000024c   0x00000034   Code   RO           62    .text.Changer_PWM_Moteurs  moteur.o
+    0x00000280   0x00000280   0x00000062   Code   RO           56    .text.Init_Moteur_PWM  moteur.o
+    0x000002e2   0x000002e2   0x0000001a   PAD
+    0x000002fc   0x000002fc   0x00000004   Code   RO           74    .ARM.__at_0x02FC    startup_lpc17xx.o
+    0x00000300   0x00000300   0x00000090   Code   RO           37    .text.EINT3_IRQHandler  dtmf.o
+    0x00000390   0x00000390   0x000000cc   Code   RO           86    .text.SystemInit    system_lpc17xx.o
+    0x0000045c   0x0000045c   0x00000060   Code   RO            4    .text.main          main.o
+    0x000004bc   0x000004bc   0x000000da   Code   RO           33    .text.process_dtmf_commands  dtmf.o
+    0x00000596   0x00000596   0x00000002   PAD
+    0x00000598   0x00000598   0x00000020   Data   RO          275    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Exec base: 0x10000000, Load base: 0x00000434, Size: 0x00000014, Max: 0xffffffff, ABSOLUTE)
-
-    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x10000000   0x00000434   0x00000010   Data   RW           33    .data.DTMF_TABLE    dtmf.o
-    0x10000010   0x00000444   0x00000001   Data   RW           32    .data.dtmf_char     dtmf.o
-
-
-    Execution Region ER_ZI (Exec base: 0x10000018, Load base: 0x00000448, Size: 0x00000268, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x10000000, Load base: 0x000005b8, Size: 0x00000014, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x10000018        -       0x00000060   Zero   RW          109    .bss                c_w.l(libspace.o)
-    0x10000078        -       0x00000001   Zero   RW           31    .bss.dtmf_tone      dtmf.o
-    0x10000079   0x00000448   0x00000007   PAD
-    0x10000080        -       0x00000000   Zero   RW           41    HEAP                startup_lpc17xx.o
-    0x10000080        -       0x00000200   Zero   RW           40    STACK               startup_lpc17xx.o
+    0x10000000   0x000005b8   0x00000010   Data   RW           44    .data.DTMF_TABLE    dtmf.o
+    0x10000010   0x000005c8   0x00000001   Data   RW           41    .data.dtmf_char     dtmf.o
+    0x10000011   0x000005c9   0x00000001   Data   RW           47    .data.process_dtmf_commands.parsed_action  dtmf.o
+    0x10000012   0x000005ca   0x00000001   Data   RW           43    .data.robot_status  dtmf.o
+
+
+    Execution Region ER_ZI (Exec base: 0x10000018, Load base: 0x000005cc, Size: 0x00000270, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x10000018        -       0x00000060   Zero   RW          140    .bss                c_w.l(libspace.o)
+    0x10000078        -       0x00000001   Zero   RW           39    .bss.ROBOT_NUMBER   dtmf.o
+    0x10000079   0x000005cc   0x00000003   PAD
+    0x1000007c        -       0x00000004   Zero   RW           48    .bss.blink_counter  dtmf.o
+    0x10000080        -       0x00000001   Zero   RW           40    .bss.dtmf_tone      dtmf.o
+    0x10000081        -       0x00000001   Zero   RW           42    .bss.new_dtmf_flag  dtmf.o
+    0x10000082        -       0x00000001   Zero   RW           45    .bss.process_dtmf_commands.current_state  dtmf.o
+    0x10000083        -       0x00000001   Zero   RW           46    .bss.process_dtmf_commands.parsed_robot_id  dtmf.o
+    0x10000084   0x000005cc   0x00000004   PAD
+    0x10000088        -       0x00000000   Zero   RW           72    HEAP                startup_lpc17xx.o
+    0x10000088        -       0x00000200   Zero   RW           71    STACK               startup_lpc17xx.o
 
 
 ==============================================================================
@@ -581,16 +638,16 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       142          0          0         17          1       4590   dtmf.o
-        10          0          0          0          0        376   main.o
+       362          0          0         19          9       5656   dtmf.o
+        96          8          0          0          0       1346   main.o
+       150          0          0          0          0       3330   moteur.o
         64         26        204          0        512       1060   startup_lpc17xx.o
-        90          0          0          0          0       4110   status.o
        204          0          0          0          0       2141   system_lpc17xx.o
 
     ----------------------------------------------------------------------
-       516         26        236         20        520      12277   Object Totals
+       904         34        236         20        528      13533   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-         6          0          0          3          7          0   (incl. Padding)
+        28          0          0          1          7          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -637,15 +694,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-       840         42        236         20        616      12761   Grand Totals
-       840         42        236         20        616      12761   ELF Image Totals
-       840         42        236         20          0          0   ROM Totals
+      1228         50        236         20        624      14017   Grand Totals
+      1228         50        236         20        624      14017   ELF Image Totals
+      1228         50        236         20          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 1076 (   1.05kB)
-    Total RW  Size (RW Data + ZI Data)               636 (   0.62kB)
-    Total ROM Size (Code + RO Data + RW Data)       1096 (   1.07kB)
+    Total RO  Size (Code + RO Data)                 1464 (   1.43kB)
+    Total RW  Size (RW Data + ZI Data)               644 (   0.63kB)
+    Total ROM Size (Code + RO Data + RW Data)       1484 (   1.45kB)
 
 ==============================================================================
 

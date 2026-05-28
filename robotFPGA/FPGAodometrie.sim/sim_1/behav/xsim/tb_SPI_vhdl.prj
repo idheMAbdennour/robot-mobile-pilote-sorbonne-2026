@@ -1,0 +1,11 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../FPGAodometrie.srcs/sources_1/new/SPI.vhd" \
+"../../../../FPGAodometrie.srcs/sources_1/new/Timer50foisParSec.vhd" \
+"../../../../FPGAodometrie.srcs/sources_1/new/calcul.vhd" \
+"../../../../FPGAodometrie.srcs/sources_1/new/odometre.vhd" \
+"../../../../FPGAodometrie.srcs/sources_1/new/top.vhd" \
+"../../../../FPGAodometrie.srcs/sim_1/new/testSPI.vhd" \
+
+# Do not sort compile order
+nosort
