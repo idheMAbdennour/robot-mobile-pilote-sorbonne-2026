@@ -6,3 +6,5 @@
     Documents : composant_graphique.txt
                 exemple_interface.jpg
 
+- Supervision app
+    Prompt :    "Je cherche à réaliser un logiciel de supervision d'un système de robot mobile piloté. Le logiciel doit être écrit en Processing 2.1.2. Ce logiciel communiquera via USB en protocole UART avec une centrale réalisée sur une carte à microcontrôleur LPCXpresso1769 + CMSIS-DAP rev D2. J'ai réaliser un ensemble de document texte contenant des descriptions rigoureuses et complètes de ce que l'application doit faire, ainsi qu'un schéma visuel présentant la vision de l'interface que j'ai imaginé. A l'aide de tout ces documents que je joins à ma requête, écrit-moi un programme en Processing 2.1.2 qui réalise rigoureusement ce cahier des charges.

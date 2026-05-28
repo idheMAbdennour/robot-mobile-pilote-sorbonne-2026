@@ -11,10 +11,15 @@ Routine de lecture de message :
         - Type 1 : Mettre à jour le robot correspondant dans listeRobot :
             - listeRobot[numero_robot].id_last_poste = numero_poste;
             - listeRobot[numero_robot].vitesse = new_vitesse;
+            - si listeRobot[numero_robot].status est "E" et listeRobot[numero_robot].id_last_poste est p_depart de la mission à laquelle il appartient, listeRobot[numero_robot].gare devient True
+            - si listeRobot[numero_robot].status est "R" et listeRobot[numero_robot].id_last_poste est p_arrive de la mission à laquelle il appartient, listeRobot[numero_robot].gare devient True
+            - si listeRobot[numero_robot].status est "E" et new_status est "C", alors listeRobot[numero_robot].gare devient False
+            - si listeRobot[numero_robot].status est "R" et new_status est "L", alors listeRobot[numero_robot].gare devient False
+            - si listeRobot[numero_robot].status est "R" et new_status est "L", alors listeRobot[numero_robot].dispo devient True
             - listeRobot[numero_robot].status = new_status;
+
         - Type 2 : Créer et initialiser une nouvelle mission dans listeMission :
             - new_mission.p_depart = numero_poste_expediteur;
             - new_mission.p_arrive = numero_poste_destinataire;
             - new_mission.code_livreur = code_livreur;
             - new_mission.id_livreur = NULL; 
-            

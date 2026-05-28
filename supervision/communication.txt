@@ -1,0 +1,134 @@
+--> entree_sortie.txt
+// Ce fichier décrit l'algorithme d'actualisation et d'animation de l'interface
+
+L'interface graphique doit s'actualiser au moins toutes les secondes.
+
+Routine actualisation : 
+    - Après réception d'un message :
+        - Si message de type 1 alors:
+            - Mettre à jour l'emplacement du robot correspondant sur le circuit du sous-écran 1 selon sa variable id_last_poste :
+                - Si id_last_poste correspond à id_last_poste_nord ou id_last_poste_sud, alors le robot est dessiné le long du Y du coté de son id_last_poste
+                - Sinon, si gare est True, alors le robot est dessinée en possition garé à son id_last_poste
+                - Sinon, le robot est dessiné sur le circuit entre son id_laste_poste et le suivant, dans un ordre logique avec les autres robots dessinés sur cette section
+            - Mettre à jour la couleur de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable status
+            - Mettre à jour le nombre de barre de la jauge de ce robot sur le circuit du sous-écran 1 selon sa variable vitesse
+            - Mettre à jour la flèche correspondant au id_last_poste :
+                - Si gare est True, en orientation garé (pointant vers le poste depuis l'interieur du circuit)
+                - Sinon, pointant le poste suivant
+            - Après une seconde, la flèche disparait
+            - Mettre à jour les cases de la ligne de ce robot dans le tableau du sous-écran 2 :
+                - Colonne Status : changer la lettre de cette case avec celle correspondant a sa variable status
+                - Colonne Vitesse : changer la valeur affichée avec celle de sa variable vitesse.
+            - Si sa variable dispo est False, mettre sa case dans la matrice du sous-écran 3 en couleur rouge et remplacer son numéro robot dans la case par la chaine "----"
+            - Si sa variable dispo est True, mettre sa case dans la matrice du sous-écran 3 en couleur verte et remplacer la chaine "----" dans la case par son numéro robot
+        - Si message de type 2 alors :
+            - Mettre à jour le tableau dynamique du sous-écran 2 avec la nouvelle mission.
+    
+    - Après routine d'interaction 1 qui débouche sur l'envoi d'un message :
+        - Mise à jour du tableau de mission du sous-écran 2
+
+Animation erreur selection : La case attribution de la ligne numero_mission_select du tableau du sous-écran 2 clignote trois fois brièvement en rouge avant de revenir à sa couleur initiale.
+
+Si un robot n'est pas signalé par un message pendant plus de 2 minutes :
+    - il disparait du circuit du sous-écran 1
+    - sa case dans la matrice de robot du sous-écran 3 devient rouge mais conserve son numéro de robot. 
+
+--> gestion_comm_in.txt
+// Ce fichier décrit la gestion des message entrant
+
+L'application doit lire des messages sur une liaison série en provenance d'un port USB de l'ordinateur suivant le protocole UART
+
+Routine de lecture de message :
+    - Les messages reçues sont stockés dans la liste FIFO fifo_message.
+    - Les messages entrants sont de type 1 et 2. L'application parse les messages et detecte les informations transmises :
+        - Type 1 : numero_poste, numero_robot, new_vitesse, new_status
+        - Type 2 : numero_poste_expediteur, code_livreur, numero_poste_destinataire
+    - Les structures de données correspondantes sont mise à jour :
+        - Type 1 : Mettre à jour le robot correspondant dans listeRobot :
+            - listeRobot[numero_robot].id_last_poste = numero_poste;
+            - listeRobot[numero_robot].vitesse = new_vitesse;
+            - si listeRobot[numero_robot].status est "E" et listeRobot[numero_robot].id_last_poste est p_depart de la mission à laquelle il appartient, listeRobot[numero_robot].gare devient True
+            - si listeRobot[numero_robot].status est "R" et listeRobot[numero_robot].id_last_poste est p_arrive de la mission à laquelle il appartient, listeRobot[numero_robot].gare devient True
+            - si listeRobot[numero_robot].status est "E" et new_status est "C", alors listeRobot[numero_robot].gare devient False
+            - si listeRobot[numero_robot].status est "R" et new_status est "L", alors listeRobot[numero_robot].gare devient False
+            - si listeRobot[numero_robot].status est "R" et new_status est "L", alors listeRobot[numero_robot].dispo devient True
+            - listeRobot[numero_robot].status = new_status;
+
+        - Type 2 : Créer et initialiser une nouvelle mission dans listeMission :
+            - new_mission.p_depart = numero_poste_expediteur;
+            - new_mission.p_arrive = numero_poste_destinataire;
+            - new_mission.code_livreur = code_livreur;
+            - new_mission.id_livreur = NULL; 
+
+--> gestion_comm_out.txt
+// Ce fichier décrit la gestion des messages sortant
+
+L'application doit envoyer des messages sur une liaison série en direction d'un port USB de l'ordinateur suivant le protocole UART
+
+Routine d'envoi de message 1 :
+    - On envoie un message de type 3
+    - "R" suivi de la valeur de listeMission[num_mission_select].id_livreur;
+    - "P" suivi de la valeur de listeMission[num_mission_select].p_depart;
+    - "P" suivi de la valeur de listeMission[num_mission_select].p_arrive;
+    - On ajoute les caractères 0x0A et 0x0D à la fin
+    - Le message est envoyé sur la liaison série
+
+Routine d'envoi de message 2 :
+    - On envoie un message de type 4
+    - "R" suivi de la valeur de listeRobot[num_robot_select].id_robot;
+    - "V" suivi de la valeur de listeMission[num_robot_select].vitesse;
+    - On ajoute les caractères 0x0A et 0x0D à la fin
+    - Le message est envoyé sur la liaison série
+
+--> structure_donnees.txt
+// Ce fichier décrit les structures de données et variables contenant les données nécessaire à l'application de supervision
+
+Le fichier de configuration donne le nombre de robot et de postes du système. Ces valeurs sont stockées dans des variables globales :
+- Le nombre de robots : int nb_robot;
+- Le nombre de postes de la branche nord : int nb_poste_nord;  
+- Le nombre de postes de la branche sud : int nb_poste_sud;  
+
+Les autres variables globales de l'application sont : 
+- Le numéro de la mission sélectionnée dans le tableau du sous-écran 2 : int numero_mission_select;
+- Le numéro du robot associé à la mission selectionnée dans le tableau du sous-écran 2 : int num_robot_select;
+- Le nombre de poste : int nb_poste;
+- Le numéro du dernier poste de la branche nord : int id_last_poste_nord;
+- Le numéro du dernier poste de la branche sud : int id_last_poste_sud;
+- La taille en nombre de ligne du tableau dynamique affiché dans sous-écran 2 : int taille_tab_mission;
+- Le nombre de mission actuellement dans la liste.
+
+Le programme de supervision conserve dans des classes un certain nombre de données qu'il extrait des messages reçue par la liaison série, en provenance de la centrale. 
+
+Les messages sont stockés dans une liste FIFO de chaines de caractères : StringList fifo_messages;
+La liste pourra contenir au maximum 100 messages.
+La taille maximale d'un message entrant est de 8 caractères de 8bits chacun.
+-> Taille totale de la liste : 100 éléments de taille 64 bits.
+
+----
+
+Classe ROBOT:
+    - Un robot possède un identifiant : int id_robot;
+    - Un robot possède une position sur le circuit, donnée par l'id du dernier poste à l'avoir vu : int id_last_poste;
+    - Un robot possède une vitesse : int vitesse;
+    - Un robot possède un status : char status;
+    - Un robot possède une situation, soit sur le circuit, soit garé à coté d'un poste : boolean gare;
+    - Un robot possède une disponibilité : boolean dispo;
+
+Classe POSTE:
+    - Un poste possède un identifiant : int id_poste;
+    - Un poste possède un indicateur de robot vu : boolean robot_vu;
+    - Un poste possède un indicateur de robot garé : boolean robot_gare;
+    
+Classe MISSION:
+    - Une mission a un poste de départ désigné par son id : int p_depart; 
+    - Une mission a un poste d'arrivé désigné par son id : int p_arrive;
+    - Une mission a un robot livreur attribué désigné par son id : int id_livreur;  
+    - Une mission a un code livreur : int code_livreur;
+
+----
+
+L'application de supervision garde en mémoire l'ensemble des postes et robots existant dans le système tel que spécifié dans le fichier de configuration :
+- Chaque robot du système est une instance de la classe ROBOT. Ils sont stockées dans un tableau de ROBOT à l'indice id_robot dont la taille est nb_robot : Robot[] listeRobot;
+- Chaque poste du système est une instance de la classe POSTE. Ils sont stockées dans un tableau de POSTE à l'indice id_poste dont la taille est nb_poste : Poste[] listePoste;
+
+Chaque mission reçus via un message est une instance de la classe MISSION. Elles sont stockés dans un tableau dynamique de MISSION : Mission[] listeMission;. 

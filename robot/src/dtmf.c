@@ -1,11 +1,10 @@
 #include "dtmf.h"
+#include "robotState.h"
 
 // CODE NON TESTE
 
 #define LED_CONCERNED_PIN   (1 << 8)
 #define LED_STATUS_PIN      (1 << 9)
-
-extern uint8_t ROBOT_NUMBER;
 
 typedef enum {
     DTMF_STATE_IDLE,
@@ -67,7 +66,7 @@ void process_dtmf_commands(void)
     switch (current_state)
     {
         case DTMF_STATE_IDLE:
-            if (c == '#') // En-tête de la séquence de l'aiguillage 
+            if (c == '#') // En-tï¿½te de la sï¿½quence de l'aiguillage 
             {
                 parsed_robot_id = 0;
                 current_state = DTMF_STATE_READ_ROBOT_ID;
@@ -77,10 +76,10 @@ void process_dtmf_commands(void)
         case DTMF_STATE_READ_ROBOT_ID:
             if (c >= '0' && c <= '9')
             {
-                // Accumulation pour gérer les identifiants robots (ex: robot 11, robot 15...) 
+                // Accumulation pour gï¿½rer les identifiants robots (ex: robot 11, robot 15...) 
                 parsed_robot_id = (parsed_robot_id * 10) + (c - '0');
             }
-            else if (c == 'A' || c == 'D') // Action détectée ('A' = Arrêt, 'D' = Départ) 
+            else if (c == 'A' || c == 'D') // Action dï¿½tectï¿½e ('A' = Arrï¿½t, 'D' = Dï¿½part) 
             {
                 parsed_action = c;
                 current_state = DTMF_STATE_WAIT_END;
@@ -92,22 +91,22 @@ void process_dtmf_commands(void)
             break;
 
         case DTMF_STATE_WAIT_END:
-            if (c == '*') // Symbole de fin validé 
+            if (c == '*') // Symbole de fin validï¿½ 
             {
-                // Vérification si l'ordre s'adresse à notre robot (ou '0' pour un ordre général si prévu) 
-                if (parsed_robot_id == ROBOT_NUMBER)
+                // Vï¿½rification si l'ordre s'adresse ï¿½ notre robot (ou '0' pour un ordre gï¿½nï¿½ral si prï¿½vu) 
+                if (parsed_robot_id == get_robot_number())
                 {
                     // Allumer la LED qui valide que le message nous concerne (P2.8) 
                     LPC_GPIO2->FIOSET = LED_CONCERNED_PIN;
                     
-                    if (parsed_action == 'A') // Ordre d'arrêt 
+                    if (parsed_action == 'A') // Ordre d'arrï¿½t 
                     {
                         robot_status = ROBOT_WAITING_JUNCTION;
                         /*
 													STOP MOTEUR
 												*/
                     }
-                    else if (parsed_action == 'D') // Ordre de départ 
+                    else if (parsed_action == 'D') // Ordre de dï¿½part 
                     {
                         robot_status = ROBOT_RUNNING;
                         /*
@@ -118,7 +117,7 @@ void process_dtmf_commands(void)
                 }
                 else
                 {
-                    // Ce message ne concerne pas notre robot, on éteint la LED concernée 
+                    // Ce message ne concerne pas notre robot, on ï¿½teint la LED concernï¿½e 
                     LPC_GPIO2->FIOCLR = LED_CONCERNED_PIN;
                 }
                 
@@ -138,11 +137,11 @@ void process_dtmf_commands(void)
 
 void update_status_leds(void)
 {
-    // Contrôle de la LED d'état comportementale (P2.9)
+    // Contrï¿½le de la LED d'ï¿½tat comportementale (P2.9)
     switch (robot_status)
     {
         case ROBOT_STOPPED:
-            LPC_GPIO2->FIOCLR = LED_STATUS_PIN; // Éteinte 
+            LPC_GPIO2->FIOCLR = LED_STATUS_PIN; // ï¿½teinte 
             break;
             
         case ROBOT_WAITING_JUNCTION:
@@ -156,7 +155,7 @@ void update_status_leds(void)
             break;
             
         case ROBOT_RUNNING:
-            LPC_GPIO2->FIOSET = LED_STATUS_PIN; // Allumée en continu 
+            LPC_GPIO2->FIOSET = LED_STATUS_PIN; // Allumï¿½e en continu 
             break;
     }
 }
@@ -167,7 +166,7 @@ void EINT3_IRQHandler()
 {
     if (LPC_GPIOINT->IO0IntStatR & (1 << 20))
     {
-        // Lecture des données du décodeur (P0.16 à P0.19) 
+        // Lecture des donnï¿½es du dï¿½codeur (P0.16 ï¿½ P0.19) 
         dtmf_tone = (LPC_GPIO0->FIOPIN >> 16) & 0xF;
         dtmf_char = DTMF_TABLE[dtmf_tone];
         new_dtmf_flag = 1; 
