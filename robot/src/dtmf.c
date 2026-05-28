@@ -1,5 +1,6 @@
 #include "dtmf.h"
 #include "robotState.h"
+#include "capteurInductif.h"
 
 #define LED_CONCERNED_PIN   (1 << 8)
 #define LED_STATUS_PIN      (1 << 9)
@@ -160,17 +161,18 @@ void update_status_leds(void)
 
 
 
-void EINT3_IRQHandler()
+void dtmf_interrupt_routine(void)
 {
+    // --- Traitement DTMF P0.20 ---
     if (LPC_GPIOINT->IO0IntStatR & (1 << 20))
     {
-        // Lecture des donn�es du d�codeur (P0.16 � P0.19) 
+        // Lecture des donnes du dcodeur (P0.16  P0.19) 
         dtmf_tone = (LPC_GPIO0->FIOPIN >> 16) & 0xF;
         dtmf_char = DTMF_TABLE[dtmf_tone];
         new_dtmf_flag = 1; 
         
         LPC_GPIOINT->IO0IntClr = (1 << 20);
-				process_dtmf_commands();
-				update_status_leds();
+        process_dtmf_commands();
+        update_status_leds();
     }
 }

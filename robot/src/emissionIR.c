@@ -82,8 +82,8 @@ void init_Timer_Enveloppe(uint16_t délai_us) {
 }
 
 
-// Interruption déclenchée toutes les 250us (un temps 't')
-void TIMER0_IRQHandler(void) {
+// Interruption appelée toutes les 250us (depuis un temps 't') par interruptions.c
+void emissionIR_interrupt_routine(void) {
     // Acquitter l'interruption
     LPC_TIM0->IR = 1;
 

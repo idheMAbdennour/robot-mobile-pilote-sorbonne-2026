@@ -15,7 +15,7 @@ extern volatile uint8_t frame_counter;
 // Prototypes IR
 void init_PWM_IR(void);
 void init_Timer_Enveloppe(uint16_t delai_us);
-void TIMER0_IRQHandler(void);
+void emissionIR_interrupt_routine(void);
 void update_PWM_state(void);
 void preparer_trame(uint8_t id, uint8_t vitesse, uint8_t status);
 
