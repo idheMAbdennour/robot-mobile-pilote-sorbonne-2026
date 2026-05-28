@@ -13,10 +13,8 @@ void init_uart0(void)
     LPC_SC->PCLKSEL0 &= ~(3 << 6);
 
     // 3. Configurer les broches P0.2 en TXD0 et P0.3 en RXD0
-    // P0.2 -> PINSEL0 bits [5:4] = 01 (binaire)
-    // P0.3 -> PINSEL0 bits [7:6] = 01 (binaire)
-    LPC_PINCON->PINSEL0 &= ~(0xF << 4);
-    LPC_PINCON->PINSEL0 |=  (0x5 << 4);
+    // Utilisation identique à l'exemple fonctionnel : définir les bits sans les réinitialiser globalement
+    LPC_PINCON->PINSEL0 |= (1 << 4) | (1 << 6);   // P0.2 TXD0, P0.3 RXD0
 
     // 4. Configuration UART0 (8 bits de données, 1 bit d'arrêt, pas de parité)
     LPC_UART0->LCR = 0x83; // DLAB = 1 permet l'accès aux diviseurs de baudrate
@@ -32,30 +30,23 @@ void init_uart0(void)
     // 6. Désactiver DLAB (Verrouille le baudrate)
     LPC_UART0->LCR = 0x03;
 
-    // 7. Activer les FIFOs TX et RX et les nettoyer
-    LPC_UART0->FCR = 0x07;
+    // 7. Activer les FIFOs TX et RX et les nettoyer (mode simple)
+    LPC_UART0->FCR = 0x01;
+
+    // 8. Activer interruption RX Data Available (optionnel, utile pour debug)
+    LPC_UART0->IER = 0x01;
+    NVIC_EnableIRQ(UART0_IRQn);
 }
 
 void uart0_send_string(const char *str)
 {
-    // Configure P0.0 as GPIO output for a debug toggle (non-intrusive)
-    LPC_PINCON->PINSEL0 &= ~(3 << 0); // P0.0 function = GPIO
-    LPC_GPIO0->FIODIR |= (1 << 0);
-
     while (*str)
     {
         // Attendre que le registre de transmission soit vide (Flag THRE)
         while (!(LPC_UART0->LSR & 0x20));
 
-        // Toggle P0.0 high to indicate a byte transmit start
-        LPC_GPIO0->FIOSET = (1 << 0);
-
         // Transmettre le caractère
         LPC_UART0->THR = *str++;
-
-        // Small software delay (couple cycles) then clear the toggle
-        for (volatile int i = 0; i < 50; ++i) { __NOP(); }
-        LPC_GPIO0->FIOCLR = (1 << 0);
     }
 }
 
@@ -69,11 +60,13 @@ void copy_main_init(void)
     extern void init_capteur_inductif(void);
     extern void set_debug_uart_enabled(uint8_t);
 
+    // Initialisations UART et capteurs
+    init_uart0();
+
+    // Initialisations Infrarouge (si présentes dans le projet)
     init_PWM_IR();
     init_Timer_Enveloppe(250);
 
-    // Initialisations UART et capteurs
-    init_uart0();
     init_microswitchs();
     init_capteur_inductif();
 
