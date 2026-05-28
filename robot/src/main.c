@@ -1,26 +1,40 @@
-// Minimal debug main: delegate init to copy_main_init(), then send a test string periodically
+#include "LPC17xx.h"
 #include "uart.h"
+#include "robotState.h"
+#include "microswitchs.h"
+#include "emissionIR.h"
+#include "debug.h"
 #include <stdint.h>
-#include <stdio.h>
 
-volatile uint8_t flag_50hz = 0; // réutilisé par SysTick
+volatile uint8_t flag_50hz = 0;
 
 int main(void)
 {
-    // Perform a compact copy of the main initialisations into uart.c
-    copy_main_init();
+    SystemInit();
 
-    // Small periodic debug message loop: every 200ms (flag set at 100Hz)
-    const char *msg = "DEBUG UART0 alive\r\n";
-    uint8_t counter = 0;
+    init_uart0();
+    init_PWM_IR();
+    init_Timer_Enveloppe(250);
+    init_microswitchs();
+    init_capteur_inductif();
 
-    while (1) {
-        if (flag_50hz) {
-            flag_50hz = 0;
-            if (++counter >= 20) { // 20 * 10ms = 200ms
-                uart0_send_string(msg);
-                counter = 0;
-            }
+    SysTick_Config(SystemCoreClock / 50);
+    set_debug_uart_enabled(1);
+
+    while (1)
+    {
+        if (!flag_50hz)
+        {
+            continue;
         }
+
+        flag_50hz = 0;
+
+        if (!get_debug_uart_enabled())
+        {
+            continue;
+        }
+
+        debug_uart_send_frame();
     }
 }
