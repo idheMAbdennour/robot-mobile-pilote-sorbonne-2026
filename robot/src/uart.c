@@ -37,12 +37,34 @@ void init_uart0(void)
     LPC_UART0->FCR = 0x07;
 }
 
+// Debug helpers: expose last written char and LSR value for inspection
+volatile uint32_t debug_last_lsr = 0;
+volatile uint32_t debug_last_thr = 0;
+
 void uart0_send_char(char c)
 {
-    // Attendre THR vide
+    // Ensure P0.0 is GPIO output for visible toggle
+    LPC_PINCON->PINSEL0 &= ~(3 << 0); // P0.0 = GPIO
+    LPC_GPIO0->FIODIR |= (1 << 0);
+
+    // Attendre THR vide (THRE)
     while (!(LPC_UART0->LSR & (1 << 5)));
 
+    // Toggle debug pin high to mark start of THR write
+    LPC_GPIO0->FIOSET = (1 << 0);
+
+    // Record and write
+    debug_last_thr = (uint32_t)c;
     LPC_UART0->THR = c;
+
+    // small delay
+    for (volatile int i = 0; i < 100; ++i) { __NOP(); }
+
+    // Read back LSR for diagnostics
+    debug_last_lsr = LPC_UART0->LSR;
+
+    // Clear debug pin
+    LPC_GPIO0->FIOCLR = (1 << 0);
 }
 
 void uart0_send_string(const char *str)
