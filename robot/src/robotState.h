@@ -41,9 +41,9 @@ void get_inductif_values(int32_t *dist1, int32_t *dist2, int32_t *angle);
 void set_microswitch_state(uint8_t state);
 uint8_t get_microswitch_state(void);
 
-// --- ITM Debug Globals ---
-void set_debug_itm_enabled(uint8_t enabled);
-uint8_t get_debug_itm_enabled(void);
+// --- UART Debug Globals ---
+void set_debug_uart_enabled(uint8_t enabled);
+uint8_t get_debug_uart_enabled(void);
 void set_wire_debug_mode(uint8_t mode);
 uint8_t get_wire_debug_mode(void);
 

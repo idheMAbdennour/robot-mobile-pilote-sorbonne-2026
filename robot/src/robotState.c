@@ -16,7 +16,7 @@ static int32_t current_angle = 3;
 
 static uint8_t switch_state = 0;
 
-static uint8_t itm_debug_enabled = 0;
+static uint8_t uart_debug_enabled = 0;
 static uint8_t wire_debug_mode = 0;
 
 // ROBOT NUMBER
@@ -97,13 +97,13 @@ uint8_t get_microswitch_state(void) {
 #endif
 }
 
-// ITM DEBUG
-void set_debug_itm_enabled(uint8_t enabled) {
-    itm_debug_enabled = enabled;
+// UART DEBUG
+void set_debug_uart_enabled(uint8_t enabled) {
+    uart_debug_enabled = enabled;
 }
 
-uint8_t get_debug_itm_enabled(void) {
-    return itm_debug_enabled;
+uint8_t get_debug_uart_enabled(void) {
+    return uart_debug_enabled;
 }
 
 void set_wire_debug_mode(uint8_t mode) {
