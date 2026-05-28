@@ -47,3 +47,28 @@ void uart0_send_string(const char *str)
         LPC_UART0->THR = *str++;
     }
 }
+
+// Copie des initialisations principales pour tests/debug
+void copy_main_init(void)
+{
+    // Initialisations Infrarouge (si présentes dans le projet)
+    extern void init_PWM_IR(void);
+    extern void init_Timer_Enveloppe(uint32_t);
+    extern void init_microswitchs(void);
+    extern void init_capteur_inductif(void);
+    extern void set_debug_uart_enabled(uint8_t);
+
+    init_PWM_IR();
+    init_Timer_Enveloppe(250);
+
+    // Initialisations UART et capteurs
+    init_uart0();
+    init_microswitchs();
+    init_capteur_inductif();
+
+    // SysTick rapide pour tests (100Hz)
+    SysTick_Config(SystemCoreClock / 100);
+
+    // Activer le debug UART localement
+    set_debug_uart_enabled(1);
+}

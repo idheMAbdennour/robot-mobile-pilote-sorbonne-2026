@@ -1,76 +1,26 @@
-#include "status.h"
-#include "dtmf.h"
-#include "emissionIR.h"
-#include "capteurInductif.h"
-#include "microswitchs.h"
+// Minimal debug main: delegate init to copy_main_init(), then send a test string periodically
 #include "uart.h"
-#include "robotState.h"
-#include "decode_enveloppe.h"
+#include <stdint.h>
 #include <stdio.h>
 
-volatile uint8_t flag_50hz = 0;
+volatile uint8_t flag_50hz = 0; // réutilisé par SysTick
 
-int main() {
-	// Initialisations Status & DTMF
-	// initLedChangementStatus();
-	// init_dtmf();
+int main(void)
+{
+    // Perform a compact copy of the main initialisations into uart.c
+    copy_main_init();
 
-	// Initialisations Infrarouge
-	init_PWM_IR();          // Lance la porteuse 38kHz sur P1.22 (en GPIO désactivé par défaut)
-	init_Timer_Enveloppe(250); // Lance le Timer 0 à 250us (un temps 't')
+    // Small periodic debug message loop: every 200ms (flag set at 100Hz)
+    const char *msg = "DEBUG UART0 alive\r\n";
+    uint8_t counter = 0;
 
-    // Initialisations UART et Debug
-    init_uart0();
-    init_microswitchs();
-    init_capteur_inductif();
-
-    // Configuration SysTick pour 100Hz (Période = 10ms)
-    SysTick_Config(SystemCoreClock / 100);
-
-    // Initialisation forcée de l'état de debug pour les tests
-    set_debug_uart_enabled(1);
-
-	// TESTS
-	// mainTestStatusLED(); // Décommenter pour tester le module status
-	// mainTestEmissionIR(); // Décommenter pour tester la préparation d'une trame IR (sans émission réelle)
-
-	while(1) {
-		// Boucle avec condition 50Hz pour la télémétrie UART
+    while (1) {
         if (flag_50hz) {
-            flag_50hz = 0; // Acquittement du drapeau
-
-            if (get_debug_uart_enabled()) {
-                uint8_t sw = get_microswitch_state();
-                char buffer[64];
-
-                // Si l'état des switchs est 11, le choix du debug se fait par le fil
-                if (sw == 3) { // '11'
-                    uint8_t mode_fil = get_wire_debug_mode();
-                    // Ajoutons de la logique factice à implémenter plus tard dans decode_enveloppe
-                    // switch (mode_fil) ...
-                }
-                else if (sw == 2) { // '10' : Valeurs PWM
-                    int32_t pg, pd;
-                    get_motor_pwms(&pg, &pd);
-                    sprintf(buffer, "G %d D %d\r\n", (int)pg, (int)pd);
-                    uart0_send_string(buffer);
-                }
-                else if (sw == 1) { // '01' : Vitesse moyenne
-                    int32_t vmoy, wang;
-                    get_motor_speeds(&vmoy, &wang);
-                    sprintf(buffer, "V %dcm /s\r\n", (int)vmoy);
-                    uart0_send_string(buffer);
-                }
-                else if (sw == 0) { // '00' : Vitesse angulaire
-                    int32_t vmoy, wang;
-                    get_motor_speeds(&vmoy, &wang);
-                    sprintf(buffer, "W %ddeg/s\r\n", (int)wang);
-                    uart0_send_string(buffer);
-                }
+            flag_50hz = 0;
+            if (++counter >= 20) { // 20 * 10ms = 200ms
+                uart0_send_string(msg);
+                counter = 0;
             }
         }
-
-        // Tout le reste est géré par interruptions:
-        // EINT3 (DTMF, Capteurs Inductifs, Switchs) et TIMER0 (IR)
-	}
+    }
 }
