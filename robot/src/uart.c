@@ -21,12 +21,16 @@ void init_uart0(void)
     LPC_UART0->LCR = 0x83;
 
     // 5. Baudrate = 115200
-    // PCLK = SystemCoreClock / 4
+    // PCLK = SystemCoreClock / 4. Pour un PCLK standard de 25MHz
     pclk = SystemCoreClock / 4;
 
-    // Diviseur UART
-    dl = pclk / (16 * 115200);
+    // On active le diviseur fractionnaire (FDR) = 1.5
+    // MULVAL = 2, DIVADDVAL = 1  => FDR = (2 << 4) | 1 = 0x21
+    // La formule devient : DL = PCLK / (16 * Baudrate * 1.5)
+    // dl_float = (PCLK * 10) / (16 * Baudrate * 15)
+    dl = (pclk * 10) / (16 * 115200 * 15);
 
+    LPC_UART0->FDR = 0x21; // Configuration fractionnaire pour 115200 bauds sur LPC1769
     LPC_UART0->DLM = (dl >> 8) & 0xFF;
     LPC_UART0->DLL = dl & 0xFF;
 

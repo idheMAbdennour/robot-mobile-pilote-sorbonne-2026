@@ -159,8 +159,6 @@ void update_status_leds(void)
     }
 }
 
-
-
 void dtmf_interrupt_routine(void)
 {
     // --- Traitement DTMF P0.20 ---

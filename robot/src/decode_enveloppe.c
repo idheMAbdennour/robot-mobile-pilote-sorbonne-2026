@@ -1,14 +1,12 @@
 #include "decode_enveloppe.h"
-#include "robotState.h"
-#include "capteurInductif.h"
 
-void decode_enveloppe_commande(void)
+// Le décodage réel des symboles d'enveloppe n'est pas dans ce module.
+// Ce stub reçoit la période mesurée en microsecondes et doit
+// appeler le décodeur/maillon de traitement dédié (externe).
+// Pour l'instant on expose simplement le point d'entrée.
+void decode_enveloppe_commande(uint16_t period_us)
 {
-    // float periode = get_envelope_period_ms();
-
-    // TODO : Interface de traduction des périodes de l'enveloppe
-    // numrique en symboles
-    // - Si le message décodé ordonne d'activer via le fil :
-    //   set_debug_uart_enabled(1);
-    //   set_wire_debug_mode(NOUVEAU_MODE);
+    // TODO: Appeler la fonction de décodage réelle qui reconstruit
+    // la trame à partir de la série de périodes mesurées.
+    (void)period_us;
 }

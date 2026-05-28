@@ -10,14 +10,18 @@ static int32_t current_pwm_d = 3;
 static int32_t current_v_moy = 4;
 static int32_t current_w_ang = 5;
 
-static int32_t current_dist1 = 1;
-static int32_t current_dist2 = 2;
+static int32_t current_dist_av = 1;
+static int32_t current_dist_ar = 2;
+static int32_t current_dist_mil = 3;
 static int32_t current_angle = 3;
 
-static uint8_t switch_state = 0;
+static int32_t current_pos_av = 111;
+static int32_t current_pos_ar = 222;
+static int32_t current_pos_mil = 333;
+
+static int32_t proxi_dists[72]; // 72 mesures de 5° pour couvrir 360°
 
 static uint8_t uart_debug_enabled = 0;
-static uint8_t wire_debug_mode = 0;
 
 // ROBOT NUMBER
 void set_robot_number(uint8_t number) {
@@ -57,8 +61,13 @@ void set_motor_pwms(int32_t pwm_g, int32_t pwm_d) {
 }
 
 void get_motor_pwms(int32_t *pwm_g, int32_t *pwm_d) {
+#if SIMULATE_SENSOR_VALUES
+    if (pwm_g) *pwm_g = 350;
+    if (pwm_d) *pwm_d = 450;
+#else
     if (pwm_g) *pwm_g = current_pwm_g;
     if (pwm_d) *pwm_d = current_pwm_d;
+#endif
 }
 
 void set_motor_speeds(int32_t v_moy, int32_t w_ang) {
@@ -67,53 +76,91 @@ void set_motor_speeds(int32_t v_moy, int32_t w_ang) {
 }
 
 void get_motor_speeds(int32_t *v_moy, int32_t *w_ang) {
+#if SIMULATE_SENSOR_VALUES
+    if (v_moy) *v_moy = 30;
+    if (w_ang) *w_ang = -5;
+#else
     if (v_moy) *v_moy = current_v_moy;
     if (w_ang) *w_ang = current_w_ang;
-}
-
-// CAPTEUR INDUCTIF
-void set_inductif_values(int32_t dist1, int32_t dist2, int32_t angle) {
-    current_dist1 = dist1;
-    current_dist2 = dist2;
-    current_angle = angle;
-}
-
-void get_inductif_values(int32_t *dist1, int32_t *dist2, int32_t *angle) {
-    if (dist1) *dist1 = current_dist1;
-    if (dist2) *dist2 = current_dist2;
-    if (angle) *angle = current_angle;
-}
-
-// SWITCHS
-void set_microswitch_state(uint8_t state) {
-    switch_state = state & 0x03; // Mask pour 2 bits
-}
-
-uint8_t get_microswitch_state(void) {
-#if FORCE_DEBUG_SWITCH_11
-    return 3; // Force l'état '11'
-#else
-    return switch_state;
 #endif
 }
 
-// UART DEBUG
+// CAPTEUR INDUCTIF
+void set_inductif_values(int32_t dist_av, int32_t dist_ar, int32_t dist_mil, int32_t angle) {
+    current_dist_av = dist_av;
+    current_dist_ar = dist_ar;
+    current_dist_mil = dist_mil;
+    current_angle = angle;
+}
+
+void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, int32_t *angle) {
+#if SIMULATE_SENSOR_VALUES
+    if (dist_av) *dist_av = 123;
+    if (dist_ar) *dist_ar = -12;
+    if (dist_mil) *dist_mil = 456;
+    if (angle) *angle = -10;
+#else
+    if (dist_av) *dist_av = current_dist_av;
+    if (dist_ar) *dist_ar = current_dist_ar;
+    if (dist_mil) *dist_mil = current_dist_mil;
+    if (angle) *angle = current_angle;
+#endif
+}
+
+// PROXIMETRE
+void set_proxi_distances(const int32_t *dists) {
+    if (!dists) {
+        return;
+    }
+
+    for (int i = 0; i < 72; i++) {
+        proxi_dists[i] = dists[i];
+    }
+}
+
+void get_proxi_distances(int32_t *dists) {
+    if (!dists) {
+        return;
+    }
+
+#if SIMULATE_SENSOR_VALUES
+    for (int i = 0; i < 72; i++) {
+        dists[i] = 200 + ((i % 18) * 7);
+    }
+#else
+    for (int i = 0; i < 72; i++) {
+        dists[i] = proxi_dists[i];
+    }
+#endif
+}
+
+static int normalize_angle(int angle_deg) {
+    int normalized = angle_deg % 360;
+
+    if (normalized < 0) {
+        normalized += 360;
+    }
+
+    return normalized;
+}
+
+void set_proxi_distance_at_angle(int angle_deg, int32_t distance) {
+    int index = normalize_angle(angle_deg) / 5; // 5° par mesure
+    proxi_dists[index] = distance;
+}
+
+void get_proxi_distance_at_angle(int angle_deg, int32_t *distance) {
+    int index = normalize_angle(angle_deg) / 5; // 5° par mesure
+    if (distance) {
+        *distance = proxi_dists[index];
+    }
+}
+
+// UART DEBUG GLOBAUX
 void set_debug_uart_enabled(uint8_t enabled) {
     uart_debug_enabled = enabled;
 }
 
 uint8_t get_debug_uart_enabled(void) {
     return uart_debug_enabled;
-}
-
-void set_wire_debug_mode(uint8_t mode) {
-    wire_debug_mode = mode;
-}
-
-uint8_t get_wire_debug_mode(void) {
-#if FORCE_WIRE_DEBUG_MODE_1
-    return 1;
-#else
-    return wire_debug_mode;
-#endif
 }

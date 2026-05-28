@@ -1,9 +1,10 @@
 #include "LPC17xx.h"
 #include "uart.h"
 #include "robotState.h"
-#include "microswitchs.h"
+#include "moteurs.h"
+#include "capteurInductif.h"
+#include "proximetre.h"
 #include "emissionIR.h"
-#include "debug.h"
 #include <stdint.h>
 
 volatile uint8_t flag_50hz = 0;
@@ -15,7 +16,8 @@ int main(void)
     init_uart0();
     init_PWM_IR();
     init_Timer_Enveloppe(250);
-    init_microswitchs();
+    init_moteurs_debug();
+    init_proximetre();
     init_capteur_inductif();
 
     SysTick_Config(SystemCoreClock / 50);
@@ -30,11 +32,16 @@ int main(void)
 
         flag_50hz = 0;
 
-        if (!get_debug_uart_enabled())
-        {
+        if (!get_debug_uart_enabled()) {
             continue;
         }
 
-        debug_uart_send_frame();
+        // Envois debug par module
+        debug_moteurs_send_frame();
+        debug_inductif_send_frame();
+
+        // Note : Ne PAS mettre debug_proximetre_send_frame() ici !
+        // Le cahier des charges dit "à chaque balayage".
+        // Il faudra l'appeler à la fin de la fonction qui gère le servo-moteur du proximètre.
     }
 }

@@ -4,10 +4,8 @@
 #include <stdint.h>
 
 // --- Configuration de Test ---
-// Mettre à 1 pour forcer l'état des microswitchs à '11' (mode debug par fil)
-#define FORCE_DEBUG_SWITCH_11 1
-// Mettre à 1 pour forcer le mode de debug par fil à une valeur de test (1)
-#define FORCE_WIRE_DEBUG_MODE_1 1
+// Mettre à 1 pour simuler toutes les valeurs de capteurs (pas de capteur branché)
+#define SIMULATE_SENSOR_VALUES 1
 
 // Enumération pour l'état du robot à transmettre par IR
 typedef enum {
@@ -34,17 +32,17 @@ void set_motor_speeds(int32_t v_moy, int32_t w_ang);
 void get_motor_speeds(int32_t *v_moy, int32_t *w_ang);
 
 // --- Capteur Inductif (Distances et Angle) ---
-void set_inductif_values(int32_t dist1, int32_t dist2, int32_t angle);
-void get_inductif_values(int32_t *dist1, int32_t *dist2, int32_t *angle);
+void set_inductif_values(int32_t dist_av, int32_t dist_ar, int32_t dist_mil, int32_t angle);
+void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, int32_t *angle);
 
-// --- Configurations Microswitchs ---
-void set_microswitch_state(uint8_t state);
-uint8_t get_microswitch_state(void);
+// --- Proximetre ---
+void set_proxi_distances(const int32_t *dists);
+void get_proxi_distances(int32_t *dists);
+void set_proxi_distance_at_angle(int angle_deg, int32_t distance);
+void get_proxi_distance_at_angle(int angle_deg, int32_t *distance);
 
-// --- UART Debug Globals ---
+// --- UART Debug Global ---
 void set_debug_uart_enabled(uint8_t enabled);
 uint8_t get_debug_uart_enabled(void);
-void set_wire_debug_mode(uint8_t mode);
-uint8_t get_wire_debug_mode(void);
 
 #endif // ROBOT_STATE_H

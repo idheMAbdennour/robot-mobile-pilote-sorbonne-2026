@@ -7,6 +7,6 @@
  * @brief Traduit la période mesurée de l'enveloppe en message ou commande.
  * Modifie potentiellement le robotState et les modes de debugs.
  */
-void decode_enveloppe_commande(void);
+void decode_enveloppe_commande(uint16_t period_us);
 
 #endif // DECODE_ENVELOPPE_H

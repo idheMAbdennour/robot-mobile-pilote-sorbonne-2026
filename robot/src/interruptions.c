@@ -2,17 +2,18 @@
 
 // Inclusions des composants qui fournissent leurs propres routines d'interruption
 #include "dtmf.h"
+#include "moteurs.h"
 #include "capteurInductif.h"
+#include "proximetre.h"
 #include "emissionIR.h"
 #include "recepSPI.h"
-#include "microswitchs.h"
 
 extern volatile uint8_t flag_50hz;
 
 // ==============================================================================
 // GESTION DU SYSTICK - Utilisé pour cadence le main à 50Hz
 // ==============================================================================
-void SysTick_Handler(void) 
+void SysTick_Handler(void)
 {
     flag_50hz = 1;
 }
@@ -24,18 +25,16 @@ void EINT3_IRQHandler(void)
 {
     // --- Routine DTMF (P0.20) ---
     dtmf_interrupt_routine();
-    
-    // --- Routine Capteur Inductif (P0.27 et P0.28) ---
-    capteurInductif_interrupt_routine();
 
-    // --- Routine Microswitchs (P0.29 et P0.30) ---
-    microswitchs_interrupt_routine();
+    moteurs_interrupt_routine();
+    capteurInductif_interrupt_routine();
+    proximetre_interrupt_routine();
 }
 
 // ==============================================================================
 // GESTION DES INTERRUPTIONS EXTERNES DEDIEES (EINT1) - Utilisé par recepSPI
 // ==============================================================================
-void EINT1_IRQHandler(void) 
+void EINT1_IRQHandler(void)
 {
     // --- Routine de réception SPI ---
     recepSPI_interrupt_routine();
@@ -44,7 +43,7 @@ void EINT1_IRQHandler(void)
 // ==============================================================================
 // GESTION DES INTERRUPTIONS TIMER 0 - Utilisé par emissionIR
 // ==============================================================================
-void TIMER0_IRQHandler(void) 
+void TIMER0_IRQHandler(void)
 {
     // --- Routine d'émission IR ---
     emissionIR_interrupt_routine();

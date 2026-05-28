@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+
+#define PIN_IND_SW1 (1 << 13) // P0.13
+#define PIN_IND_SW2 (1 << 14) // P0.14
+#define PIN_IND_SW3 (1 << 15) // P0.15
+
 /**
  * @brief Initialise le capteur inductif (ADC, GPIO pour l'horloge et l'enveloppe, Timer pour mesure réseau)
  */
@@ -14,13 +19,18 @@ void init_capteur_inductif(void);
 void capteurInductif_interrupt_routine(void);
 
 /**
- * @brief Récupère les dernières valeurs moyennes des capteurs
+ * @brief Reçoit un code wire 1XX et prépare une émission unique si le mode HW l'autorise.
  */
-void get_capteur_averages(uint32_t *avg1, uint32_t *avg2, uint32_t *avg3);
+void capteurInductif_receive_wire_command(uint8_t wire_code);
 
 /**
- * @brief Récupère la période du signal enveloppe (en millisecondes)
+ * @brief Récupère les dernières valeurs moyennes des capteurs
  */
-float get_envelope_period_ms(void);
+void get_capteur_averages(uint16_t *avg1, uint16_t *avg2, uint16_t *avg3);
+
+/**
+ * @brief Récupère la période du signal enveloppe (en microsecondes)
+ */
+uint16_t get_envelope_period_us(void);
 
 #endif /* CAPTEUR_INDUCTIF_H */
