@@ -5,6 +5,24 @@ static uint8_t current_robot_number = 0; // Par exemple, le robot numéro 7 par 
 static uint8_t current_vitesse = 0; // vitesse initiale
 static robot_status_t current_status = STATUS_LIBRE; // Statut par défaut 0001
 
+static int32_t current_pwm_g = 2;
+static int32_t current_pwm_d = 3;
+static int32_t current_v_moy = 4;
+static int32_t current_w_ang = 5;
+
+static int32_t current_dist_av = 1;
+static int32_t current_dist_ar = 2;
+static int32_t current_dist_mil = 3;
+static int32_t current_angle = 3;
+
+static int32_t current_pos_av = 111;
+static int32_t current_pos_ar = 222;
+static int32_t current_pos_mil = 333;
+
+static int32_t proxi_dists[72]; // 72 mesures de 5° pour couvrir 360°
+
+static uint8_t uart_debug_enabled = 0;
+
 // ROBOT NUMBER
 void set_robot_number(uint8_t number) {
     if (number <= 15) {
@@ -34,4 +52,115 @@ void set_robot_status(robot_status_t status) {
 
 robot_status_t get_robot_status(void) {
     return current_status;
+}
+
+// MOTEURS COMMANDES & RETOURS
+void set_motor_pwms(int32_t pwm_g, int32_t pwm_d) {
+    current_pwm_g = pwm_g;
+    current_pwm_d = pwm_d;
+}
+
+void get_motor_pwms(int32_t *pwm_g, int32_t *pwm_d) {
+#if SIMULATE_SENSOR_VALUES
+    if (pwm_g) *pwm_g = 350;
+    if (pwm_d) *pwm_d = 450;
+#else
+    if (pwm_g) *pwm_g = current_pwm_g;
+    if (pwm_d) *pwm_d = current_pwm_d;
+#endif
+}
+
+void set_motor_speeds(int32_t v_moy, int32_t w_ang) {
+    current_v_moy = v_moy;
+    current_w_ang = w_ang;
+}
+
+void get_motor_speeds(int32_t *v_moy, int32_t *w_ang) {
+#if SIMULATE_SENSOR_VALUES
+    if (v_moy) *v_moy = 30;
+    if (w_ang) *w_ang = -5;
+#else
+    if (v_moy) *v_moy = current_v_moy;
+    if (w_ang) *w_ang = current_w_ang;
+#endif
+}
+
+// CAPTEUR INDUCTIF
+void set_inductif_values(int32_t dist_av, int32_t dist_ar, int32_t dist_mil, int32_t angle) {
+    current_dist_av = dist_av;
+    current_dist_ar = dist_ar;
+    current_dist_mil = dist_mil;
+    current_angle = angle;
+}
+
+void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, int32_t *angle) {
+#if SIMULATE_SENSOR_VALUES
+    if (dist_av) *dist_av = 123;
+    if (dist_ar) *dist_ar = -12;
+    if (dist_mil) *dist_mil = 456;
+    if (angle) *angle = -10;
+#else
+    if (dist_av) *dist_av = current_dist_av;
+    if (dist_ar) *dist_ar = current_dist_ar;
+    if (dist_mil) *dist_mil = current_dist_mil;
+    if (angle) *angle = current_angle;
+#endif
+}
+
+// PROXIMETRE
+void set_proxi_distances(const int32_t *dists) {
+    if (!dists) {
+        return;
+    }
+
+    for (int i = 0; i < 72; i++) {
+        proxi_dists[i] = dists[i];
+    }
+}
+
+void get_proxi_distances(int32_t *dists) {
+    if (!dists) {
+        return;
+    }
+
+#if SIMULATE_SENSOR_VALUES
+    for (int i = 0; i < 72; i++) {
+        dists[i] = 200 + ((i % 18) * 7);
+    }
+#else
+    for (int i = 0; i < 72; i++) {
+        dists[i] = proxi_dists[i];
+    }
+#endif
+}
+
+static int normalize_angle(int angle_deg) {
+    int normalized = angle_deg % 360;
+
+    if (normalized < 0) {
+        normalized += 360;
+    }
+
+    return normalized;
+}
+
+void set_proxi_distance_at_angle(int angle_deg, int32_t distance) {
+    int index = normalize_angle(angle_deg) / 5; // 5° par mesure
+    proxi_dists[index] = distance;
+}
+
+void get_proxi_distance_at_angle(int angle_deg, int32_t *distance) {
+    int index = normalize_angle(angle_deg) / 5; // 5° par mesure
+    if (distance) {
+        *distance = proxi_dists[index];
+    }
+}
+
+// UART DEBUG GLOBAUX
+void set_debug_uart_enabled(uint8_t enabled) {
+    uart_debug_enabled = enabled;
+}
+
+uint8_t get_debug_uart_enabled(void) {
+    return uart_debug_enabled;
 }

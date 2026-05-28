@@ -68,7 +68,7 @@ void setCSVal(int csNum) {
 	posWriteCS = (posWriteCS + 1) % 8;
 }
 
-void EINT1_IRQHandler() {
+void recepSPI_interrupt_routine(void) {
 	// FLAG
 	LPC_SC->EXTINT |= 1 << 1;
 	

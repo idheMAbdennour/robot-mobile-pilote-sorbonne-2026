@@ -82,8 +82,8 @@ void init_Timer_Enveloppe(uint16_t délai_us) {
 }
 
 
-// Interruption déclenchée toutes les 250us (un temps 't')
-void TIMER0_IRQHandler(void) {
+// Interruption appelée toutes les 250us (depuis un temps 't') par interruptions.c
+void emissionIR_interrupt_routine(void) {
     // Acquitter l'interruption
     LPC_TIM0->IR = 1;
 
@@ -106,7 +106,7 @@ void update_PWM_state(void) {
             frame_counter++;
             if (frame_counter >= 6) {
                 frame_counter = 0; // On reprend un nouveau cycle d'émission, reconstruire la trame :
-                preparer_trame(get_robot_number(), get_robot_vitesse(), (uint8_t)get_robot_ir_status());
+                preparer_trame(get_robot_number(), get_robot_vitesse(), (uint8_t)get_robot_status());
             }
         }
         return;

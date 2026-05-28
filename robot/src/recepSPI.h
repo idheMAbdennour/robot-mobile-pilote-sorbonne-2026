@@ -9,3 +9,4 @@ void initCS1234();
 
 // Demander un valeur pour un CS précis (0 à 3)
 void setCSVal(int csNum);
+void recepSPI_interrupt_routine(void);

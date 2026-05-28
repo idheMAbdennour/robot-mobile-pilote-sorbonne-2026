@@ -1,5 +1,4 @@
 #include "LPC17xx.h"
 
-uint8_t ROBOT_NUMBER = 0;
-
-void init_dtmf();
+void init_dtmf(void);
+void dtmf_interrupt_routine(void);
