@@ -20,7 +20,7 @@ int main() {
 	init_Timer_Enveloppe(250); // Lance le Timer 0 à 250us (un temps 't')
 
     // Initialisations UART et Debug
-    init_uart1();
+    init_uart3();
     init_microswitchs();
     init_capteur_inductif();
 
@@ -54,19 +54,19 @@ int main() {
                     int32_t pg, pd;
                     get_motor_pwms(&pg, &pd);
                     sprintf(buffer, "G %d D %d\r\n", (int)pg, (int)pd);
-                    uart1_send_string(buffer);
+                    uart3_send_string(buffer);
                 }
                 else if (sw == 1) { // '01' : Vitesse moyenne
                     int32_t vmoy, wang;
                     get_motor_speeds(&vmoy, &wang);
                     sprintf(buffer, "V %dcm /s\r\n", (int)vmoy);
-                    uart1_send_string(buffer);
+                    uart3_send_string(buffer);
                 }
                 else if (sw == 0) { // '00' : Vitesse angulaire
                     int32_t vmoy, wang;
                     get_motor_speeds(&vmoy, &wang);
                     sprintf(buffer, "W %ddeg/s\r\n", (int)wang);
-                    uart1_send_string(buffer);
+                    uart3_send_string(buffer);
                 }
             }
         }

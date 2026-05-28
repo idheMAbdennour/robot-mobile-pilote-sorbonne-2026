@@ -10,15 +10,14 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>6240000::V6.24::ARMCLANG</pArmCC>
-      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
+      <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>LPC1769</Device>
           <Vendor>NXP</Vendor>
-          <PackID>Keil.LPC1700_DFP.2.6.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.LPC1700_DFP.2.7.2</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x8000) IRAM2(0x2007C000,0x8000) IROM(0x00000000,0x80000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -410,6 +409,91 @@
               <FileType>5</FileType>
               <FilePath>.\src\dtmf.h</FilePath>
             </File>
+            <File>
+              <FileName>capteurInductif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\capteurInductif.c</FilePath>
+            </File>
+            <File>
+              <FileName>capteurInductif.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\capteurInductif.h</FilePath>
+            </File>
+            <File>
+              <FileName>decode_enveloppe.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\decode_enveloppe.c</FilePath>
+            </File>
+            <File>
+              <FileName>decode_enveloppe.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\decode_enveloppe.h</FilePath>
+            </File>
+            <File>
+              <FileName>emissionIR.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\emissionIR.c</FilePath>
+            </File>
+            <File>
+              <FileName>emissionIR.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\emissionIR.h</FilePath>
+            </File>
+            <File>
+              <FileName>interruptions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\interruptions.c</FilePath>
+            </File>
+            <File>
+              <FileName>interruptions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\interruptions.h</FilePath>
+            </File>
+            <File>
+              <FileName>microswitchs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\microswitchs.c</FilePath>
+            </File>
+            <File>
+              <FileName>microswitchs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\microswitchs.h</FilePath>
+            </File>
+            <File>
+              <FileName>recepSPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\recepSPI.c</FilePath>
+            </File>
+            <File>
+              <FileName>recepSPI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\recepSPI.h</FilePath>
+            </File>
+            <File>
+              <FileName>robotState.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\robotState.c</FilePath>
+            </File>
+            <File>
+              <FileName>robotState.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\robotState.h</FilePath>
+            </File>
+            <File>
+              <FileName>toolsIR.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\toolsIR.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\uart.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -425,8 +509,8 @@
   <RTE>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -442,7 +526,7 @@
       <file attr="config" category="header" condition="LPC1700 CMSIS Device" name="RTE_Driver\Config\RTE_Device.h" version="2.4.1">
         <instance index="0">RTE\Device\LPC1769\RTE_Device.h</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="LPC17xx CMSIS Device ARMCC"/>
-        <package name="LPC1700_DFP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="2.6.0"/>
+        <package name="LPC1700_DFP" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="Keil" version="2.7.2"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -450,7 +534,7 @@
       <file attr="config" category="source" condition="LPC176x" name="Device\Source\ARM\startup_LPC17xx.s" version="1.0.0">
         <instance index="0">RTE\Device\LPC1769\startup_LPC17xx.s</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="LPC17xx CMSIS Device ARMCC"/>
-        <package name="LPC1700_DFP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="2.6.0"/>
+        <package name="LPC1700_DFP" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="Keil" version="2.7.2"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
@@ -458,7 +542,7 @@
       <file attr="config" category="source" condition="LPC176x" name="Device\Source\system_LPC17xx.c" version="1.0.0">
         <instance index="0">RTE\Device\LPC1769\system_LPC17xx.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="LPC17xx CMSIS Device ARMCC"/>
-        <package name="LPC1700_DFP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="2.6.0"/>
+        <package name="LPC1700_DFP" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="Keil" version="2.7.2"/>
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
