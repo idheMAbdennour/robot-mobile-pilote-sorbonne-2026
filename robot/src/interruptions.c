@@ -48,3 +48,12 @@ void TIMER0_IRQHandler(void)
     // --- Routine d'émission IR ---
     emissionIR_interrupt_routine();
 }
+
+// ==============================================================================
+// GESTION DES INTERRUPTIONS TIMER 3 - Utilisé par proximetre (servo PWM logiciel)
+// ==============================================================================
+void TIMER3_IRQHandler(void)
+{
+    // --- Génération du signal servo du proximètre ---
+    proximetre_timer_interrupt_routine();
+}
