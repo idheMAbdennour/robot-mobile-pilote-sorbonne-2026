@@ -1,56 +1,16 @@
-/*======================================================================
- *  proximetre.c  —  LPC1769
- *  Détection d'obstacles : servo (balayage) + GP2Y0A02YK0F (ADC)
- *                           + UART de débogage + buzzer
- *
- *  Modules : uart.h, robotState.h, proximetre.h
- *  Les vecteurs d'interruption se trouvent dans interruptions.c — le module
- *  fournit seulement les routines :
- *    - proximetre_interrupt_routine()        <- depuis EINT3_IRQHandler (switchs)
- *    - proximetre_timer_interrupt_routine()  <- depuis TIMER3_IRQHandler (servo)
- *
- *  Horloges : CCLK=100MHz, PCLK=CCLK/4=25MHz.
- *
- *  >>> PWM / TEMPORISATEURS <<<
- *  PWM1 est utilisé par les moteurs (25 kHz, période commune) — le servo
- *  ne peut pas y être ajouté.
- *  Timer0 (emissionIR) et Timer1 sont utilisés. Tout le proximètre fonctionne
- *  avec Timer3 :
- *    - servo : PWM logiciel par interruption (MR0=front↑, MR1=front↓)
- *    - pauses et buzzer : lecture du TC en libre comptage (1 µs)
- *
- *  Si Timer3 n'est PAS libre, modifier ici : LPC_TIM3->LPC_TIM2,
- *  PCONP (1<<23)->(1<<22), TIMER3_IRQn->TIMER2_IRQn ; et dans interruptions.c
- *  renommer TIMER3_IRQHandler -> TIMER2_IRQHandler.
- *
- *  PLAN DES BROCHES :
- *    Servo sig : P2.2  -> GPIO + ISR Timer3  (J2-43)
- *    IR Vo ADC : P0.23 -> AD0.0    (J2-15)
- *    UART0 dbg : P0.2 TXD0 / P0.3 RXD0
- *    Buzzer    : P0.21 -> sortie GPIO (J2-23)
- *    Switch S0 : P0.4  -> entrée GPIO  ] 2 micro-switchs -> 4 modes
- *    Switch S1 : P0.5  -> entrée GPIO
- *====================================================================*/
-
 #include "LPC17xx.h"
 #include "proximetre.h"
 #include "robotState.h"
 #include "uart.h"
 #include <stdio.h>
-#include <stdlib.h>     /* abs */
-#include <math.h>       /* powf (seulement si USE_LUT=0) */
+#include <stdlib.h>     
+#include <math.h>       
 
-/*---------------------------------------------------------------------
- *  BROCHES
- *-------------------------------------------------------------------*/
-#define PIN_PROX_SW1   (1u << 12)    /* P0.12 */
-#define PIN_PROX_SW2   (1u << 13)    /* P0.13 */
-#define SERVO_PIN      (1u << 2)    /* P2.2 (GPIO2) — signal du servo */
-#define BUZZ_PIN       (1u << 21)   /* P0.21 (GPIO0) */
+#define PIN_PROX_SW1   (1u << 12)    
+#define PIN_PROX_SW2   (1u << 13)    
+#define SERVO_PIN      (1u << 2)    
+#define BUZZ_PIN       (1u << 21)   
 
-/*---------------------------------------------------------------------
- *  PARAMÈTRES (à calibrer / vérifier avec le cahier des charges — marqué !!!)
- *-------------------------------------------------------------------*/
 #define ADC_VREF        3.3f
 #define ADC_MAX         4095.0f
 #define ADC_AVG_N       8
@@ -61,45 +21,38 @@
 
 #define US_PER_DEG      11
 #define SERVO_CENTER_US 1500
-#define SERVO_PERIOD_US 20000u      /* 20 ms */
+#define SERVO_PERIOD_US 20000u      
 
-#define BUZZ_ON_US      250000u     /* bip 0,25 s (cahier des charges p.10) */
+#define BUZZ_ON_US      250000u     
 
 #define USE_LUT         1
 
-/*---------------------------------------------------------------------
- *  Modes de balayage (structure du cahier des charges p.9 ; vérifier les nombres)
- *-------------------------------------------------------------------*/
 typedef struct { int angle_max; uint32_t step_delay_ms; } mode_t;
 static const mode_t MODES[4] = {
-    /* 00 */ { 60, 40 },
-    /* 01 */ { 30, 38 },
-    /* 10 */ { 20, 37 },
-    /* 11 */ { 15, 36 }
+    { 60, 40 },
+    { 30, 38 },
+    { 20, 37 },
+    { 15, 36 }
 };
 
-/* Linéarisation du GP2Y0A02YK0F (V avec l'objet, d'après la fiche technique) */
 static const float LUT_V[]  = {2.5f,2.0f,1.55f,1.25f,1.1f,0.85f,0.8f,
                                0.73f,0.7f,0.65f,0.6f,0.5f,0.45f,0.4f};
 static const int   LUT_CM[] = { 20, 30, 40, 50, 60, 70, 80,
                                 90,100,110,120,130,140,150};
 #define LUT_N (sizeof(LUT_CM)/sizeof(LUT_CM[0]))
 
-/*---------------------------------------------------------------------
- *  État du module
- *-------------------------------------------------------------------*/
-static volatile uint8_t  prox_mode = 0;          /* écrit dans l'ISR des switchs */
+static volatile uint8_t  prox_mode = 0;          
 static int32_t  prox_buf[NUM_PROXI_MEASUREMENTS];
 static int      prox_count = 0;
 static char     prox_dir = 'T';
 
-static volatile uint32_t servo_pulse_us = SERVO_CENTER_US;  /* lu dans l'ISR du servo */
+static volatile uint32_t servo_pulse_us = SERVO_CENTER_US;  
 
 static volatile uint32_t buzz_period_us = 0;
 static uint32_t buzz_t0 = 0;
 static uint8_t  buzz_on = 0;
 
-/* déclarations anticipées */
+/* Внутренние прототипы */
 static void init_proximetre_switches(void);
 static void proximetre_update_mode_from_gpio(void);
 static void Timer3_Init(void);
@@ -112,39 +65,35 @@ static void Buzzer_SetFromDistance(int cm);
 static void Buzzer_Service(void);
 static void delay_ms(uint32_t ms);
 
-/*=====================================================================
- *  Timer3 — comptage libre à 1 µs. Gère le servo (ISR) + la base de temps (TC).
- *===================================================================*/
 static void Timer3_Init(void)
 {
-    LPC_PINCON->PINSEL4 &= ~(3u << 4);          /* P2.2 = GPIO */
+    LPC_PINCON->PINSEL4 &= ~(3u << 4);          
     LPC_GPIO2->FIODIR   |=  SERVO_PIN;
     LPC_GPIO2->FIOCLR    =  SERVO_PIN;
 
-    LPC_SC->PCONP |= (1u << 23);                /* alimentation de Timer3 */
-    LPC_TIM3->TCR  = 0x02;                      /* réinitialisation, TC=0 */
-    LPC_TIM3->PR   = 24;                        /* 25MHz/(24+1)=1MHz -> 1 µs */
-    LPC_TIM3->MCR  = (1u << 0) | (1u << 3);     /* IRQ sur MR0 et MR1, SANS réinitialisation */
-    LPC_TIM3->MR0  = 1000u;                     /* premier front↑ dans 1 ms */
-    LPC_TIM3->MR1  = 1000u + SERVO_CENTER_US;   /* premier front↓ */
-    LPC_TIM3->IR   = 0x3F;                      /* effacer les indicateurs */
+    LPC_SC->PCONP |= (1u << 23);                
+    LPC_TIM3->TCR  = 0x02;                      
+    LPC_TIM3->PR   = 24;                        
+    LPC_TIM3->MCR  = (1u << 0) | (1u << 3);     
+    LPC_TIM3->MR0  = 1000u;                     
+    LPC_TIM3->MR1  = 1000u + SERVO_CENTER_US;   
+    LPC_TIM3->IR   = 0x3F;                      
     NVIC_EnableIRQ(TIMER3_IRQn);
-    LPC_TIM3->TCR  = 0x01;                      /* démarrage (comptage libre) */
+    LPC_TIM3->TCR  = 0x01;                      
 }
 
-/* Appelée depuis TIMER3_IRQHandler (définie dans interruptions.c) */
 void proximetre_timer_interrupt_routine(void)
 {
     uint32_t ir = LPC_TIM3->IR;
 
-    if (ir & (1u << 0)) {                       /* MR0 : front montant */
+    if (ir & (1u << 0)) {                       
         LPC_GPIO2->FIOSET = SERVO_PIN;
-        uint32_t base = LPC_TIM3->MR0;          /* grille idéale, sans dérive */
-        LPC_TIM3->MR1 = base + servo_pulse_us;  /* moment où abaisser */
-        LPC_TIM3->MR0 = base + SERVO_PERIOD_US; /* période suivante */
+        uint32_t base = LPC_TIM3->MR0;          
+        LPC_TIM3->MR1 = base + servo_pulse_us;  
+        LPC_TIM3->MR0 = base + SERVO_PERIOD_US; 
         LPC_TIM3->IR  = (1u << 0);
     }
-    if (ir & (1u << 1)) {                       /* MR1 : front descendant */
+    if (ir & (1u << 1)) {                       
         LPC_GPIO2->FIOCLR = SERVO_PIN;
         LPC_TIM3->IR  = (1u << 1);
     }
@@ -163,17 +112,14 @@ static void Servo_SetAngle(int angle_deg)
     int pulse = SERVO_CENTER_US + angle_deg * US_PER_DEG;
     if (pulse < 700)  pulse = 700;
     if (pulse > 2300) pulse = 2300;
-    servo_pulse_us = (uint32_t)pulse;           /* l'ISR le prendra en compte à partir de la période suivante */
+    servo_pulse_us = (uint32_t)pulse;           
 }
 
-/*=====================================================================
- *  ADC — AD0.0 sur P0.23
- *===================================================================*/
 static void ADC_Init(void)
 {
     LPC_SC->PCONP    |= (1u << 12);
     LPC_PINCON->PINSEL1 &= ~(3u << 14);
-    LPC_PINCON->PINSEL1 |=  (1u << 14);          /* P0.23 = AD0.0 */
+    LPC_PINCON->PINSEL1 |=  (1u << 14);          
     LPC_ADC->ADCR = (1u << 0) | (4u << 8) | (1u << 21);
 }
 
@@ -192,9 +138,6 @@ static uint16_t ADC_ReadAvg(void)
     return (uint16_t)(s / ADC_AVG_N);
 }
 
-/*=====================================================================
- *  ADC -> centimètres
- *===================================================================*/
 static int Distance_cm(uint16_t adc)
 {
     float v = (adc / ADC_MAX) * ADC_VREF;
@@ -217,12 +160,9 @@ static int Distance_cm(uint16_t adc)
 #endif
 }
 
-/*=====================================================================
- *  Buzzer (P0.21) — fréquence de répétition du bip (cahier des charges p.10)
- *===================================================================*/
 static void Buzzer_Init(void)
 {
-    LPC_PINCON->PINSEL1 &= ~(3u << 10);          /* P0.21 = GPIO */
+    LPC_PINCON->PINSEL1 &= ~(3u << 10);          
     LPC_GPIO0->FIODIR   |=  BUZZ_PIN;
     LPC_GPIO0->FIOCLR    =  BUZZ_PIN;
 }
@@ -250,12 +190,9 @@ static void Buzzer_Service(void)
     }
 }
 
-/*=====================================================================
- *  Switchs de mode (P0.4, P0.5)
- *===================================================================*/
 static void init_proximetre_switches(void)
 {
-    LPC_PINCON->PINSEL0 &= ~((3u << 8) | (3u << 10)); /* P0.4,P0.5 = GPIO */
+    LPC_PINCON->PINSEL0 &= ~((3u << 8) | (3u << 10)); 
     LPC_GPIO0->FIODIR   &= ~(PIN_PROX_SW1 | PIN_PROX_SW2);
     LPC_GPIOINT->IO0IntEnR |= (PIN_PROX_SW1 | PIN_PROX_SW2);
     LPC_GPIOINT->IO0IntEnF |= (PIN_PROX_SW1 | PIN_PROX_SW2);
@@ -277,10 +214,10 @@ void init_proximetre(void)
     proximetre_update_mode_from_gpio();
     Servo_SetAngle(0);
     delay_ms(500);
-    NVIC_EnableIRQ(EINT3_IRQn);          /* les interruptions GPIO passent par EINT3 */
+    NVIC_EnableIRQ(EINT3_IRQn);          
 }
 
-void proximetre_interrupt_routine(void)  /* appelée depuis l'EINT3_IRQHandler commun */
+void proximetre_interrupt_routine(void)  
 {
     if ((LPC_GPIOINT->IO0IntStatR & (PIN_PROX_SW1 | PIN_PROX_SW2)) ||
         (LPC_GPIOINT->IO0IntStatF & (PIN_PROX_SW1 | PIN_PROX_SW2)))
@@ -290,13 +227,6 @@ void proximetre_interrupt_routine(void)  /* appelée depuis l'EINT3_IRQHandler c
     }
 }
 
-/*=====================================================================
- *  Routine de balayage : un passage, alterne avant/arrière
- *  ATTENTION : bloquante (delay_ms). Avec un main coopératif à 50 Hz, cela
- *  bloquera les autres tâches pendant la durée du passage. Voir la remarque
- *  dans le chat — pour ton architecture, il vaut mieux la transformer en
- *  automate tick non bloquant.
- *===================================================================*/
 void proximetre_run_balayage(void)
 {
     static int going_fwd = 1;
@@ -313,6 +243,7 @@ void proximetre_run_balayage(void)
             delay_ms(m.step_delay_ms);
             int cm = Distance_cm(ADC_ReadAvg());
             prox_buf[i++] = cm;
+            set_proxi_distance_at_angle(a, (int32_t)cm);
             if (abs(a) <= 10 && cm < front) front = cm;
         }
         prox_dir = 'T';
@@ -322,6 +253,7 @@ void proximetre_run_balayage(void)
             delay_ms(m.step_delay_ms);
             int cm = Distance_cm(ADC_ReadAvg());
             prox_buf[i++] = cm;
+            set_proxi_distance_at_angle(a, (int32_t)cm);
             if (abs(a) <= 10 && cm < front) front = cm;
         }
         prox_dir = 't';
@@ -330,15 +262,13 @@ void proximetre_run_balayage(void)
     going_fwd  = !going_fwd;
 
     Buzzer_SetFromDistance(front);
-
-    /* TODO robotState : en cas d'obstacle, définir un indicateur pour le reste de la logique,
-       par exemple : robot_set_obstacle(front < SEUIL_CM);  (adapter l'API) */
+    
+    if (front < 30) {
+        set_robot_status(STATUS_RDV_EXPEDITION);
+    }
 }
 
-/*=====================================================================
- *  Accesseurs + trame de débogage
- *===================================================================*/
-void get_proxi_distances(int32_t *out)
+void get_local_proxi_buffer(int32_t *out)
 {
     for (int i = 0; i < prox_count; i++) out[i] = prox_buf[i];
 }
@@ -352,7 +282,7 @@ void debug_proximetre_send_frame(void)
     int32_t mesures[NUM_PROXI_MEASUREMENTS];
     int  cnt = get_proxi_count();
 
-    get_proxi_distances(mesures);
+    get_local_proxi_buffer(mesures);
 
     offset += sprintf(buffer + offset, "%c", prox_dir);
     for (int i = 0; i < cnt; i++)
