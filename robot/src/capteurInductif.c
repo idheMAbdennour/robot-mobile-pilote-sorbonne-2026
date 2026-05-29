@@ -25,11 +25,6 @@ static uint32_t sum_sin2 = 0;
 static uint32_t sum_sin3 = 0;
 static uint16_t sample_count = 0;
 
-// Variables pour les valeurs moyennes lues
-static uint16_t current_avg1 = 0;
-static uint16_t current_avg2 = 0;
-static uint16_t current_avg3 = 0;
-
 // Variables pour la mesure d'enveloppe
 static uint32_t last_capture_time = 0;
 static uint32_t envelope_period_ticks = 0;
@@ -179,9 +174,12 @@ void capteurInductif_interrupt_routine(void)
         // C'est également la fin de la salve, on fige les moyennes glissantes calculées
         if (sample_count > 0)
         {
-            current_avg1 = sum_sin1 / sample_count;
-            current_avg2 = sum_sin2 / sample_count;
-            current_avg3 = sum_sin3 / sample_count;
+            uint16_t avg_av = (uint16_t)(sum_sin1 / sample_count);
+            uint16_t avg_ar = (uint16_t)(sum_sin2 / sample_count);
+            uint16_t avg_hor = (uint16_t)(sum_sin3 / sample_count);
+
+            // Mettre à jour l'état global via robotState (accesseurs centralisés)
+            set_capteur_averages(avg_av, avg_ar, avg_hor);
         }
 
         LPC_GPIOINT->IO0IntClr = (1 << 28); // Acquitter Front Descendant
@@ -219,18 +217,11 @@ static uint16_t adc_read(uint8_t channel)
     return val;
 }
 
-void get_capteur_averages(uint16_t *avg1, uint16_t *avg2, uint16_t *avg3)
-{
-#if SIMULATE_SENSOR_VALUES
-    if (avg1) *avg1 = 4095;
-    if (avg2) *avg2 = 2048;
-    if (avg3) *avg3 = 1024;
-#else
-    if (avg1) *avg1 = current_avg1;
-    if (avg2) *avg2 = current_avg2;
-    if (avg3) *avg3 = current_avg3;
-#endif
-}
+/* Les accesseurs sont fournis par `robotState` :
+   - `get_capteur_averages()` et `get_inductif_values()` sont définis dans robotState.c
+   Le module capteurInductif publie uniquement `set_capteur_averages()` via
+   l'appel dans l'interruption lorsque de nouvelles moyennes sont disponibles.
+*/
 
 uint16_t get_envelope_period_us(void)
 {
@@ -244,27 +235,22 @@ uint16_t get_envelope_period_us(void)
 void debug_inductif_send_frame(void)
 {
     char buffer[128];
-    uint16_t avg1 = 0;
-    uint16_t avg2 = 0;
-    uint16_t avg3 = 0;
+    uint16_t avg_av = 0;
+    uint16_t avg_ar = 0;
+    uint16_t avg_hor = 0;
     int32_t dist_av = 0;
     int32_t dist_ar = 0;
     int32_t dist_mil = 0;
     int32_t angle = 0;
     uint16_t period_us = get_envelope_period_us();
 
+    // Mode 0b111: wire command mode - only respond if command pending
     if (ind_hw_mode == 0b111)
     {
         if (!ind_wire_pending) {
             return;
         }
-
-        get_inductif_positions(&pos_av, &pos_ar, &pos_mil);
-        sprintf(buffer, "wire overwrite P av %ld ar %ld mil %ld\r\n",
-                (long)pos_av, (long)pos_ar, (long)pos_mil);
-        uart0_send_string(buffer);
-        ind_wire_pending = 0;
-        return;
+        ind_wire_pending = 0;  // Clear pending flag after handling
     }
 
     switch (ind_hw_mode)
@@ -285,16 +271,20 @@ void debug_inductif_send_frame(void)
             sprintf(buffer, "x%ldmm\r\n", (long)dist_av);
             break;
         case 0b100:
-            get_capteur_averages(&avg1, &avg2, &avg3);
-            sprintf(buffer, "C 0x%03lX\r\n", (unsigned long)avg3);
+            get_capteur_averages(&avg_av, &avg_ar, &avg_hor);
+            sprintf(buffer, "C 0x%03lX\r\n", (unsigned long)avg_hor);
             break;
         case 0b101:
-            get_capteur_averages(&avg1, &avg2, &avg3);
-            sprintf(buffer, "B 0x%03lX\r\n", (unsigned long)avg2);
+            get_capteur_averages(&avg_av, &avg_ar, &avg_hor);
+            sprintf(buffer, "B 0x%03lX\r\n", (unsigned long)avg_ar);
             break;
         case 0b110:
-            get_capteur_averages(&avg1, &avg2, &avg3);
-            sprintf(buffer, "A 0x%03lX\r\n", (unsigned long)avg1);
+            get_capteur_averages(&avg_av, &avg_ar, &avg_hor);
+            sprintf(buffer, "A 0x%03lX\r\n", (unsigned long)avg_av);
+            break;
+        case 0b111:
+            // Wire command mode response
+            sprintf(buffer, "W %d\r\n", ind_wire_mode);
             break;
         default:
             buffer[0] = '\0';

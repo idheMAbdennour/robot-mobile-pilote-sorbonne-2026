@@ -23,14 +23,15 @@ void capteurInductif_interrupt_routine(void);
  */
 void capteurInductif_receive_wire_command(uint8_t wire_code);
 
-/**
- * @brief Récupère les dernières valeurs moyennes des capteurs
- */
-void get_capteur_averages(uint16_t *avg1, uint16_t *avg2, uint16_t *avg3);
 
 /**
  * @brief Récupère la période du signal enveloppe (en microsecondes)
  */
 uint16_t get_envelope_period_us(void);
+
+/**
+ * @brief Envoie un frame de debug du capteur inductif via UART
+ */
+void debug_inductif_send_frame(void);
 
 #endif /* CAPTEUR_INDUCTIF_H */

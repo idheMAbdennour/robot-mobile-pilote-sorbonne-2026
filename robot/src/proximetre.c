@@ -9,6 +9,10 @@
 
 static uint8_t prox_mode = 0;
 
+/* Forward declarations to avoid implicit non-static declarations */
+static void init_proximetre_switches(void);
+static void proximetre_update_mode_from_gpio(void);
+
 static void proximetre_update_mode_from_gpio(void)
 {
     uint8_t sw1 = LPC_GPIO0->FIOPIN & PIN_PROX_SW1;

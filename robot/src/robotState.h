@@ -35,6 +35,10 @@ void get_motor_speeds(int32_t *v_moy, int32_t *w_ang);
 void set_inductif_values(int32_t dist_av, int32_t dist_ar, int32_t dist_mil, int32_t angle);
 void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, int32_t *angle);
 
+// --- Capteurs inductifs bruts (ADC averages) ---
+void set_capteur_averages(uint16_t avg_av, uint16_t avg_ar, uint16_t avg_hor);
+void get_capteur_averages(uint16_t *avg_av, uint16_t *avg_ar, uint16_t *avg_hor);
+
 // --- Proximetre ---
 void set_proxi_distances(const int32_t *dists);
 void get_proxi_distances(int32_t *dists);

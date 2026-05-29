@@ -2,7 +2,7 @@
 
 // Inclusions des composants qui fournissent leurs propres routines d'interruption
 #include "dtmf.h"
-#include "moteurs.h"
+#include "moteur.h"
 #include "capteurInductif.h"
 #include "proximetre.h"
 #include "emissionIR.h"

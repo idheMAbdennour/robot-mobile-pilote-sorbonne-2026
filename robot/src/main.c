@@ -1,7 +1,7 @@
 #include "LPC17xx.h"
 #include "uart.h"
 #include "robotState.h"
-#include "moteurs.h"
+#include "moteur.h"
 #include "capteurInductif.h"
 #include "proximetre.h"
 #include "emissionIR.h"

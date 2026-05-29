@@ -23,6 +23,11 @@ static int32_t proxi_dists[72]; // 72 mesures de 5° pour couvrir 360°
 
 static uint8_t uart_debug_enabled = 0;
 
+// Valeurs moyennes brutes lues par le capteur inductif (12-bit ADC)
+static uint16_t current_avg_av = 0;
+static uint16_t current_avg_ar = 0;
+static uint16_t current_avg_hor = 0;
+
 // ROBOT NUMBER
 void set_robot_number(uint8_t number) {
     if (number <= 15) {
@@ -104,6 +109,25 @@ void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, 
     if (dist_ar) *dist_ar = current_dist_ar;
     if (dist_mil) *dist_mil = current_dist_mil;
     if (angle) *angle = current_angle;
+#endif
+}
+
+// Capteur inductif (averages)
+void set_capteur_averages(uint16_t avg_av, uint16_t avg_ar, uint16_t avg_hor) {
+    current_avg_av = avg_av;
+    current_avg_ar = avg_ar;
+    current_avg_hor = avg_hor;
+}
+
+void get_capteur_averages(uint16_t *avg_av, uint16_t *avg_ar, uint16_t *avg_hor) {
+#if SIMULATE_SENSOR_VALUES
+    if (avg_av) *avg_av = 4095;
+    if (avg_ar) *avg_ar = 2048;
+    if (avg_hor) *avg_hor = 1024;
+#else
+    if (avg_av) *avg_av = current_avg_av;
+    if (avg_ar) *avg_ar = current_avg_ar;
+    if (avg_hor) *avg_hor = current_avg_hor;
 #endif
 }
 
