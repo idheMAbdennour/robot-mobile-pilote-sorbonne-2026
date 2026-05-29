@@ -103,7 +103,7 @@ void Changer_PWM_Moteurs(uint8_t pourcent_gauche, uint8_t pourcent_droite) {
 
 void moteurs_interrupt_routine(void)
 {
-    if (LPC_GPIOINT->IO0IntStatR & (PIN_MOT_SW1 | PIN_MOT_SW2) |
+    if (LPC_GPIOINT->IO0IntStatR & (PIN_MOT_SW1 | PIN_MOT_SW2) ||
         LPC_GPIOINT->IO0IntStatF & (PIN_MOT_SW1 | PIN_MOT_SW2))
     {
         moteurs_update_mode_from_gpio();
