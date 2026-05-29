@@ -1,11 +1,11 @@
 #include "fil.h"
 
 // Nouveau mapping sur le PORT 0 (évite soigneusement toutes les broches interdites)
-#define PIN_N_PMOS    (1 << 4)  // Branche Nord P-MOS -> Broche P0.4
-#define PIN_N_NMOS    (1 << 5)  // Branche Nord N-MOS -> Broche P0.5
-#define PIN_S_PMOS    (1 << 6)  // Branche Sud P-MOS  -> Broche P0.6
-#define PIN_S_NMOS    (1 << 7)  // Branche Sud N-MOS  -> Broche P0.7
-#define PIN_DEBUG     (1 << 8)  // Patte de synchro   -> Broche P0.8
+#define PIN_N_HIN     (1 << 4)  // Branche Nord : High-Side Input -> Broche P0.4
+#define PIN_N_LIN     (1 << 5)  // Branche Nord : Low-Side Input  -> Broche P0.5
+#define PIN_S_HIN     (1 << 6)  // Branche Sud  : High-Side Input -> Broche P0.6
+#define PIN_S_LIN     (1 << 7)  // Branche Sud  : Low-Side Input  -> Broche P0.7
+#define PIN_DEBUG     (1 << 8)  // Patte de synchro              -> Broche P0.8
 
 // Énumération des motifs disponibles
 typedef enum {
@@ -47,52 +47,52 @@ volatile uint8_t active_motif = MOTIF_E; // Tracks the motif currently being emi
 // --- Fonctions de bas niveau pour le pilotage des ponts ---
 
 void Set_Nord_HiZ(void) {
-    LPC_GPIO0->FIOSET = PIN_N_PMOS; // Bloque le P-MOS (Actif à 0)
-    LPC_GPIO0->FIOCLR = PIN_N_NMOS; // Bloque le N-MOS (Actif à 1)
+    LPC_GPIO0->FIOCLR = PIN_N_HIN; // Désactive High-Side (NMOS Haut OFF)
+    LPC_GPIO0->FIOCLR = PIN_N_LIN; // Désactive Low-Side  (NMOS Bas OFF)
 }
 
 void Set_Sud_HiZ(void) {
-    LPC_GPIO0->FIOSET = PIN_S_PMOS; 
-    LPC_GPIO0->FIOCLR = PIN_S_NMOS; 
+    LPC_GPIO0->FIOCLR = PIN_S_HIN; // Désactive High-Side (NMOS Haut OFF)
+    LPC_GPIO0->FIOCLR = PIN_S_LIN; // Désactive Low-Side  (NMOS Bas OFF)
 }
 
 void Toggle_Nord_50kHz(bool state) {
-    if (state) { // État Haut du signal
-        LPC_GPIO0->FIOCLR = PIN_N_NMOS; // Éteint d'abord le bas (sécurité)
-        LPC_GPIO0->FIOCLR = PIN_N_PMOS; // Allume le haut
-    } else { // État Bas du signal
-        LPC_GPIO0->FIOSET = PIN_N_PMOS; // Éteint d'abord le haut
-        LPC_GPIO0->FIOSET = PIN_N_NMOS; // Allume le bas
+    if (state) { // État Haut du signal (VCC sur le fil)
+        LPC_GPIO0->FIOCLR = PIN_N_LIN; // Éteint d'abord le bas (sécurité anti-cross conduction)
+        LPC_GPIO0->FIOSET = PIN_N_HIN; // Allume le haut
+    } else { // État Bas du signal (GND sur le fil)
+        LPC_GPIO0->FIOCLR = PIN_N_HIN; // Éteint d'abord le haut
+        LPC_GPIO0->FIOSET = PIN_N_LIN; // Allume le bas
     }
 }
 
 void Toggle_Sud_50kHz(bool state) {
-    if (state) {
-        LPC_GPIO0->FIOCLR = PIN_S_NMOS;
-        LPC_GPIO0->FIOCLR = PIN_S_PMOS;
-    } else {
-        LPC_GPIO0->FIOSET = PIN_S_PMOS;
-        LPC_GPIO0->FIOSET = PIN_S_NMOS;
+    if (state) { // État Haut du signal (VCC sur le fil)
+        LPC_GPIO0->FIOCLR = PIN_S_LIN; // Éteint d'abord le bas
+        LPC_GPIO0->FIOSET = PIN_S_HIN; // Allume le haut
+    } else { // État Bas du signal (GND sur le fil)
+        LPC_GPIO0->FIOCLR = PIN_S_HIN; // Éteint d'abord le haut
+        LPC_GPIO0->FIOSET = PIN_S_LIN; // Allume le bas
     }
 }
 
 // --- Initialisation du Matériel ---
 void Generator_Init(void) {
     // Configuration des directions GPIO en sortie
-    LPC_GPIO0->FIODIR |= (PIN_N_PMOS | PIN_N_NMOS | PIN_S_PMOS | PIN_S_NMOS | PIN_DEBUG);
+    LPC_GPIO0->FIODIR |= (PIN_N_HIN | PIN_N_LIN | PIN_S_HIN | PIN_S_LIN | PIN_DEBUG);
     
-    // Extinction initiale (Hi-Z partout)
+    // Extinction initiale (Hi-Z partout : entrées IR2304 à 0)
     Set_Nord_HiZ();
     Set_Sud_HiZ();
     LPC_GPIO0->FIOCLR = PIN_DEBUG;
 
     // Configuration de TIMER0 pour une interruption toutes les 10 µs
-    // En supposant que le PCLK du timer est à 25MHz (CCLK/4 avec CCLK=100MHz)
     LPC_SC->PCONP |= (1 << 1);          // Alim Timer 0
     LPC_TIM0->MR0 = (SystemCoreClock / 4) / 100000 - 1; // 10 µs match
     LPC_TIM0->MCR = (1 << 0) | (1 << 1); // Interruption et Reset sur MR0
     
-    NVIC_SetPriority(TIMER0_IRQn, 1);    // Priorité élevée
+    // Priorité et activation
+    NVIC_SetPriority(TIMER0_IRQn, 1);    
     NVIC_EnableIRQ(TIMER0_IRQn);
     LPC_TIM0->TCR =  1;                  // Démarrage du Timer
 }

@@ -403,15 +403,15 @@ Image Symbol Table
     [Anonymous Symbol]                       0x00000390   Section        0  fil.o(.text.Generator_Send_Frame)
     [Anonymous Symbol]                       0x00000428   Section        0  fil.o(.text.Push_Motif)
     [Anonymous Symbol]                       0x0000047c   Section        0  fil.o(.text.Set_Sud_HiZ)
-    [Anonymous Symbol]                       0x00000498   Section        0  system_lpc17xx.o(.text.SystemInit)
-    [Anonymous Symbol]                       0x0000061c   Section        0  fil.o(.text.TIMER0_IRQHandler)
-    [Anonymous Symbol]                       0x000007f4   Section        0  fil.o(.text.Toggle_Nord_50kHz)
-    [Anonymous Symbol]                       0x0000082c   Section        0  fil.o(.text.Toggle_Sud_50kHz)
-    __NVIC_EnableIRQ                         0x00000865   Thumb Code    48  fil.o(.text.__NVIC_EnableIRQ)
-    [Anonymous Symbol]                       0x00000864   Section        0  fil.o(.text.__NVIC_EnableIRQ)
-    __NVIC_SetPriority                       0x00000895   Thumb Code    66  fil.o(.text.__NVIC_SetPriority)
-    [Anonymous Symbol]                       0x00000894   Section        0  fil.o(.text.__NVIC_SetPriority)
-    [Anonymous Symbol]                       0x000008d8   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x00000490   Section        0  system_lpc17xx.o(.text.SystemInit)
+    [Anonymous Symbol]                       0x00000614   Section        0  fil.o(.text.TIMER0_IRQHandler)
+    [Anonymous Symbol]                       0x000007ec   Section        0  fil.o(.text.Toggle_Nord_50kHz)
+    [Anonymous Symbol]                       0x00000834   Section        0  fil.o(.text.Toggle_Sud_50kHz)
+    __NVIC_EnableIRQ                         0x0000087d   Thumb Code    48  fil.o(.text.__NVIC_EnableIRQ)
+    [Anonymous Symbol]                       0x0000087c   Section        0  fil.o(.text.__NVIC_EnableIRQ)
+    __NVIC_SetPriority                       0x000008ad   Thumb Code    66  fil.o(.text.__NVIC_SetPriority)
+    [Anonymous Symbol]                       0x000008ac   Section        0  fil.o(.text.__NVIC_SetPriority)
+    [Anonymous Symbol]                       0x000008f0   Section        0  main.o(.text.main)
     .bss                                     0x10000008   Section       96  libspace.o(.bss)
     TIMER0_IRQHandler.idle_flip              0x10000068   Data           1  fil.o(.bss.TIMER0_IRQHandler.idle_flip)
     [Anonymous Symbol]                       0x10000068   Section        0  fil.o(.bss.TIMER0_IRQHandler.idle_flip)
@@ -567,19 +567,19 @@ Image Symbol Table
     Delay_ms                                 0x0000024d   Thumb Code    54  main.o(.text.Delay_ms)
     Encode_And_Push_Bit                      0x00000285   Thumb Code    50  fil.o(.text.Encode_And_Push_Bit)
     Generator_Cmd_Vitesse                    0x000002b9   Thumb Code    30  fil.o(.text.Generator_Cmd_Vitesse)
-    Set_Nord_HiZ                             0x000002d9   Thumb Code    26  fil.o(.text.Set_Nord_HiZ)
+    Set_Nord_HiZ                             0x000002d9   Thumb Code    18  fil.o(.text.Set_Nord_HiZ)
     Generator_Init                           0x00000301   Thumb Code   144  fil.o(.text.Generator_Init)
     Generator_Send_Frame                     0x00000391   Thumb Code   152  fil.o(.text.Generator_Send_Frame)
     Push_Motif                               0x00000429   Thumb Code    82  fil.o(.text.Push_Motif)
-    Set_Sud_HiZ                              0x0000047d   Thumb Code    26  fil.o(.text.Set_Sud_HiZ)
-    SystemInit                               0x00000499   Thumb Code   388  system_lpc17xx.o(.text.SystemInit)
-    TIMER0_IRQHandler                        0x0000061d   Thumb Code   472  fil.o(.text.TIMER0_IRQHandler)
-    Toggle_Nord_50kHz                        0x000007f5   Thumb Code    56  fil.o(.text.Toggle_Nord_50kHz)
-    Toggle_Sud_50kHz                         0x0000082d   Thumb Code    56  fil.o(.text.Toggle_Sud_50kHz)
-    main                                     0x000008d9   Thumb Code    36  main.o(.text.main)
-    MOTIF_DURATION_TICKS                     0x000008fc   Data          24  fil.o(.rodata.MOTIF_DURATION_TICKS)
-    Region$$Table$$Base                      0x00000914   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00000934   Number         0  anon$$obj.o(Region$$Table)
+    Set_Sud_HiZ                              0x0000047d   Thumb Code    18  fil.o(.text.Set_Sud_HiZ)
+    SystemInit                               0x00000491   Thumb Code   388  system_lpc17xx.o(.text.SystemInit)
+    TIMER0_IRQHandler                        0x00000615   Thumb Code   472  fil.o(.text.TIMER0_IRQHandler)
+    Toggle_Nord_50kHz                        0x000007ed   Thumb Code    72  fil.o(.text.Toggle_Nord_50kHz)
+    Toggle_Sud_50kHz                         0x00000835   Thumb Code    72  fil.o(.text.Toggle_Sud_50kHz)
+    main                                     0x000008f1   Thumb Code    36  main.o(.text.main)
+    MOTIF_DURATION_TICKS                     0x00000914   Data          24  fil.o(.rodata.MOTIF_DURATION_TICKS)
+    Region$$Table$$Base                      0x0000092c   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x0000094c   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x10000000   Data           4  system_lpc17xx.o(.data.SystemCoreClock)
     active_motif                             0x10000004   Data           1  fil.o(.data.active_motif)
     current_state                            0x10000005   Data           1  fil.o(.data.current_state)
@@ -600,9 +600,9 @@ Memory Map of the image
 
   Image Entry point : 0x00000195
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x0000093c, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000954, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000934, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x0000094c, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -673,51 +673,51 @@ Memory Map of the image
     0x000002b6   0x000002b6   0x00000002   PAD
     0x000002b8   0x000002b8   0x0000001e   Code   RO           71    .text.Generator_Cmd_Vitesse  fil.o
     0x000002d6   0x000002d6   0x00000002   PAD
-    0x000002d8   0x000002d8   0x0000001a   Code   RO           49    .text.Set_Nord_HiZ  fil.o
-    0x000002f2   0x000002f2   0x0000000a   PAD
+    0x000002d8   0x000002d8   0x00000012   Code   RO           49    .text.Set_Nord_HiZ  fil.o
+    0x000002ea   0x000002ea   0x00000012   PAD
     0x000002fc   0x000002fc   0x00000004   Code   RO           94    .ARM.__at_0x02FC    startup_lpc17xx.o
     0x00000300   0x00000300   0x00000090   Code   RO           57    .text.Generator_Init  fil.o
     0x00000390   0x00000390   0x00000098   Code   RO           69    .text.Generator_Send_Frame  fil.o
     0x00000428   0x00000428   0x00000052   Code   RO           63    .text.Push_Motif    fil.o
     0x0000047a   0x0000047a   0x00000002   PAD
-    0x0000047c   0x0000047c   0x0000001a   Code   RO           51    .text.Set_Sud_HiZ   fil.o
-    0x00000496   0x00000496   0x00000002   PAD
-    0x00000498   0x00000498   0x00000184   Code   RO          106    .text.SystemInit    system_lpc17xx.o
-    0x0000061c   0x0000061c   0x000001d8   Code   RO           65    .text.TIMER0_IRQHandler  fil.o
-    0x000007f4   0x000007f4   0x00000038   Code   RO           53    .text.Toggle_Nord_50kHz  fil.o
-    0x0000082c   0x0000082c   0x00000038   Code   RO           55    .text.Toggle_Sud_50kHz  fil.o
-    0x00000864   0x00000864   0x00000030   Code   RO           61    .text.__NVIC_EnableIRQ  fil.o
-    0x00000894   0x00000894   0x00000042   Code   RO           59    .text.__NVIC_SetPriority  fil.o
-    0x000008d6   0x000008d6   0x00000002   PAD
-    0x000008d8   0x000008d8   0x00000024   Code   RO            4    .text.main          main.o
-    0x000008fc   0x000008fc   0x00000018   Data   RO           75    .rodata.MOTIF_DURATION_TICKS  fil.o
-    0x00000914   0x00000914   0x00000020   Data   RO          295    Region$$Table       anon$$obj.o
+    0x0000047c   0x0000047c   0x00000012   Code   RO           51    .text.Set_Sud_HiZ   fil.o
+    0x0000048e   0x0000048e   0x00000002   PAD
+    0x00000490   0x00000490   0x00000184   Code   RO          106    .text.SystemInit    system_lpc17xx.o
+    0x00000614   0x00000614   0x000001d8   Code   RO           65    .text.TIMER0_IRQHandler  fil.o
+    0x000007ec   0x000007ec   0x00000048   Code   RO           53    .text.Toggle_Nord_50kHz  fil.o
+    0x00000834   0x00000834   0x00000048   Code   RO           55    .text.Toggle_Sud_50kHz  fil.o
+    0x0000087c   0x0000087c   0x00000030   Code   RO           61    .text.__NVIC_EnableIRQ  fil.o
+    0x000008ac   0x000008ac   0x00000042   Code   RO           59    .text.__NVIC_SetPriority  fil.o
+    0x000008ee   0x000008ee   0x00000002   PAD
+    0x000008f0   0x000008f0   0x00000024   Code   RO            4    .text.main          main.o
+    0x00000914   0x00000914   0x00000018   Data   RO           75    .rodata.MOTIF_DURATION_TICKS  fil.o
+    0x0000092c   0x0000092c   0x00000020   Data   RO          295    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Exec base: 0x10000000, Load base: 0x00000934, Size: 0x00000008, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x10000000, Load base: 0x0000094c, Size: 0x00000008, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x10000000   0x00000934   0x00000004   Data   RW          108    .data.SystemCoreClock  system_lpc17xx.o
-    0x10000004   0x00000938   0x00000001   Data   RW           82    .data.active_motif  fil.o
-    0x10000005   0x00000939   0x00000001   Data   RW           76    .data.current_state  fil.o
+    0x10000000   0x0000094c   0x00000004   Data   RW          108    .data.SystemCoreClock  system_lpc17xx.o
+    0x10000004   0x00000950   0x00000001   Data   RW           82    .data.active_motif  fil.o
+    0x10000005   0x00000951   0x00000001   Data   RW           76    .data.current_state  fil.o
 
 
-    Execution Region ER_ZI (Exec base: 0x10000008, Load base: 0x0000093c, Size: 0x000002f0, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x10000008, Load base: 0x00000954, Size: 0x000002f0, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x10000008        -       0x00000060   Zero   RW          160    .bss                c_w.l(libspace.o)
     0x10000068        -       0x00000001   Zero   RW           84    .bss.TIMER0_IRQHandler.idle_flip  fil.o
-    0x10000069   0x0000093c   0x00000001   PAD
+    0x10000069   0x00000954   0x00000001   PAD
     0x1000006a        -       0x00000002   Zero   RW           79    .bss.buffer_head    fil.o
     0x1000006c        -       0x00000002   Zero   RW           80    .bss.buffer_tail    fil.o
     0x1000006e        -       0x00000080   Zero   RW           83    .bss.motif_buffer   fil.o
     0x100000ee        -       0x00000001   Zero   RW           81    .bss.msg_in_progress  fil.o
-    0x100000ef   0x0000093c   0x00000001   PAD
+    0x100000ef   0x00000954   0x00000001   PAD
     0x100000f0        -       0x00000004   Zero   RW           77    .bss.tick_counter   fil.o
     0x100000f4        -       0x00000001   Zero   RW           78    .bss.toggle_50khz   fil.o
-    0x100000f5   0x0000093c   0x00000003   PAD
+    0x100000f5   0x00000954   0x00000003   PAD
     0x100000f8        -       0x00000000   Zero   RW           92    HEAP                startup_lpc17xx.o
     0x100000f8        -       0x00000200   Zero   RW           91    STACK               startup_lpc17xx.o
 
@@ -729,15 +729,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-      1208          0         24          2        139       7736   fil.o
+      1224          0         24          2        139       7736   fil.o
         90          0          0          0          0        730   main.o
         64         26        204          0        512       1068   startup_lpc17xx.o
        388          0          0          4          0       2290   system_lpc17xx.o
 
     ----------------------------------------------------------------------
-      1772         26        260          8        656      11824   Object Totals
+      1796         26        260          8        656      11824   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        22          0          0          2          5          0   (incl. Padding)
+        30          0          0          2          5          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -784,15 +784,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      2096         42        260          8        752      12328   Grand Totals
-      2096         42        260          8        752      12328   ELF Image Totals
-      2096         42        260          8          0          0   ROM Totals
+      2120         42        260          8        752      12328   Grand Totals
+      2120         42        260          8        752      12328   ELF Image Totals
+      2120         42        260          8          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 2356 (   2.30kB)
+    Total RO  Size (Code + RO Data)                 2380 (   2.32kB)
     Total RW  Size (RW Data + ZI Data)               760 (   0.74kB)
-    Total ROM Size (Code + RO Data + RW Data)       2364 (   2.31kB)
+    Total ROM Size (Code + RO Data + RW Data)       2388 (   2.33kB)
 
 ==============================================================================
 
