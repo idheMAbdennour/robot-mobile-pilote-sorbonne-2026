@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>     
 #include <math.h>       
-  
+
 #define SERVO_PIN      (1u << 2)    
 #define BUZZ_PIN       (1u << 21)   
 
@@ -123,10 +123,15 @@ static void ADC_Init(void)
 
 static uint16_t ADC_ReadCh0(void)
 {
+    NVIC_DisableIRQ(EINT3_IRQn);        
+    LPC_ADC->ADCR &= ~(0xFFu);          
+    LPC_ADC->ADCR |=  (1u << 0);        
     LPC_ADC->ADCR &= ~(7u << 24);
-    LPC_ADC->ADCR |=  (1u << 24);
+    LPC_ADC->ADCR |=  (1u << 24);      
     while (!(LPC_ADC->ADGDR & (1u << 31)));
-    return (uint16_t)((LPC_ADC->ADGDR >> 4) & 0x0FFF);
+    uint16_t v = (LPC_ADC->ADGDR >> 4) & 0x0FFF;
+    NVIC_EnableIRQ(EINT3_IRQn);
+    return v;
 }
 
 static uint16_t ADC_ReadAvg(void)
@@ -225,44 +230,72 @@ void proximetre_interrupt_routine(void)
     }
 }
 
-void proximetre_run_balayage(void)
+/* --- Balayage non bloquant : machine à états cadencée à 50 Hz --- */
+static int      bal_in_progress = 0;   /* balayage en cours ? */
+static int      bal_going_fwd   = 1;   /* sens courant (T = aller, t = retour) */
+static int      bal_angle;             /* angle cible courant */
+static int      bal_amax;              /* amplitude du mode courant */
+static int      bal_n;                 /* nb de mesures prévues ce balayage */
+static int      bal_i;                 /* index courant dans prox_buf */
+static int      bal_front;             /* min distance frontale (-10..+10°) */
+static uint32_t bal_step_us;           /* délai de stabilisation (µs) du mode */
+static uint32_t bal_t0;                /* horodatage TC du dernier Servo_SetAngle */
+
+static void prox_begin_sweep(void)
 {
-    static int going_fwd = 1;
-    mode_t m   = MODES[prox_mode & 0x3];
-    int amax   = m.angle_max;
-    int n      = (2 * amax) / STEP_DEG + 1;
-    if (n > NUM_PROXI_MEASUREMENTS) n = NUM_PROXI_MEASUREMENTS;
+    mode_t m    = MODES[prox_mode & 0x3];
+    bal_amax    = m.angle_max;
+    bal_step_us = m.step_delay_ms * 1000u;
+    bal_n       = (2 * bal_amax) / STEP_DEG + 1;
+    if (bal_n > NUM_PROXI_MEASUREMENTS) bal_n = NUM_PROXI_MEASUREMENTS;
+    bal_i     = 0;
+    bal_front = DIST_MAX_CM;
+    bal_angle = bal_going_fwd ? -bal_amax : bal_amax;
+    Servo_SetAngle(bal_angle);
+    bal_t0          = LPC_TIM3->TC;
+    bal_in_progress = 1;
+}
 
-    int i = 0, front = DIST_MAX_CM;
+static void prox_finish_sweep(void)
+{
+    prox_count = bal_i;
+    prox_dir   = bal_going_fwd ? 'T' : 't';
 
-    if (going_fwd) {
-        for (int a = -amax; a <= amax && i < n; a += STEP_DEG) {
-            Servo_SetAngle(a);
-            delay_ms(m.step_delay_ms);
-            int cm = Distance_cm(ADC_ReadAvg());
-            prox_buf[i++] = cm;
-            set_proxi_distance_at_angle(a, (int32_t)cm);
-            if (abs(a) <= 10 && cm < front) front = cm;
-        }
-        prox_dir = 'T';
-    } else {
-        for (int a = amax; a >= -amax && i < n; a -= STEP_DEG) {
-            Servo_SetAngle(a);
-            delay_ms(m.step_delay_ms);
-            int cm = Distance_cm(ADC_ReadAvg());
-            prox_buf[i++] = cm;
-            set_proxi_distance_at_angle(a, (int32_t)cm);
-            if (abs(a) <= 10 && cm < front) front = cm;
-        }
-        prox_dir = 't';
-    }
-    prox_count = i;
-    going_fwd  = !going_fwd;
-
-    Buzzer_SetFromDistance(front);
-    
-    if (front < 30) {
+    Buzzer_SetFromDistance(bal_front);
+    if (bal_front < 30) {
         set_robot_status(STATUS_RDV_EXPEDITION);
+    }
+    if (get_debug_uart_enabled()) {
+        debug_proximetre_send_frame();   /* « à chaque balayage » */
+    }
+
+    bal_going_fwd   = !bal_going_fwd;    /* le balayage suivant repart en sens inverse */
+    bal_in_progress = 0;
+}
+
+void proximetre_tick(void)
+{
+    Buzzer_Service();                    /* entretient le bip (remplace le service fait dans delay_ms) */
+
+    if (!bal_in_progress) prox_begin_sweep();
+
+    if ((uint32_t)(LPC_TIM3->TC - bal_t0) < bal_step_us) {
+        return;                          /* servo pas encore stabilisé */
+    }
+
+    int cm = Distance_cm(ADC_ReadAvg());
+    prox_buf[bal_i++] = cm;
+    set_proxi_distance_at_angle(bal_angle, (int32_t)cm);
+    if (abs(bal_angle) <= 10 && cm < bal_front) bal_front = cm;
+
+    bal_angle += bal_going_fwd ? STEP_DEG : -STEP_DEG;
+    int done = bal_going_fwd ? (bal_angle > bal_amax  || bal_i >= bal_n)
+                             : (bal_angle < -bal_amax || bal_i >= bal_n);
+    if (done) {
+        prox_finish_sweep();
+    } else {
+        Servo_SetAngle(bal_angle);
+        bal_t0 = LPC_TIM3->TC;           /* relance le chrono de stabilisation */
     }
 }
 
