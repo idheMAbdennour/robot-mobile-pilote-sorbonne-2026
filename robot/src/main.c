@@ -5,6 +5,8 @@
 #include "capteurInductif.h"
 #include "proximetre.h"
 #include "emissionIR.h"
+#include "decode_enveloppe.h"
+#include <stdio.h>
 #include <stdint.h>
 
 volatile uint8_t flag_50hz = 0;

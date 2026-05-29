@@ -188,3 +188,56 @@ void set_debug_uart_enabled(uint8_t enabled) {
 uint8_t get_debug_uart_enabled(void) {
     return uart_debug_enabled;
 }
+
+// --- Wire Frame Reception ---
+static wire_trame_t current_wire_trame = {0, 0, 0};
+static uint8_t wire_trame_is_valid = 0;
+static uint8_t new_wire_trame = 0;
+
+void set_wire_trame(const wire_trame_t *trame, uint8_t is_valid)
+{
+    if (!trame) {
+        return;
+    }
+
+    // 1. Copier d'abord les données
+    current_wire_trame.type = trame->type;
+    current_wire_trame.robot_id = trame->robot_id;
+    current_wire_trame.parameter = trame->parameter;
+
+    // 2. Puis mettre à jour le flag de validité
+    wire_trame_is_valid = is_valid;
+
+    // 3. Enfin setter le flag new (appelé séparément par l'appelant)
+    // (pour éviter les incohérences entre les données et les flags)
+}
+
+void get_wire_trame(wire_trame_t *trame, uint8_t *is_valid)
+{
+    if (!trame) {
+        return;
+    }
+
+    trame->type = current_wire_trame.type;
+    trame->robot_id = current_wire_trame.robot_id;
+    trame->parameter = current_wire_trame.parameter;
+
+    if (is_valid) {
+        *is_valid = wire_trame_is_valid;
+    }
+}
+
+uint8_t get_new_wire_trame(void)
+{
+    return new_wire_trame;
+}
+
+void clear_new_wire_trame(void)
+{
+    new_wire_trame = 0;
+}
+
+void set_new_wire_trame(uint8_t is_new)
+{
+    new_wire_trame = is_new;
+}

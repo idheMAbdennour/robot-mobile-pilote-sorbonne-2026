@@ -5,7 +5,7 @@
 
 // --- Configuration de Test ---
 // Mettre à 1 pour simuler toutes les valeurs de capteurs (pas de capteur branché)
-#define SIMULATE_SENSOR_VALUES 1
+#define SIMULATE_SENSOR_VALUES 0
 
 // Enumération pour l'état du robot à transmettre par IR
 typedef enum {
@@ -48,5 +48,18 @@ void get_proxi_distance_at_angle(int angle_deg, int32_t *distance);
 // --- UART Debug Global ---
 void set_debug_uart_enabled(uint8_t enabled);
 uint8_t get_debug_uart_enabled(void);
+
+// --- Wire Frame Reception ---
+typedef struct {
+    uint8_t type;       // Type de message (3 bits)
+    uint8_t robot_id;   // Numéro de robot destinataire (4 bits)
+    uint16_t parameter; // Paramètre du message (7 bits)
+} wire_trame_t;
+
+void set_wire_trame(const wire_trame_t *trame, uint8_t is_valid);
+void get_wire_trame(wire_trame_t *trame, uint8_t *is_valid);
+uint8_t get_new_wire_trame(void);
+void clear_new_wire_trame(void);
+void set_new_wire_trame(uint8_t is_new);
 
 #endif // ROBOT_STATE_H

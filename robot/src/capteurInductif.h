@@ -29,9 +29,6 @@ void capteurInductif_receive_wire_command(uint8_t wire_code);
  */
 uint16_t get_envelope_period_us(void);
 
-/**
- * @brief Envoie un frame de debug du capteur inductif via UART
- */
-void debug_inductif_send_frame(void);
+// Removed: debug_inductif_send_frame UART helper (unused in trimmed debug)
 
 #endif /* CAPTEUR_INDUCTIF_H */

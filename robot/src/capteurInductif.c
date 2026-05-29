@@ -26,9 +26,11 @@ static uint32_t sum_sin3 = 0;
 static uint16_t sample_count = 0;
 
 // Variables pour la mesure d'enveloppe
-static uint32_t last_capture_time = 0;
-static uint32_t envelope_period_ticks = 0;
+static uint32_t last_rise_time = 0;      // Temps du dernier front montant
+static uint32_t last_fall_time = 0;      // Temps du dernier front descendant
+static uint16_t last_rest_duration_us = 500; // Durée du repos bas (cycle précédent)
 static uint16_t current_period_us = 0;
+static uint16_t current_r_us = 0;
 
 static uint16_t adc_read(uint8_t channel);
 
@@ -138,8 +140,17 @@ void capteurInductif_interrupt_routine(void)
     // P0.28 (Enveloppe) : Front Montant (Début de la salve/pulse)
     if (LPC_GPIOINT->IO0IntStatR & (1 << 28))
     {
-        // Enregistrer le temps de départ
-        last_capture_time = LPC_TIM2->TC;
+        uint32_t current_time = LPC_TIM2->TC;
+
+        // Mesurer la durée bas du cycle précédent (si first_fall_time existe)
+        if (last_fall_time > 0) {
+            uint32_t rest_ticks = (current_time >= last_fall_time) ?
+                (current_time - last_fall_time) :
+                (0xFFFFFFFF - last_fall_time) + current_time;
+            last_rest_duration_us = (uint16_t)(rest_ticks * (uint32_t)TIMER2_TICK_US);
+        }
+
+        last_rise_time = current_time;
 
         // Remise à zéro des accumulateurs pour cette nouvelle salve
         sum_sin1 = 0;
@@ -156,20 +167,19 @@ void capteurInductif_interrupt_routine(void)
         uint32_t current_time = LPC_TIM2->TC;
 
         // Calculer la durée (période en ticks de 10us) passée à l'état haut
-        if (current_time >= last_capture_time) {
-            envelope_period_ticks = current_time - last_capture_time;
-        } else {
-            envelope_period_ticks = (0xFFFFFFFF - last_capture_time) + current_time;
-        }
+        uint32_t period_ticks = (current_time >= last_rise_time) ?
+            (current_time - last_rise_time) :
+            (0xFFFFFFFF - last_rise_time) + current_time;
 
-        if (envelope_period_ticks > 0) {
-            uint32_t period_us = envelope_period_ticks * (uint32_t)TIMER2_TICK_US;
-
+        if (period_ticks > 0) {
+            uint32_t period_us = period_ticks * (uint32_t)TIMER2_TICK_US;
             current_period_us = (uint16_t)period_us;
 
-            // Appel du décodeur d'enveloppe (période en us)
-            decode_enveloppe_commande(current_period_us);
+            // Appel du décodeur d'enveloppe avec période haute et durée bas (du cycle précédent)
+            decode_enveloppe_commande(current_period_us, last_rest_duration_us);
         }
+
+        last_fall_time = current_time;
 
         // C'est également la fin de la salve, on fige les moyennes glissantes calculées
         if (sample_count > 0)
