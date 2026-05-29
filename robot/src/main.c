@@ -11,6 +11,8 @@
 
 volatile uint8_t flag_50hz = 0;
 
+
+
 int main(void)
 {
     SystemInit();
@@ -21,12 +23,19 @@ int main(void)
     init_moteurs_debug();
     init_proximetre();
     init_capteur_inductif();
+    Init_Moteur_PWM();
 
     SysTick_Config(SystemCoreClock / 50);
     set_debug_uart_enabled(1);
 
+    uint32_t last_time = 0;
+    uint8_t speed = 70;
+    uint8_t state = 0;
+
     while (1)
     {
+        Changer_PWM_Gauche(speed);
+        Changer_PWM_Droite(speed);
         if (!flag_50hz)
         {
             continue;
@@ -39,11 +48,26 @@ int main(void)
         }
 
         // Envois debug par module
-        debug_moteurs_send_frame();
-        debug_inductif_send_frame();
+        //debug_moteurs_send_frame();
+        //debug_inductif_send_frame();
 
         // Note : Ne PAS mettre debug_proximetre_send_frame() ici !
         // Le cahier des charges dit "à chaque balayage".
         // Il faudra l'appeler à la fin de la fonction qui gère le servo-moteur du proximètre.
     }
 }
+/*
+int main(void) {
+    SysTick_Config(SystemCoreClock / 1000);
+    
+    Init_Moteur_PWM();
+    
+    uint32_t last_time = 0;
+    uint8_t speed = 70;
+    uint8_t state = 0;
+
+    while(1) {
+				Changer_PWM_Gauche(speed);
+        Changer_PWM_Droite(speed);
+    }
+} */

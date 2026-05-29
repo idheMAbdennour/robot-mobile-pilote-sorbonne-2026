@@ -5,9 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>     
 #include <math.h>       
-
-#define PIN_PROX_SW1   (1u << 12)    
-#define PIN_PROX_SW2   (1u << 13)    
+  
 #define SERVO_PIN      (1u << 2)    
 #define BUZZ_PIN       (1u << 21)   
 
