@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file robot_state.h
  * @brief Fichier du module robot_state.
  */
@@ -97,12 +97,8 @@ void set_proxi_distance_at_angle(int angle_deg, int32_t distance);
 void get_proxi_distance_at_angle(int angle_deg, int32_t *distance);
 
 // --- Wire Frame Reception ---
-void set_wire_trame(const wire_trame_t *trame, uint8_t is_valid);
-void get_wire_trame(wire_trame_t *trame, uint8_t *is_valid);
-
-uint8_t get_new_wire_trame(void);
-void clear_new_wire_trame(void);
-void set_new_wire_trame(uint8_t is_new);
+void set_wire_trame(const wire_trame_t *trame);
+uint8_t get_wire_trame(wire_trame_t *trame);
 
 // --- Variables SPI (Vg, Vd, Pg, Pd) ---
 void set_spi_variables(uint8_t vg, uint8_t vd, uint8_t pg, uint8_t pd);

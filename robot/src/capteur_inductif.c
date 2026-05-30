@@ -39,10 +39,17 @@ static uint32_t last_fall_time = 0;           // Temps du dernier front descenda
 static uint16_t last_rest_duration_us = 500;  // Durée du repos bas (cycle précédent)
 static uint16_t current_period_us = 0;
 
-// Drapeaux et accumulateurs volatils (communication ISR -> Main)
-static volatile uint8_t envelope_event = 0;
-static volatile uint16_t envelope_period_us = 0;
-static volatile uint16_t envelope_rest_us = 0;
+// FIFO d'événements pour l'enveloppe
+#define ENVELOPE_FIFO_SIZE 32
+typedef struct {
+    uint16_t period_us;
+    uint16_t rest_us;
+} EnvelopeEvent_t;
+
+static volatile EnvelopeEvent_t env_fifo[ENVELOPE_FIFO_SIZE];
+static volatile uint8_t fifo_head = 0;
+static volatile uint8_t fifo_tail = 0;
+
 volatile uint32_t volatile_adc_sum1 = 0;
 volatile uint32_t volatile_adc_sum2 = 0;
 volatile uint32_t volatile_adc_sum3 = 0;
@@ -136,7 +143,10 @@ void capteur_inductif_interrupt_routine(void) {
     }
 
     if (LPC_GPIOINT->IO0IntStatF & CAPTEUR_IND_SW_CLOCK) {
-        adc_start_inductif_sequence();
+        // On lance la séquence ADC UNIQUEMENT quand l'enveloppe est à l'état haut
+        if (LPC_GPIO0->FIOPIN & CAPTEUR_IND_SW_ENVELOP) {
+            adc_start_inductif_sequence();
+        }
         LPC_GPIOINT->IO0IntClr = CAPTEUR_IND_SW_CLOCK; // Acquitter
     }
 
@@ -153,10 +163,8 @@ void capteur_inductif_interrupt_routine(void) {
 
         last_rise_time = current_time;
 
-        volatile_adc_sum1 = 0;
-        volatile_adc_sum2 = 0;
-        volatile_adc_sum3 = 0;
-        volatile_adc_sample_count = 0;
+        // Note : On ne remet plus les sommes ADC à zéro ici.
+        // Elles s'accumulent sur toute la période de 20ms pour être moyennées dans le main.
 
         LPC_GPIOINT->IO0IntClr = CAPTEUR_IND_SW_ENVELOP; // Acquitter
     }
@@ -172,10 +180,14 @@ void capteur_inductif_interrupt_routine(void) {
         if (period_ticks > 0) {
             uint32_t period_us = period_ticks * (uint32_t)TIMER2_TICK_US;
             current_period_us = (uint16_t)period_us;
-
-            envelope_period_us = (uint16_t)period_us;
-            envelope_rest_us = last_rest_duration_us;
-            envelope_event = 1;
+            
+            // Pousser dans la FIFO (Uniquement les informations temporelles)
+            uint8_t next_head = (fifo_head + 1) % ENVELOPE_FIFO_SIZE;
+            if (next_head != fifo_tail) {
+                env_fifo[fifo_head].period_us = (uint16_t)period_us;
+                env_fifo[fifo_head].rest_us = last_rest_duration_us;
+                fifo_head = next_head;
+            }
         }
 
         last_fall_time = current_time;
@@ -199,52 +211,44 @@ uint16_t get_envelope_period_us(void) {
     }
 }
 
-int capteur_inductif_consume_event(uint16_t *period_us, uint16_t *rest_us,
-                                   uint32_t *sum1, uint32_t *sum2, uint32_t *sum3,
-                                   uint16_t *sample_count) {
-    if (!envelope_event) return 0;
+void capteur_inductif_update(void) {
+    EnvelopeEvent_t ev;
+    
+    // 1. Traitement des événements d'enveloppe (Dépilement de la FIFO)
+    while (fifo_tail != fifo_head) {
+        NVIC_DisableIRQ(EINT3_IRQn);
+        ev = env_fifo[fifo_tail];
+        fifo_tail = (fifo_tail + 1) % ENVELOPE_FIFO_SIZE;
+        NVIC_EnableIRQ(EINT3_IRQn);
 
-    // Empêcher l'ISR EINT3 de modifier les données pendant la copie.
-    NVIC_DisableIRQ(EINT3_IRQn);
+        // Transmission au décodeur d'enveloppe
+        decode_enveloppe_commande(ev.period_us, ev.rest_us);
+    }
 
-    if (period_us) *period_us = envelope_period_us;
-    if (rest_us) *rest_us = envelope_rest_us;
-    if (sum1) *sum1 = volatile_adc_sum1;
-    if (sum2) *sum2 = volatile_adc_sum2;
-    if (sum3) *sum3 = volatile_adc_sum3;
-    if (sample_count) *sample_count = volatile_adc_sample_count;
-
-    // Effacer les accumulateurs volatils et l'événement.
-    envelope_event = 0;
-    envelope_period_us = 0;
-    envelope_rest_us = 0;
+    // 2. Traitement global des ADC pour l'estimation de distance (Indépendant de la trame)
+    // On copie et on reset les sommes accumulées pendant les 20 dernières millisecondes
+    NVIC_DisableIRQ(ADC_IRQn);
+    uint32_t sum1 = volatile_adc_sum1;
+    uint32_t sum2 = volatile_adc_sum2;
+    uint32_t sum3 = volatile_adc_sum3;
+    uint16_t count = volatile_adc_sample_count;
+    
     volatile_adc_sum1 = 0;
     volatile_adc_sum2 = 0;
     volatile_adc_sum3 = 0;
     volatile_adc_sample_count = 0;
+    NVIC_EnableIRQ(ADC_IRQn);
 
-    NVIC_EnableIRQ(EINT3_IRQn);
-    return 1;
+    // Calcul de la moyenne hors interruption
+    if (count > 0) {
+        uint16_t avg1 = (uint16_t)(sum1 / count);
+        uint16_t avg2 = (uint16_t)(sum2 / count);
+        uint16_t avg3 = (uint16_t)(sum3 / count);
+        set_capteur_averages(avg1, avg2, avg3);
+    }
 }
 
 void debug_inductif_send_frame(void) {
-    uint16_t ev_period = 0;
-    uint16_t ev_rest = 0;
-    uint32_t sum1 = 0;
-    uint32_t sum2 = 0;
-    uint32_t sum3 = 0;
-    uint16_t samples = 0;
-
-    if (capteur_inductif_consume_event(&ev_period, &ev_rest, &sum1, &sum2, &sum3, &samples)) {
-        decode_enveloppe_commande(ev_period, ev_rest);
-        if (samples > 0) {
-            uint16_t avg1 = (uint16_t)(sum1 / samples);
-            uint16_t avg2 = (uint16_t)(sum2 / samples);
-            uint16_t avg3 = (uint16_t)(sum3 / samples);
-            set_capteur_averages(avg1, avg2, avg3);
-        }
-    }
-
     char buffer[128];
     uint16_t avg_av = 0, avg_ar = 0, avg_hor = 0;
     int32_t dist_av = 0, dist_ar = 0, dist_mil = 0, angle = 0;

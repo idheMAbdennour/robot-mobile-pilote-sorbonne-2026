@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file capteur_inductif.h
  * @brief Fichier du module capteur_inductif.
  */
@@ -44,24 +44,16 @@ void capteur_inductif_receive_wire_command(uint8_t wire_code);
 void debug_inductif_send_frame(void);
 
 /**
- * @brief Consomme atomiquement un événement d'enveloppe et les accumulateurs ADC depuis l'ISR.
- * @param period_us Pointeur pour récupérer la période en us.
- * @param rest_us Pointeur pour récupérer le repos en us.
- * @param sum1 Pointeur pour récupérer la somme du canal 1.
- * @param sum2 Pointeur pour récupérer la somme du canal 2.
- * @param sum3 Pointeur pour récupérer la somme du canal 3.
- * @param sample_count Pointeur pour récupérer le nombre d'échantillons.
- * @return 1 si un événement était disponible et copié, 0 sinon.
- */
-int capteur_inductif_consume_event(uint16_t *period_us, uint16_t *rest_us,
-                                   uint32_t *sum1, uint32_t *sum2, uint32_t *sum3,
-                                   uint16_t *sample_count);
-
-/**
- * @brief Récupère la période du signal enveloppe (en microsecondes).
- * @return La période en microsecondes.
+ * @brief Récupère la dernière période d'enveloppe mesurée.
+ * @return Période en microsecondes.
  */
 uint16_t get_envelope_period_us(void);
+
+/**
+ * @brief Dépile la FIFO des événements d'enveloppe et met à jour le décodeur et l'ADC.
+ * Doit être appelée périodiquement (par exemple à 50Hz dans le main).
+ */
+void capteur_inductif_update(void);
 
 /**
  * @brief Test du module capteur inductif (décommentable dans main).

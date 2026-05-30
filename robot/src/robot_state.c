@@ -37,7 +37,6 @@ static int32_t proxi_dists[NUM_PROXI_MEASUREMENTS];
 
 // Wire Frame (Enveloppe)
 static wire_trame_t current_wire_trame = {0, 0, 0};
-static uint8_t wire_trame_is_valid = 0;
 static uint8_t new_wire_trame = 0;
 
 // Variables SPI
@@ -216,34 +215,23 @@ void get_proxi_distance_at_angle(int angle_deg, int32_t *distance) {
 }
 
 // --- WIRE TRAME ---
-void set_wire_trame(const wire_trame_t *trame, uint8_t is_valid) {
+void set_wire_trame(const wire_trame_t *trame) {
     if (!trame) return;
     current_wire_trame.type = trame->type;
     current_wire_trame.robot_id = trame->robot_id;
     current_wire_trame.parameter = trame->parameter;
-    wire_trame_is_valid = is_valid;
+    new_wire_trame = 1; // Le flag monte automatiquement
 }
 
-void get_wire_trame(wire_trame_t *trame, uint8_t *is_valid) {
-    if (!trame) return;
+uint8_t get_wire_trame(wire_trame_t *trame) {
+    if (!trame) return 0;
     trame->type = current_wire_trame.type;
     trame->robot_id = current_wire_trame.robot_id;
     trame->parameter = current_wire_trame.parameter;
-    if (is_valid) {
-        *is_valid = wire_trame_is_valid;
-    }
-}
-
-uint8_t get_new_wire_trame(void) {
-    return new_wire_trame;
-}
-
-void clear_new_wire_trame(void) {
-    new_wire_trame = 0;
-}
-
-void set_new_wire_trame(uint8_t is_new) {
-    new_wire_trame = is_new;
+    
+    uint8_t is_new = new_wire_trame;
+    new_wire_trame = 0; // Le flag descend automatiquement à la lecture
+    return is_new;
 }
 
 // --- VARIABLES SPI ---

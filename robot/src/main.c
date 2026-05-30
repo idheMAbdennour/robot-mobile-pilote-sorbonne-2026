@@ -57,6 +57,9 @@
             // Acquittement du flag
             set_flag_50hz(0);
 
+            // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
+            capteur_inductif_update();
+
             // Lecture de l'ID du robot via les switchs
             update_robot_id_from_hardware();
 
@@ -74,16 +77,9 @@
             // -----------------------------------------------------
             // Traitement de l'enveloppe (réception série par fil)
             // -----------------------------------------------------
-            if (get_new_wire_trame()) {
-                set_new_wire_trame(0);
-                wire_trame_t trame;
-                get_wire_trame(&trame, NULL);
-
-                // Si la trame correspond au numéro du robot
-                if (trame.robot_id == get_robot_number()) {
-                    moteurs_receive_wire_command(trame.type);
-                    capteur_inductif_receive_wire_command(trame.type);
-                }
+            wire_trame_t trame;
+            if (get_wire_trame(&trame)) {
+                decode_enveloppe_process_command(&trame);
             }
 
             // Balayage du proximètre (équivalent à proximetre_tick / proximetre_run_balayage)
@@ -93,7 +89,7 @@
             // Envois debug par module
             debug_moteurs_send_frame(); // mode sur P0.4 et P0.5
             debug_inductif_send_frame(); // mode sur P0.0, P0.1 et P0.6
-            decode_enveloppe_debug_print_uart(); // Pour test uniquement, affiche les buffer
+            // test_print_buffer(); // Pour test uniquement, affiche les buffer
 
             // Emission de la trame du proximètre "T/t ddd..."
             debug_proximetre_send_frame();

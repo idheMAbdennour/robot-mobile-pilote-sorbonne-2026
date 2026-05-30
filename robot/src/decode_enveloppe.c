@@ -9,6 +9,8 @@
 
 #include "robot_state.h"
 #include "uart.h"
+#include "moteur.h"
+#include "capteur_inductif.h"
 
 /* ==========================================================================
  * DÉFINITIONS ET MACROS
@@ -31,7 +33,6 @@ typedef enum {
 #define PERIOD_o       1250
 #define PERIOD_1       1750
 #define PERIOD_i       2250
-#define REST_DURATION  500
 #define ERROR_MARGIN_PERCENT 15 // Marge de tolérance ajustée
 
 #define MARGIN_E       ((PERIOD_E * ERROR_MARGIN_PERCENT) / 100)
@@ -40,29 +41,33 @@ typedef enum {
 #define MARGIN_o       ((PERIOD_o * ERROR_MARGIN_PERCENT) / 100)
 #define MARGIN_1       ((PERIOD_1 * ERROR_MARGIN_PERCENT) / 100)
 #define MARGIN_i       ((PERIOD_i * ERROR_MARGIN_PERCENT) / 100)
-#define MARGIN_REST    ((REST_DURATION * ERROR_MARGIN_PERCENT) / 100)
 
 /* ==========================================================================
- * VARIABLES GLOBALES PRIVÉES
+ * VARIABLES GLOBALES PRIVÉES (MACHINE D'ÉTAT)
  * ========================================================================== */
-#define FRAME_LEN 15
-static Symbol_t window_nord[FRAME_LEN] = {SYMBOL_BLANK};
-static Symbol_t window_sud[FRAME_LEN]  = {SYMBOL_BLANK};
+typedef enum {
+    STATE_WAIT_HEADER,
+    STATE_COLLECT_DATA
+} DecodeState_t;
+
+typedef struct {
+    DecodeState_t state;
+    uint8_t bit_count;
+    uint32_t data;
+} Decoder_t;
+
+static Decoder_t decoder_nord = {STATE_WAIT_HEADER, 0, 0};
+static Decoder_t decoder_sud = {STATE_WAIT_HEADER, 0, 0};
 
 /* ==========================================================================
  * IMPLÉMENTATION DES FONCTIONS PRIVÉES
  * ========================================================================== */
-static void init_windows(void) {
-    for (int i = 0; i < FRAME_LEN; i++) {
-        window_nord[i] = SYMBOL_BLANK;
-        window_sud[i] = SYMBOL_BLANK;
-    }
-}
 
 static uint8_t is_rest_duration_valid(uint16_t rest_us) {
-    uint16_t min_rest = REST_DURATION - MARGIN_REST;
-    uint16_t max_rest = REST_DURATION + MARGIN_REST;
-    return (rest_us >= min_rest && rest_us <= max_rest);
+    // Un repos "court" est ~500us. 
+    // Un repos "long" (quand on rate les symboles de l'autre fil) peut aller jusqu'à 500us + 3250us + 500us = 4250us.
+    // On fixe une fourchette généreuse : 350us à 5000us pour accepter les repos longs de trame alternée.
+    return (rest_us >= 350 && rest_us <= 5000);
 }
 
 static Symbol_t period_us_to_symbol(uint16_t period_us) {
@@ -83,139 +88,160 @@ static uint8_t is_sud_symbol(Symbol_t sym) {
     return (sym == SYMBOL_e || sym == SYMBOL_o || sym == SYMBOL_i);
 }
 
-static uint8_t symbol_to_bit(Symbol_t sym) {
-    if (sym == SYMBOL_1 || sym == SYMBOL_i) return 1;
-    return 0; // Défaut pour 0 et o
-}
-
-static void decode_frame(const Symbol_t *window, wire_trame_t *trame) {
-    uint32_t data = 0;
-    // Extraction des 14 bits (l'index 0 est l'en-tête)
-    for (int i = 1; i < 15; i++) {
-        data = (data << 1) | symbol_to_bit(window[i]);
-    }
-    
-    // Format du cahier des charges : 3 bits Type, 4 bits RobotID, 7 bits Param
-    trame->type = (data >> 11) & 0x07;
-    trame->robot_id = (data >> 7) & 0x0F;
-    trame->parameter = data & 0x7F;
-}
-
 /* ==========================================================================
  * IMPLÉMENTATION DES FONCTIONS PUBLIQUES
  * ========================================================================== */
 void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
-    if (!is_rest_duration_valid(rest_duration_us)) {
-        init_windows();
-        return;
-    }
-
     Symbol_t symbol = period_us_to_symbol(period_us);
+
+    // L'en-tête (E ou e) peut arriver après un long silence inter-trames.
+    // On ne vérifie le repos que si ce n'est pas un symbole d'entête.
+    if (symbol != SYMBOL_E && symbol != SYMBOL_e) {
+        if (!is_rest_duration_valid(rest_duration_us)) {
+            decoder_nord.state = STATE_WAIT_HEADER;
+            decoder_sud.state = STATE_WAIT_HEADER;
+            return;
+        }
+    }
+
     if (symbol == SYMBOL_INVALID) {
-        init_windows();
+        decoder_nord.state = STATE_WAIT_HEADER;
+        decoder_sud.state = STATE_WAIT_HEADER;
         return;
     }
 
-    // Glissement de la fenêtre correspondante
-    if (is_nord_symbol(symbol)) {
-        for (int i = 0; i < FRAME_LEN - 1; i++) {
-            window_nord[i] = window_nord[i + 1];
-        }
-        window_nord[FRAME_LEN - 1] = symbol;
-    } else if (is_sud_symbol(symbol)) {
-        for (int i = 0; i < FRAME_LEN - 1; i++) {
-            window_sud[i] = window_sud[i + 1];
-        }
-        window_sud[FRAME_LEN - 1] = symbol;
-    }
-
-    // Validation de la fenêtre NORD
-    uint8_t nord_valid = 0;
-    if (window_nord[0] == SYMBOL_E) {
-        nord_valid = 1;
-        for (int i = 1; i < FRAME_LEN; i++) {
-            if (window_nord[i] != SYMBOL_0 && window_nord[i] != SYMBOL_1) {
-                nord_valid = 0;
-                break;
-            }
-        }
-    }
-
-    // Validation de la fenêtre SUD
-    uint8_t sud_valid = 0;
-    if (window_sud[0] == SYMBOL_e) {
-        sud_valid = 1;
-        for (int i = 1; i < FRAME_LEN; i++) {
-            if (window_sud[i] != SYMBOL_o && window_sud[i] != SYMBOL_i) {
-                sud_valid = 0;
-                break;
-            }
-        }
-    }
-
-    // Extraction et Priorisation
     uint8_t decoded = 0;
     wire_trame_t final_trame;
     uint8_t my_id = get_robot_number();
 
-    if (nord_valid) {
-        decode_frame(window_nord, &final_trame);
-        decoded = 1;
-        // On purge la fenêtre pour ne pas redécoder au prochain cycle
-        for (int i = 0; i < FRAME_LEN; i++) window_nord[i] = SYMBOL_BLANK;
-    }
-
-    if (sud_valid) {
-        wire_trame_t trame_sud;
-        decode_frame(window_sud, &trame_sud);
-        
-        // Si aucune trame n'a été validée, OU si Sud nous est adressé prioritairement
-        if (!decoded || trame_sud.robot_id == my_id) {
-            final_trame = trame_sud;
-            decoded = 1;
+    if (is_nord_symbol(symbol)) {
+        if (symbol == SYMBOL_E) {
+            decoder_nord.state = STATE_COLLECT_DATA;
+            decoder_nord.bit_count = 0;
+            decoder_nord.data = 0;
+        } else if (decoder_nord.state == STATE_COLLECT_DATA) {
+            decoder_nord.data = (decoder_nord.data << 1) | (symbol == SYMBOL_1 ? 1 : 0);
+            decoder_nord.bit_count++;
+            
+            if (decoder_nord.bit_count == 14) {
+                wire_trame_t trame_nord;
+                trame_nord.type = (decoder_nord.data >> 11) & 0x07;
+                trame_nord.robot_id = (decoder_nord.data >> 7) & 0x0F;
+                trame_nord.parameter = decoder_nord.data & 0x7F;
+                
+                final_trame = trame_nord;
+                decoded = 1;
+                decoder_nord.state = STATE_WAIT_HEADER;
+            }
         }
-        for (int i = 0; i < FRAME_LEN; i++) window_sud[i] = SYMBOL_BLANK;
+    } else if (is_sud_symbol(symbol)) {
+        if (symbol == SYMBOL_e) {
+            decoder_sud.state = STATE_COLLECT_DATA;
+            decoder_sud.bit_count = 0;
+            decoder_sud.data = 0;
+        } else if (decoder_sud.state == STATE_COLLECT_DATA) {
+            decoder_sud.data = (decoder_sud.data << 1) | (symbol == SYMBOL_i ? 1 : 0);
+            decoder_sud.bit_count++;
+            
+            if (decoder_sud.bit_count == 14) {
+                wire_trame_t trame_sud;
+                trame_sud.type = (decoder_sud.data >> 11) & 0x07;
+                trame_sud.robot_id = (decoder_sud.data >> 7) & 0x0F;
+                trame_sud.parameter = decoder_sud.data & 0x7F;
+                
+                // Priorité au Sud si l'ID correspond, sinon on garde la dernière trame (ou Nord)
+                if (!decoded || trame_sud.robot_id == my_id) {
+                    final_trame = trame_sud;
+                    decoded = 1;
+                }
+                decoder_sud.state = STATE_WAIT_HEADER;
+            }
+        }
     }
 
     // Transmission au système principal
     if (decoded) {
-        set_wire_trame(&final_trame, 1);
-        set_new_wire_trame(1);
+        set_wire_trame(&final_trame);
+    }
+}
+
+void decode_enveloppe_process_command(const wire_trame_t *trame) {
+    char debug_buf[64];
+    
+    if (!trame || trame->robot_id != get_robot_number()) {
+        return; // Message invalide ou ne nous est pas destiné
+    }
+
+    // Avertir par UART qu'une trame a été validée
+    sprintf(debug_buf, "\r\n!!! TRAME RECUE !!! Type:%d Robot:%d Param:%d\r\n", 
+            trame->type, trame->robot_id, trame->parameter);
+    uart0_send_string(debug_buf);
+
+    switch (trame->type) {
+        case 0b000: // Vitesse
+            set_robot_vitesse((uint8_t)trame->parameter);
+            changer_pwm_moteurs((uint8_t)trame->parameter, (uint8_t)trame->parameter);
+            break;
+            
+        case 0b001: // Direction
+            // À implémenter selon la logique de direction
+            break;
+            
+        case 0b011: // Commande de la diode de signalisation
+            // À implémenter avec le module de statut
+            break;
+            
+        case 0b110: // Validation du mode Hardware pour le débuggage
+            capteur_inductif_receive_wire_command(trame->type);
+            moteurs_receive_wire_command(trame->type);
+            break;
+            
+        case 0b111: // Demande d'état du module de débuggage
+            capteur_inductif_receive_wire_command(trame->type);
+            moteurs_receive_wire_command(trame->type);
+            break;
+            
+        default:
+            // Autres commandes (servomoteurs, IR, balises) ignorées pour l'instant
+            break;
     }
 }
 
 uint8_t decode_enveloppe_get_buffer_index(void) {
-    // Calcul fictif pour rétrocompatibilité avec la signature existante
-    uint8_t count = 0;
-    for (int i = 0; i < FRAME_LEN; i++) {
-        if (window_nord[i] != SYMBOL_BLANK) count++;
-        if (window_sud[i] != SYMBOL_BLANK) count++;
-    }
-    return count;
+    if (decoder_nord.state == STATE_COLLECT_DATA) return decoder_nord.bit_count + 1;
+    if (decoder_sud.state == STATE_COLLECT_DATA) return decoder_sud.bit_count + 1;
+    return 0;
 }
 
-void decode_enveloppe_debug_print_uart(void) {
+void test_print_buffer(void) {
     char buffer[128];
     int pos = 0;
 
+    // Affichage Nord
     pos += sprintf(buffer + pos, "N[");
-    for (int i = 0; i < FRAME_LEN; i++) {
-        char c = '.';
-        if (window_nord[i] == SYMBOL_E) c = 'E';
-        else if (window_nord[i] == SYMBOL_0) c = '0';
-        else if (window_nord[i] == SYMBOL_1) c = '1';
-        pos += sprintf(buffer + pos, "%c", c);
+    pos += sprintf(buffer + pos, (decoder_nord.state == STATE_COLLECT_DATA) ? "E" : ".");
+    for (int i = 0; i < 14; i++) {
+        if (i < decoder_nord.bit_count) {
+            uint8_t bit = (decoder_nord.data >> (decoder_nord.bit_count - 1 - i)) & 1;
+            pos += sprintf(buffer + pos, "%c", bit ? '1' : '0');
+        } else {
+            pos += sprintf(buffer + pos, ".");
+        }
     }
+    pos += sprintf(buffer + pos, "]");
 
-    pos += sprintf(buffer + pos, "] S[");
-    for (int i = 0; i < FRAME_LEN; i++) {
-        char c = '.';
-        if (window_sud[i] == SYMBOL_e) c = 'e';
-        else if (window_sud[i] == SYMBOL_o) c = 'o';
-        else if (window_sud[i] == SYMBOL_i) c = 'i';
-        pos += sprintf(buffer + pos, "%c", c);
+    // Affichage Sud
+    pos += sprintf(buffer + pos, " S[");
+    pos += sprintf(buffer + pos, (decoder_sud.state == STATE_COLLECT_DATA) ? "e" : ".");
+    for (int i = 0; i < 14; i++) {
+        if (i < decoder_sud.bit_count) {
+            uint8_t bit = (decoder_sud.data >> (decoder_sud.bit_count - 1 - i)) & 1;
+            pos += sprintf(buffer + pos, "%c", bit ? 'i' : 'o');
+        } else {
+            pos += sprintf(buffer + pos, ".");
+        }
     }
+    pos += sprintf(buffer + pos, "]\r\n");
 
-    sprintf(buffer + pos, "]\r\n");
     uart0_send_string(buffer);
 }
