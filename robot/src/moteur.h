@@ -1,40 +1,65 @@
-#ifndef MOTEUR_H
+﻿#ifndef MOTEUR_H
 #define MOTEUR_H
 
 #include <stdint.h>
 
-#define PIN_MOT_SW1 (1 << 11) // P0.11
-#define PIN_MOT_SW2 (1 << 12) // P0.12
+/* ==========================================================================
+ * DÉFINITIONS (PINS)
+ * ========================================================================== */
+#define PIN_MOT_SW1 (1 << 4) // P0.4 - Switch moteur 1
+#define PIN_MOT_SW2 (1 << 5) // P0.5 - Switch moteur 2
 
-void init_moteurs_debug(void);
-void moteurs_interrupt_routine(void);
-void moteurs_receive_wire_command(uint8_t wire_code);
-void debug_moteurs_send_frame(void);
 
-static void init_moteurs_switches(void);
+/* ==========================================================================
+ * PROTOTYPES DES FONCTIONS
+ * ========================================================================== */
+
 /**
- * @brief Initialise le module PWM1 pour les deux roues du robot.
- * Configure P2.0 (Roue Gauche) et P2.1 (Roue Droite) à une fréquence de 25 kHz.
+ * @brief Initialise le module PWM pour les deux roues du robot (via pwm.c).
  */
-void Init_Moteur_PWM(void);
+void init_moteur_pwm(void);
 
 /**
- * @brief Modifie le rapport cyclique de la roue GAUCHE à tout moment.
+ * @brief Modifie le rapport cyclique de la roue GAUCHE.
  * @param pourcent Valeur entre 0 (arrêt) et 100 (vitesse max).
  */
-void Changer_PWM_Gauche(uint8_t pourcent);
+void changer_pwm_gauche(uint8_t pourcent);
 
 /**
- * @brief Modifie le rapport cyclique de la roue DROITE à tout moment.
+ * @brief Modifie le rapport cyclique de la roue DROITE.
  * @param pourcent Valeur entre 0 (arrêt) et 100 (vitesse max).
  */
-void Changer_PWM_Droite(uint8_t pourcent);
+void changer_pwm_droite(uint8_t pourcent);
 
 /**
  * @brief Modifie simultanément la vitesse des deux roues.
- * @param pourcent_gauche Valeur entre 0 et 100 pour le moteur gauche.
- * @param pourcent_droite Valeur entre 0 et 100 pour le moteur droit.
+ * @param pourcent_gauche Valeur entre 0 et 100.
+ * @param pourcent_droite Valeur entre 0 et 100.
  */
-void Changer_PWM_Moteurs(uint8_t pourcent_gauche, uint8_t pourcent_droite);
+void changer_pwm_moteurs(uint8_t pourcent_gauche, uint8_t pourcent_droite);
+
+/**
+ * @brief Initialise les interruptions et GPIO pour le debug des moteurs.
+ */
+void init_moteurs_debug(void);
+
+/**
+ * @brief Routine d'interruption pour les switchs moteurs.
+ */
+void moteurs_interrupt_routine(void);
+/**
+ * @brief Reçoit et traite une commande via le fil (enveloppe).
+ * @param wire_code Le code reçu.
+ */
+void moteurs_receive_wire_command(uint8_t wire_code);
+/**
+ * @brief Envoie l'état de debug actuel des moteurs via UART.
+ */
+void debug_moteurs_send_frame(void);
+
+/**
+ * @brief Fonction de test du module moteurs, décommentable dans le main.
+ */
+void test_moteurs_module(void);
 
 #endif // MOTEUR_H
