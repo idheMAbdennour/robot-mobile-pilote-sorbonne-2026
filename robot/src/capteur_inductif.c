@@ -72,7 +72,7 @@ static void init_switches(void) {
     // Configurer P0.0, P0.1 et P0.6 en GPIO (PINSEL0 bits 0:1, 2:3, 12:13)
     LPC_PINCON->PINSEL0 &= ~((3u << 0) | (3u << 2) | (3u << 12));
     LPC_PINCON->PINMODE0 &= ~((3u << 0) | (3u << 2) | (3u << 12)); // Pull-up par défaut
-    
+
     // Direction entrée
     LPC_GPIO0->FIODIR &= ~(PIN_IND_SW1 | PIN_IND_SW2 | PIN_IND_SW3);
 
@@ -143,10 +143,7 @@ void capteur_inductif_interrupt_routine(void) {
     }
 
     if (LPC_GPIOINT->IO0IntStatF & CAPTEUR_IND_SW_CLOCK) {
-        // On lance la séquence ADC UNIQUEMENT quand l'enveloppe est à l'état haut
-        if (LPC_GPIO0->FIOPIN & CAPTEUR_IND_SW_ENVELOP) {
             adc_start_inductif_sequence();
-        }
         LPC_GPIOINT->IO0IntClr = CAPTEUR_IND_SW_CLOCK; // Acquitter
     }
 
@@ -180,7 +177,7 @@ void capteur_inductif_interrupt_routine(void) {
         if (period_ticks > 0) {
             uint32_t period_us = period_ticks * (uint32_t)TIMER2_TICK_US;
             current_period_us = (uint16_t)period_us;
-            
+
             // Pousser dans la FIFO (Uniquement les informations temporelles)
             uint8_t next_head = (fifo_head + 1) % ENVELOPE_FIFO_SIZE;
             if (next_head != fifo_tail) {
@@ -213,7 +210,7 @@ uint16_t get_envelope_period_us(void) {
 
 void capteur_inductif_update(void) {
     EnvelopeEvent_t ev;
-    
+
     // 1. Traitement des événements d'enveloppe (Dépilement de la FIFO)
     while (fifo_tail != fifo_head) {
         NVIC_DisableIRQ(EINT3_IRQn);
@@ -232,7 +229,7 @@ void capteur_inductif_update(void) {
     uint32_t sum2 = volatile_adc_sum2;
     uint32_t sum3 = volatile_adc_sum3;
     uint16_t count = volatile_adc_sample_count;
-    
+
     volatile_adc_sum1 = 0;
     volatile_adc_sum2 = 0;
     volatile_adc_sum3 = 0;
@@ -254,6 +251,8 @@ void debug_inductif_send_frame(void) {
     int32_t dist_av = 0, dist_ar = 0, dist_mil = 0, angle = 0;
     uint16_t period_us = get_envelope_period_us();
 
+    WireMeasure measure;
+
     if (ind_hw_mode == 0b111) {
         if (!ind_wire_pending) return;
         ind_wire_pending = 0;
@@ -264,16 +263,16 @@ void debug_inductif_send_frame(void) {
             sprintf(buffer, "I %ld\r\n", (long)period_us);
             break;
         case 0b001:
-            get_inductif_values(&dist_av, &dist_ar, &dist_mil, &angle);
-            sprintf(buffer, "a %ld°\r\n", (long)angle);
+            get_wire_measure(&measure);
+            sprintf(buffer, "a %drad\r\n", (int)(measure.alpha_mes * 1000));
             break;
         case 0b010:
-            get_inductif_values(&dist_av, &dist_ar, &dist_mil, &angle);
-            sprintf(buffer, "X%ldmm\r\n", (long)dist_ar);
+            get_wire_measure(&measure);
+            sprintf(buffer, "X%dmm\r\n", (int)(measure.y_mes * 1000));
             break;
         case 0b011:
-            get_inductif_values(&dist_av, &dist_ar, &dist_mil, &angle);
-            sprintf(buffer, "x%ldmm\r\n", (long)dist_av);
+            get_wire_measure(&measure);
+            sprintf(buffer, "x%dmm\r\n", (int)(measure.y_mes * 1000));
             break;
         case 0b100:
             get_capteur_averages(&avg_av, &avg_ar, &avg_hor);

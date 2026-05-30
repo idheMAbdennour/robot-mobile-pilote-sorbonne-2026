@@ -12,8 +12,17 @@
 
 // État Global
 static uint8_t current_robot_number = 0; // Par défaut : Robot 0
-static uint8_t current_vitesse = 0;      // Vitesse initiale
 static robot_status_t current_status = STATUS_LIBRE; 
+
+// Asservissement : Vitesse
+static int32_t current_vitesse_centrale = 0;
+static int32_t current_vitesse_commande = 0;
+static int32_t current_vitesse_reelle = 0;
+
+// Asservissement : Odométrie et Capteurs
+static WireMeasure current_wire_measure = {0.0f, 0.0f, 0, 0, 0};
+static WheelDelta current_wheel_delta = {0.0f, 0.0f, 0.0f};
+
 
 // Moteurs
 static int32_t current_pwm_g = 2;
@@ -21,11 +30,7 @@ static int32_t current_pwm_d = 3;
 static int32_t current_v_moy = 4;
 static int32_t current_w_ang = 5;
 
-// Capteur Inductif (Distances et Angle)
-static int32_t current_dist_av = 1;
-static int32_t current_dist_ar = 2;
-static int32_t current_dist_mil = 3;
-static int32_t current_angle = 3;
+// (Les anciennes distances et angles bruts ont été remplacés par WireMeasure)
 
 // Capteur Inductif (Valeurs brutes ADC)
 static uint16_t current_avg_av = 0;
@@ -88,15 +93,47 @@ uint8_t get_robot_number(void) {
     return current_robot_number;
 }
 
-// --- VITESSE ---
-void set_robot_vitesse(uint8_t vitesse) {
-    if (vitesse <= 15) {
-        current_vitesse = vitesse;
+// --- VARIABLES D'ASSERVISSEMENT : VITESSE ---
+void set_vitesse_centrale(int32_t vitesse) { current_vitesse_centrale = vitesse; }
+int32_t get_vitesse_centrale(void) { return current_vitesse_centrale; }
+
+void set_vitesse_commande(int32_t vitesse) { current_vitesse_commande = vitesse; }
+int32_t get_vitesse_commande(void) { return current_vitesse_commande; }
+
+void set_vitesse_reelle(int32_t vitesse) { current_vitesse_reelle = vitesse; }
+int32_t get_vitesse_reelle(void) { return current_vitesse_reelle; }
+
+uint8_t get_vitesse_code_ir(void) {
+    int32_t vr = current_vitesse_reelle;
+    if (vr < 20) return 0;
+    int32_t code = (vr - 20) / 5;
+    if (code > 15) return 15;
+    return (uint8_t)code;
+}
+
+// --- VARIABLES D'ASSERVISSEMENT : ODOMÉTRIE ET CAPTEURS ---
+void set_wire_measure(const WireMeasure *measure) {
+    if (measure) {
+        current_wire_measure = *measure;
     }
 }
 
-uint8_t get_robot_vitesse(void) {
-    return current_vitesse;
+void get_wire_measure(WireMeasure *measure) {
+    if (measure) {
+        *measure = current_wire_measure;
+    }
+}
+
+void set_wheel_delta(const WheelDelta *delta) {
+    if (delta) {
+        current_wheel_delta = *delta;
+    }
+}
+
+void get_wheel_delta(WheelDelta *delta) {
+    if (delta) {
+        *delta = current_wheel_delta;
+    }
 }
 
 // --- STATUS ---
@@ -139,27 +176,7 @@ void get_motor_speeds(int32_t *v_moy, int32_t *w_ang) {
 #endif
 }
 
-// --- CAPTEUR INDUCTIF ---
-void set_inductif_values(int32_t dist_av, int32_t dist_ar, int32_t dist_mil, int32_t angle) {
-    current_dist_av = dist_av;
-    current_dist_ar = dist_ar;
-    current_dist_mil = dist_mil;
-    current_angle = angle;
-}
-
-void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, int32_t *angle) {
-#if SIMULATE_SENSOR_VALUES
-    if (dist_av) *dist_av = 123;
-    if (dist_ar) *dist_ar = -12;
-    if (dist_mil) *dist_mil = 456;
-    if (angle) *angle = -10;
-#else
-    if (dist_av) *dist_av = current_dist_av;
-    if (dist_ar) *dist_ar = current_dist_ar;
-    if (dist_mil) *dist_mil = current_dist_mil;
-    if (angle) *angle = current_angle;
-#endif
-}
+// (Anciennes fonctions get/set inductif supprimées)
 
 void set_capteur_averages(uint16_t avg_av, uint16_t avg_ar, uint16_t avg_hor) {
     current_avg_av = avg_av;

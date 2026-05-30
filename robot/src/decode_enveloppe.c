@@ -179,10 +179,12 @@ void decode_enveloppe_process_command(const wire_trame_t *trame) {
 
     switch (trame->type) {
         case 0b000: // Vitesse
-            set_robot_vitesse((uint8_t)trame->parameter);
-            changer_pwm_moteurs((uint8_t)trame->parameter, (uint8_t)trame->parameter);
+            // La vitesse commandée par la centrale (en %)
+            set_vitesse_centrale((int32_t)trame->parameter);
+            // On ne modifie plus directement les PWM ici : c'est le rôle de la boucle d'asservissement à 50Hz.
             break;
             
+        // @todo: implémenter
         case 0b001: // Direction
             // À implémenter selon la logique de direction
             break;

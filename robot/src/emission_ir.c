@@ -101,7 +101,7 @@ static void update_pwm_state(void) {
             frame_counter++;
             if (frame_counter >= 6) {
                 frame_counter = 0; // On reprend un nouveau cycle d'émission
-                preparer_trame(get_robot_number(), get_robot_vitesse(), (uint8_t)get_robot_status());
+                preparer_trame(get_robot_number(), get_vitesse_code_ir(), (uint8_t)get_robot_status());
             }
         }
         

@@ -20,6 +20,7 @@
 #include "robot_state.h"
 #include "status.h"
 #include "uart.h"
+#include "asservissement.h"
 
     int main(void)
     {
@@ -81,6 +82,11 @@
             if (get_wire_trame(&trame)) {
                 decode_enveloppe_process_command(&trame);
             }
+
+            // -----------------------------------------------------
+            // Boucle d'asservissement (calcul PID / consigne moteurs)
+            // -----------------------------------------------------
+            asservissement_update();
 
             // Balayage du proximètre (équivalent à proximetre_tick / proximetre_run_balayage)
             // Doit tourner même si le debug UART est désactivé.

@@ -42,6 +42,16 @@ void update_robot_id_from_hardware(void);
 // Configuration de Test : Mettre à 1 pour simuler les capteurs
 #define SIMULATE_SENSOR_VALUES 0
 
+/* ==========================================================================
+ * DÉFINITIONS PARAMÈTRES PHYSIQUES ET ASSERVISSEMENT
+ * ========================================================================== */
+// Ces macros pourront être ajustées dynamiquement lors des tests
+#define ROBOT_WHEEL_DIAMETER_MM    50  // Diamètre des roues en mm (valeur d'exemple)
+#define ROBOT_WHEEL_DISTANCE_MM    120 // Entraxe entre les roues en mm (valeur d'exemple)
+#define MAX_SENSOR_ANGLE_DEG       10  // L'angle max fonctionnel du capteur inductif (+/-)
+#define MAX_SENSOR_DISTANCE_CM     10  // La distance max fonctionnelle du capteur inductif (+/-)
+
+
 // Longueur maximale d'une séquence IR
 #define MAX_SEQ_LENGTH 100
 
@@ -72,9 +82,38 @@ uint8_t get_robot_number(void);
 void set_robot_status(robot_status_t status);
 robot_status_t get_robot_status(void);
 
-// --- Vitesse et Commandes Moteurs ---
-void set_robot_vitesse(uint8_t vitesse);
-uint8_t get_robot_vitesse(void);
+// --- Variables d'Asservissement : Vitesse (%) ---
+void set_vitesse_centrale(int32_t vitesse);
+int32_t get_vitesse_centrale(void);
+
+void set_vitesse_commande(int32_t vitesse);
+int32_t get_vitesse_commande(void);
+
+void set_vitesse_reelle(int32_t vitesse);
+int32_t get_vitesse_reelle(void);
+
+uint8_t get_vitesse_code_ir(void);
+
+// --- Variables d'Asservissement : Mesures et Odométrie ---
+typedef struct {
+    float y_mes;          // mesure latérale en m
+    float alpha_mes;        // mesure angulaire en rad
+    uint8_t has_y;        // 1 si mesure y disponible
+    uint8_t has_alpha;      // 1 si mesure alpha disponible
+    uint8_t wire_valid;   // 1 si fil détecté et signal exploitable
+} WireMeasure;
+
+typedef struct {
+    float dd_g;           // déplacement roue gauche en m
+    float dd_d;           // déplacement roue droite en m
+    float dt;             // temps écoulé (en s) pour ce delta
+} WheelDelta;
+
+void set_wire_measure(const WireMeasure *measure);
+void get_wire_measure(WireMeasure *measure);
+
+void set_wheel_delta(const WheelDelta *delta);
+void get_wheel_delta(WheelDelta *delta);
 
 void set_motor_pwms(int32_t pwm_g, int32_t pwm_d);
 void get_motor_pwms(int32_t *pwm_g, int32_t *pwm_d);
@@ -82,9 +121,7 @@ void get_motor_pwms(int32_t *pwm_g, int32_t *pwm_d);
 void set_motor_speeds(int32_t v_moy, int32_t w_ang);
 void get_motor_speeds(int32_t *v_moy, int32_t *w_ang);
 
-// --- Capteur Inductif ---
-void set_inductif_values(int32_t dist_av, int32_t dist_ar, int32_t dist_mil, int32_t angle);
-void get_inductif_values(int32_t *dist_av, int32_t *dist_ar, int32_t *dist_mil, int32_t *angle);
+// --- Capteur Inductif (ADC Averages) ---
 
 void set_capteur_averages(uint16_t avg_av, uint16_t avg_ar, uint16_t avg_hor);
 void get_capteur_averages(uint16_t *avg_av, uint16_t *avg_ar, uint16_t *avg_hor);
