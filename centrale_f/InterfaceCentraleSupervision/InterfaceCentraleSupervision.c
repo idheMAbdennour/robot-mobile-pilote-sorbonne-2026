@@ -13,22 +13,21 @@ static volatile uint16_t tx_tail = 0;
 static uint32_t last_tx_tick = 0;
 extern volatile uint32_t tick_ms;
 
-void Init_Supervision_UART1(uint32_t baudrate) {
-    LPC_SC->PCONP |= (1 << 4);
+void Init_Supervision_UART0(uint32_t baudrate) {
+    LPC_SC->PCONP |= (1 << 3);
 
-    LPC_PINCON->PINSEL1 &= ~((3 << 30) | (3 << 0));
-    LPC_PINCON->PINSEL1 |= (1 << 30); 
-    LPC_PINCON->PINSEL0 |= (1 << 0);  
+    LPC_PINCON->PINSEL0 &= ~((3 << 4) | (3 << 6));
+    LPC_PINCON->PINSEL0 |=  ((1 << 4) | (1 << 6));  
 
-    LPC_UART1->LCR = (1 << 7) | (3 << 0);
+    LPC_UART0->LCR = (1 << 7) | (3 << 0);
 
     uint32_t pclk = SystemCoreClock / 4;
     uint32_t d = pclk / (16 * baudrate);
-    LPC_UART1->DLM = (d >> 8) & 0xFF;
-    LPC_UART1->DLL = d & 0xFF;
+    LPC_UART0->DLM = (d >> 8) & 0xFF;
+    LPC_UART0->DLL = d & 0xFF;
 
-    LPC_UART1->LCR &= ~(1 << 7);
-    LPC_UART1->FCR = (1 << 0) | (1 << 1) | (1 << 2);
+    LPC_UART0->LCR &= ~(1 << 7);
+    LPC_UART0->FCR = (1 << 0) | (1 << 1) | (1 << 2);
 }
 
 void Supervision_Push_TX_Queue(const char *str) {
@@ -45,8 +44,8 @@ void Supervision_Push_TX_Queue(const char *str) {
 void Supervision_Process_TX_Non_Blocking(void) {
     if (tx_tail == tx_head) return; 
 
-    if (LPC_UART1->LSR & (1 << 5)) { 
-        LPC_UART1->THR = tx_buffer[tx_tail];
+    if (LPC_UART0->LSR & (1 << 5)) { 
+        LPC_UART0->THR = tx_buffer[tx_tail];
         tx_tail = (tx_tail + 1) % TX_BUFFER_SIZE;
     }
 }
@@ -90,9 +89,9 @@ static void parse_supervision_cmd(const char *cmd) {
 }
 
 void Supervision_Process_Incoming_Non_Blocking(void) {
-    if (!(LPC_UART1->LSR & (1 << 0))) return;
+    if (!(LPC_UART0->LSR & (1 << 0))) return;
 
-    char c = LPC_UART1->RBR;
+    char c = LPC_UART0->RBR;
 
     if (c == '\r' || c == '\n') {
         if (sup_rx_index > 0) {

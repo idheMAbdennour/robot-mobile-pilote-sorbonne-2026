@@ -30,7 +30,7 @@ int main(void) {
     init_uart3_centrale();
     init_leds();
     
-    Init_Supervision_UART1(9600);
+    Init_Supervision_UART0(9600);
 
     init_systick_50us();          
     init_recepteur_ir_centrale(); 
