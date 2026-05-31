@@ -182,10 +182,11 @@ void init_gpio(void) {
     LPC_PINCON->PINSEL0 &= ~(0xFFFF << 8); 
     LPC_GPIO0->FIODIR &= ~(0xFF << 4);  
     LPC_GPIO0->FIOCLR = (0xF << 4);    
-    LPC_PINCON->PINMODE0 &= ~(0xFF << 16); 
+    LPC_PINCON->PINMODE0 &= ~(0xFFFF << 8); 
 }
 
 void init_timer(void) {
+    LPC_SC->PCONP |= (1 << 1);
     LPC_SC->PCLKSEL0 &= ~(3 << 2);     
     LPC_TIM0->MR0 = 200000;             
     LPC_TIM0->MCR |= (1 << 0) | (1 << 1);

@@ -66,7 +66,7 @@ int Message_Traitement(void) {
     if (tens >= 0 && tens <= 9 && units >= 0 && units <= 9) {
         int target_post = (tens * 10) + units;
         if (target_post == num_post) {
-						affichage_etat_lecture(-1);
+				affichage_etat_lecture(-1);
             is_for_us = 1; 
         }
     }
