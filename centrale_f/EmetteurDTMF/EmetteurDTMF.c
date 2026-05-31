@@ -1,4 +1,5 @@
 #include "EmetteurDTMF.h"
+#include <math.h>
 
 typedef enum {
     DTMF_IDLE,
@@ -16,21 +17,34 @@ extern volatile uint32_t tick_ms;
 #define SAMPLING_FREQ 40000
 #define SINE_STEPS 1024
 
-#define CALCULATE_INCREMENT(freq)  ((uint32_t)(((uint64_t)(freq) * 4194304ULL) / SAMPLING_FREQ))
-
-
+/* a tester
 static const uint32_t DTMF_STEP_LOW[4] = {
-    CALCULATE_INCREMENT(697),
-    CALCULATE_INCREMENT(770),
-    CALCULATE_INCREMENT(852),
-    CALCULATE_INCREMENT(941)
+    73088,   
+    80742,   
+    89339,   
+    98674    
 };
 
 static const uint32_t DTMF_STEP_HIGH[4] = {
-    CALCULATE_INCREMENT(1209),
-    CALCULATE_INCREMENT(1336),
-    CALCULATE_INCREMENT(1477),
-    CALCULATE_INCREMENT(1633)
+    126763,  
+    140082,  
+    154868,  
+    171225   
+};
+*/
+
+static const uint32_t DTMF_STEP_LOW[4] = {
+    74836,   // 697 Hz 
+    82678,   // 770 Hz 
+    91482,   // 852 Hz 
+    101039   // 941 Hz
+};
+
+static const uint32_t DTMF_STEP_HIGH[4] = {
+    129805,  // 1209 Hz
+    143451,  // 1336 Hz
+    158593,  // 1477 Hz
+    175342   // 1633 Hz
 };
 
 static uint16_t SINE_TABLE[SINE_STEPS];
@@ -38,56 +52,40 @@ volatile uint32_t current_step_low = 0;
 volatile uint32_t current_step_high = 0;
 volatile uint8_t sound_enabled = 0;
 
+//TIM1
 void init_timer(void) {
-		for (int i = 0; i < SINE_STEPS; i++) {
+    for (int i = 0; i < SINE_STEPS; i++) {
         SINE_TABLE[i] = (uint16_t)(512.0 + 500.0 * sin((2.0 * 3.14159265 * i) / SINE_STEPS));
     }
+    
+    // P0.26
     LPC_SC->PCONP |= (1 << 15);          
     LPC_PINCON->PINSEL1 &= ~(3 << 20);   
     LPC_PINCON->PINSEL1 |= (2 << 20);    
     
-    LPC_SC->PCONP |= (1 << 1);         
+    LPC_SC->PCONP |= (1 << 2); 
+    // 100Mhz        
+    LPC_SC->PCLKSEL0 &= ~(3 << 4);    
+    LPC_SC->PCLKSEL0 |= (1 << 4);      
     
-    LPC_SC->PCLKSEL0 &= ~(3 << 2);    
-    LPC_SC->PCLKSEL0 |= (1 << 2);
+    //40kHz
+    LPC_TIM1->PR = 0;                 
+    LPC_TIM1->MR0 = 2499;               
     
-    LPC_TIM0->PR = 0;                 
-    LPC_TIM0->MR0 = 2499;                
+    LPC_TIM1->MCR |= (1 << 0) | (1 << 1); 
     
-    LPC_TIM0->MCR |= (1 << 0) | (1 << 1); 
-    
-    NVIC_EnableIRQ(TIMER0_IRQn);
-    LPC_TIM0->TCR = 1;   
-    LPC_DAC->DACCNTVAL = 0;
+    NVIC_EnableIRQ(TIMER1_IRQn);
+    LPC_TIM1->TCR = 1;   
 }
-/*
-void TIMER0_IRQHandler(void) {
-    if (LPC_TIM0->IR & (1 << 0)) {
-        LPC_TIM0->IR = (1 << 0);
-        
-        static uint32_t phase_acc_low = 0;
-       
-        phase_acc_low += DTMF_STEP_LOW[0];
-        
-        uint32_t idx_low = (phase_acc_low >> 22) & 0x3FF;
-        
-        uint32_t dac_signal = SINE_TABLE[idx_low];
-       
-        LPC_DAC->DACR = (dac_signal << 6) | (1 << 16);
-    }
-}*/
 
-
-void TIMER0_IRQHandler(void) {
-    if (LPC_TIM0->IR & (1 << 0)) {
-        LPC_TIM0->IR = (1 << 0);
+void TIMER1_IRQHandler(void) {
+    if (LPC_TIM1->IR & (1 << 0)) {
+        LPC_TIM1->IR = (1 << 0);
         
-      
         static uint32_t phase_acc_low = 0;
         static uint32_t phase_acc_high = 0;
         
         if (sound_enabled) {
-            
             phase_acc_low  += current_step_low;
             phase_acc_high += current_step_high;
             
@@ -95,12 +93,11 @@ void TIMER0_IRQHandler(void) {
             uint32_t idx_high = (phase_acc_high >> 22) & 0x3FF;
             
             uint32_t dac_signal = (SINE_TABLE[idx_low] + SINE_TABLE[idx_high]) >> 1;
-						//uint32_t dac_signal = SINE_TABLE[idx_low];
            
             LPC_DAC->DACR = (dac_signal << 6) | (1 << 16);
         } else {
-            LPC_DAC->DACR = (512 << 6) | (1 << 16);
-				}
+            LPC_DAC->DACR = (512 << 6) | (1 << 16); 
+        }
     }
 }
 
@@ -108,13 +105,10 @@ void dtmf_set_char(char c) {
     int row = -1;
     int col = -1;
 
-    if (c >= '1' && c <= '3') { row = 0; }
-    else if (c >= '4' && c <= '6') { row = 1; }
-    else if (c >= '7' && c <= '9') { row = 2; }
+    if ((c >= '1' && c <= '3') || c == 'A' || c == 'a') { row = 0; }
+    else if ((c >= '4' && c <= '6') || c == 'B' || c == 'b') { row = 1; }
+    else if ((c >= '7' && c <= '9') || c == 'C' || c == 'c') { row = 2; }
     else if (c == '*' || c == '0' || c == '#' || c == 'D' || c == 'd') { row = 3; }
-    else if (c == 'A' || c == 'a') { row = 0; }
-    else if (c == 'B' || c == 'b') { row = 1; }
-    else if (c == 'C' || c == 'c') { row = 2; }
 
     if (c == '1' || c == '4' || c == '7' || c == '*') { col = 0; }
     else if (c == '2' || c == '5' || c == '8' || c == '0') { col = 1; }

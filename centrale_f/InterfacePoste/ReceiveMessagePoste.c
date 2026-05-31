@@ -13,6 +13,13 @@ static int led_state = 0;
 
 extern volatile uint32_t tick_ms;
 
+static uint8_t Parse_Hex_Char(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
+    if (c >= 'a' && c <= 'f') return 10 + (c - 'a');
+    return 0;
+}
+
 void UART3_IRQHandler(void) {
     uint32_t iir = LPC_UART3->IIR;
     
@@ -42,15 +49,21 @@ void UART3_IRQHandler(void) {
 }
 
 void Traitement_Response_Post(uint32_t post_id) {
-    //LPC_GPIO0->FIOSET = (1 << 22); 
+    //LPC_GPIO0->FIOCLR = (1 << 22); 
     
-    if (rx_buffer[0] == 'N' && rx_buffer[1] == 'U' && rx_buffer[2] == 'L' && rx_buffer[3] == 'L') {
+    if ((rx_buffer[0] == 'N' || rx_buffer[0] == 'n') && 
+        (rx_buffer[1] == 'U' || rx_buffer[1] == 'u') && 
+        (rx_buffer[2] == 'L' || rx_buffer[2] == 'l') && 
+        (rx_buffer[3] == 'L' || rx_buffer[3] == 'l')) {
+        
+        rx_index = 0;
+        packet_ready = 0;
         return;
     }
     
-    if (rx_buffer[0] == 'R') {
+    if (rx_buffer[0] == 'R' || rx_buffer[0] == 'r') {
         uint8_t r_id = rx_buffer[1] - '0';
-        uint8_t r_speed = rx_buffer[2];
+        uint8_t r_speed = Parse_Hex_Char(rx_buffer[2]);
         char r_status = rx_buffer[3];
         
         if (r_id < MAX_ROBOTS) {
@@ -58,19 +71,19 @@ void Traitement_Response_Post(uint32_t post_id) {
             robots_db[r_id].vitesse_actuelle = r_speed;
             robots_db[r_id].status = r_status;
             
-            if (r_status == 'E') {
+            if (r_status == 'E' || r_status == 'e') {
                 robots_db[r_id].enlevement = 0;
             }
-            else if (r_status == 'D') {
+            else if (r_status == 'D' || r_status == 'd') {
                 robots_db[r_id].livraison = 0;
             }
         }
     }
-    else if (rx_buffer[0] >= 'A' && rx_buffer[0] <= 'D' && rx_buffer[1] == 'P') {
-        char service = rx_buffer[0];
+    else if (((rx_buffer[0] >= 'A' && rx_buffer[0] <= 'D') || (rx_buffer[0] >= 'a' && rx_buffer[0] <= 'd')) && 
+             (rx_buffer[1] == 'P' || rx_buffer[1] == 'p')) {
         
-        int parsed_dest = 0;
-        parsed_dest = (rx_buffer[2] - '0') * 10 + (rx_buffer[3] - '0');
+        char service = rx_buffer[0];
+        uint8_t parsed_dest = (rx_buffer[2] - '0') * 10 + (rx_buffer[3] - '0');
         
         if (post_id < MAX_POSTS) {
             posts_requests[post_id].destination_post = parsed_dest;
@@ -95,12 +108,17 @@ void Traitement_Response_Post(uint32_t post_id) {
         led_blink_cycles = 0;
         LPC_GPIO3->FIOSET = (1 << 26);
     }
+    
+    rx_index = 0;
+    packet_ready = 0;
 }
 
 void Traitement_Timeout_Error(void) {
     //LPC_GPIO0->FIOCLR = (1 << 22); 
     //led_blink_cycles = 0;
     //LPC_GPIO3->FIOSET = (1 << 26); 
+    rx_index = 0;
+    packet_ready = 0;
 }
 
 void handle_centrale_leds_non_blocking(void) {

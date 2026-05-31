@@ -2,10 +2,9 @@
 #define RECEIVE_MESSAGE_POSTE_H
 
 #include "LPC17xx.h"
+#include "../Config/Config_numeroPoste.h"
 
 #define BUFFER_SIZE 16
-#define MAX_ROBOTS  16
-#define MAX_POSTS   99
 
 typedef struct {
     uint8_t robot_id;

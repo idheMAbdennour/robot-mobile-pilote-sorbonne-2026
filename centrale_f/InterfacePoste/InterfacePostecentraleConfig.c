@@ -1,6 +1,7 @@
 #include "InterfacePostecentraleConfig.h"
 
 void init_uart3_centrale(void) {
+    // P0.0 et P0.1 -> TXD3 et RXD3
     LPC_SC->PCONP |= (1 << 25);
     LPC_SC->PCLKSEL1 &= ~(3 << 18);
 	

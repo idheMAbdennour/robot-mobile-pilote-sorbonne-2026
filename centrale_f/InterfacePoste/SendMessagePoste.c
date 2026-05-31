@@ -2,8 +2,6 @@
 #include "SendMessagePoste.h"
 #include "ReceiveMessagePoste.h"
 
-#define MAX_POSTS 99 
-
 extern volatile uint32_t tick_ms;
 volatile uint32_t timeout_timer = 0;         
 volatile uint32_t inter_slot_timer = 0;
@@ -36,8 +34,9 @@ void Centrale_SendSMS(int post_number) {
     UART3_SendChar(0x0D); 
 }
 
+// FUNCTION DEBUG (signalise l'envoye de message)
 void Centrale_Indicator_Tx(int state) {
-		/*
+	/*
     if (state == 1) {
         LPC_GPIO3->FIOCLR = (1 << 25);
     } else {
@@ -49,51 +48,48 @@ void polling_system_non_blocking(void) {
     if (actual_total_posts == 0) return;
 
     switch(poll_state) {
-        
+
+        // SEND MESSAGE STATE
         case POLL_SEND_REQ: {
             uint32_t active_post = posts_list[current_post_idx];
             
             rx_index = 0;
             packet_ready = 0;
             
-            Centrale_Indicator_Tx(1);    
+            //Centrale_Indicator_Tx(1);    
             
             Centrale_SendSMS(active_post); 
             
             while (!(LPC_UART3->LSR & (1 << 6))); 
             
-            Centrale_Indicator_Tx(0); 
+            //Centrale_Indicator_Tx(0); 
             
             timeout_timer = tick_ms;     
             poll_state = POLL_WAIT_RESP;
             break;
         }
-            
+        // ATTENT DE REPONSE
         case POLL_WAIT_RESP:
-
+            // On a reçu 
             if (packet_ready) {
                 Traitement_Response_Post(posts_list[current_post_idx]);
-                
-                rx_index = 0;
-                packet_ready = 0;
-                
+                //rx_index = 0;
+                //packet_ready = 0;
                 inter_slot_timer = tick_ms; 
                 poll_state = POLL_INTER_SLOT_DELAY;
             }
            
             else if ((uint32_t)(tick_ms - timeout_timer) >= 15) {
                 Traitement_Timeout_Error();
-                
-                rx_index = 0;
-                packet_ready = 0;
-                
+                //rx_index = 0;
+                //packet_ready = 0;
                 inter_slot_timer = tick_ms; 
                 poll_state = POLL_INTER_SLOT_DELAY;
             }
             break;
             
         case POLL_INTER_SLOT_DELAY:
-            if ((uint32_t)(tick_ms - inter_slot_timer) >= 150) {
+            if ((uint32_t)(tick_ms - inter_slot_timer) >= 5) {
                 current_post_idx++;
                 if (current_post_idx >= actual_total_posts) {
                     current_post_idx = 0; 

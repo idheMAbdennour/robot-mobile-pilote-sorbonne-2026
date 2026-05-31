@@ -3,6 +3,7 @@
 
 #include "LPC17xx.h"
 #include "../InterfacePoste/ReceiveMessagePoste.h"
+#include "../GenerateurFil/fil.h"
 
 extern volatile uint8_t intersection_busy;
 extern volatile int8_t robot_inside_intersection;

@@ -4,8 +4,6 @@
 #include "LPC17xx.h"
 #include "../Config/Config_numeroPoste.h"
 
-#define MAX_POSTS 99 
-
 typedef enum {
     POLL_SEND_REQ,
     POLL_WAIT_RESP,
