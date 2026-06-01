@@ -48,6 +48,11 @@ void update_robot_id_from_hardware(void);
 // Ces macros pourront être ajustées dynamiquement lors des tests
 #define ROBOT_WHEEL_DIAMETER_MM     50      // Diamètre des roues en mm
 #define ROBOT_WHEEL_DISTANCE_MM     120     // Entraxe entre les roues en mm
+
+// Odométrie : Paramètres des codeurs [VALEURS A CALIBRER]
+#define ENCODER_TICKS_PER_TURN      1024.0f // Nombre de ticks par tour de roue complet
+#define ODO_TICKS_TO_METER          ((ROBOT_WHEEL_DIAMETER_MM * 3.14159f / 1000.0f) / ENCODER_TICKS_PER_TURN)
+
 #define MAX_SENSOR_ANGLE_DEG        15      // L'angle max fonctionnel du capteur inductif (+/-)
 #define MAX_SENSOR_DISTANCE_CM      15      // La distance max fonctionnelle du capteur inductif (+/-)
 #define DIST_AV_CENTRE_MM           460     // Distance du capteur inductif au centre du robot en mm

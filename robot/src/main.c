@@ -89,10 +89,21 @@ int main(void)
         // Mise à jour de la LED RGB depuis l'état centralisé
         set_status_led(get_robot_status());
 
-        // Polling pour la lecture des capteurs via SPI
-        static uint8_t spi_cs_index = 0;
-        set_spi(spi_cs_index);
-        spi_cs_index = (spi_cs_index + 1) % 4;
+        // -----------------------------------------------------
+        // Calcul de l'Odométrie (Conversion SPI -> Mètres)
+        // -----------------------------------------------------
+        // Les variables g_Vg et g_Vd sont mises à jour par l'interruption EINT1 (Top 50Hz du FPGA)
+        extern volatile uint32_t g_Vg; 
+        extern volatile uint32_t g_Vd;
+
+        WheelDelta delta;
+        // Le FPGA fournit directement le nombre de ticks effectués sur la période de 20ms (1/50s)
+        delta.dd_g = (float)((int32_t)g_Vg) * ODO_TICKS_TO_METER;
+        delta.dd_d = (float)((int32_t)g_Vd) * ODO_TICKS_TO_METER;
+        delta.dt   = 0.02f; // Période fixe de 50Hz (1/50s)
+
+        // Transmission au robot_state pour utilisation par l'asservissement
+        set_wheel_delta(&delta);
 
         // -----------------------------------------------------
         // Boucle d'asservissement (calcul PID / consigne moteurs)

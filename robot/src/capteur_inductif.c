@@ -254,12 +254,16 @@ void capteur_inductif_update(void) {
         if (avg3 > 0) {
             float dist_av = 0, dist_ar = 0, dist_mil = 0, angle = 0;
             
-            // Soustraction de l'offset matériel mesuré (24.5 mV ~ 30 en valeurs ADC 12 bits)
-            // Cela est INDISPENSABLE pour que la division (rapport B_z / B_y) soit mathématiquement linéaire !
-            float offset = 30.0f;
-            float val1 = (avg1 > offset) ? (avg1 - offset) : 1.0f;
-            float val2 = (avg2 > offset) ? (avg2 - offset) : 1.0f;
-            float val3 = (avg3 > offset) ? (avg3 - offset) : 1.0f;
+            // Pour obtenir une distance signée (gauche/droite), les bobines horizontales (AV/AR)
+            // varient de 0V à 2.9V. Le centre (0 distance) est donc à 1.45V.
+            // Avec un ADC 12 bits sous 3.3V : (1.45 / 3.3) * 4095 = 1799
+            // La bobine verticale (HOR / Hauteur) reste en valeur absolue avec son petit offset de bruit.
+            float offset_y = 1799.0f; // Zéro matériel à 1.45V (1799 en valeurs ADC 12 bits)
+            float offset_z = 0.0f;   // Offset de bruit pour la bobine verticale
+            
+            float val1 = (float)avg1 - offset_y;
+            float val2 = (float)avg2 - offset_y;
+            float val3 = (avg3 > offset_z) ? ((float)avg3 - offset_z) : 1.0f;
 
             dist_av = (val1 / val3) * IND_DIST_GAIN;
             dist_ar = (val2 / val3) * IND_DIST_GAIN;

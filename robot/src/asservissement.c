@@ -163,7 +163,7 @@ void asservissement_update(void)
      * base, puis chaque roue est bornée à [0,100] (pas de marche arrière). */
 #define OMEGA_TO_PWM 20.0f
 
-float turn = clampf(-OMEGA_TO_PWM * omega_cmd,
+float turn = clampf(OMEGA_TO_PWM * omega_cmd,
                     -TURN_MAX_PCT,
                     TURN_MAX_PCT);
     float pwm_g_f = base_pwm - turn;
