@@ -48,7 +48,10 @@ void EINT3_IRQHandler(void) {
  */
 void EINT1_IRQHandler(void) {
     // --- Routine de réception SPI (Horloge) ---
-    recep_spi_interrupt_routine();
+    if (LPC_SC->EXTINT & (1 << 1)) {
+        recep_spi_interrupt_routine();
+        LPC_SC->EXTINT = (1 << 1);
+    }
 }
 
 /**

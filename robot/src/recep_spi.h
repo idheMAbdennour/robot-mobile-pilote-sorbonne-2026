@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file recep_spi.h
  * @brief Fichier du module recep_spi.
  */
@@ -17,7 +17,7 @@
 #define PIN_SPI_CS2  (1 << 10) // P0.10
 #define PIN_SPI_CS3  (1 << 11) // P0.11
 #define PIN_SPI_CS4  (1 << 15) // P0.15
-#define PIN_ODO_READY (1 << 11) // P2.11 (EINT1)
+#define PIN_ODO_READY (1 << 11) // P2.11
 
 
 /* ==========================================================================
@@ -33,7 +33,7 @@ void init_recep_spi(void);
  * @brief Demande une valeur pour un Chip Select précis (0 à 3).
  * @param cs_num Numéro du CS (0 = Vg, 1 = Vd, 2 = Pg, 3 = Pd).
  */
-void set_spi_cs_val(int cs_num);
+void set_spi(int cs_num);
 
 /**
  * @brief Routine d'interruption appelée par EINT1_IRQHandler (horloge SPI).
