@@ -5,6 +5,7 @@
 
 #include "interruptions.h"
 
+#include "ultrason_recep.h"
 #include "buttons.h"
 #include "capteur_inductif.h"
 #include "dtmf.h"
@@ -41,6 +42,9 @@ void EINT3_IRQHandler(void) {
 
     // --- Routine Boutons (Charge/Décharge) ---
     buttons_interrupt_routine();
+
+    // --- Routine Recepteur Ultrason ---
+    ultrason_recep_interrupt_routine();
 }
 
 /**
