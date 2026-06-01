@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file dtmf.h
  * @brief Fichier du module dtmf.
  */
@@ -7,6 +7,7 @@
 #define DTMF_H
 
 #include <stdint.h>
+#include "uart.h"
 
 /* ==========================================================================
  * DÉFINITIONS (PINS)
