@@ -459,6 +459,26 @@
               <FileType>5</FileType>
               <FilePath>.\Centrale\EmetteurDTMF\EmetteurDTMF.h</FilePath>
             </File>
+            <File>
+              <FileName>InterfaceCentraleSupervision.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Centrale\InterfaceCentraleSupervision\InterfaceCentraleSupervision.c</FilePath>
+            </File>
+            <File>
+              <FileName>InterfaceCentraleSupervision.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Centrale\InterfaceCentraleSupervision\InterfaceCentraleSupervision.h</FilePath>
+            </File>
+            <File>
+              <FileName>fil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Centrale\GenerateurFil\fil.c</FilePath>
+            </File>
+            <File>
+              <FileName>fil.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Centrale\GenerateurFil\fil.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
