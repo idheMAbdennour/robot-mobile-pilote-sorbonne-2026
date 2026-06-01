@@ -20,6 +20,7 @@
 #include "robot_state.h"
 #include "status.h"
 #include "uart.h"
+#include "ultrason_recep.h"
 #include "asservissement.h"
 
     int main(void)
@@ -38,6 +39,7 @@
         init_moteurs_debug();
         init_proximetre();
         init_capteur_inductif();
+        init_ultrason_recep();
         init_robot_id_switches();
         init_buttons();
         init_status_led();
@@ -99,5 +101,14 @@
 
             // Emission de la trame du proximètre "T/t ddd..."
             debug_proximetre_send_frame();
+
+            // --- Ultrason : identification du poste ---
+            ultrason_recep_tick();
+            uint8_t poste; char cote;
+            if (ultrason_recep_lire(&poste, &cote)) {
+                char us_buf[48];
+                sprintf(us_buf, "US: poste=%u cote=%c\r\n", poste, cote);
+                uart0_send_string(us_buf);
+            }   
         }
     }
