@@ -11,11 +11,11 @@
 #include "LPC17xx.h"
 
 /* ==========================================================================
- * DÉFINITIONS DES PINS (74HC595)
+ * DÉFINITIONS DES PINS (CD4015)
  * ========================================================================== */
 #define PIN_LED_SHIFT_DATA  (1 << 9)  // P2.9
 #define PIN_LED_SHIFT_CLK   (1 << 29) // P4.29
-#define PIN_LED_SHIFT_LATCH (1 << 20) // P0.20
+#define PIN_LED_SHIFT_LATCH (1 << 20) // P0.20 (Connecté au RST du CD4015, maintenu à 0)
 
 /* ==========================================================================
  * MASQUES DES LEDS

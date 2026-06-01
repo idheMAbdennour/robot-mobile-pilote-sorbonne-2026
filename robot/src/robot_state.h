@@ -46,11 +46,14 @@ void update_robot_id_from_hardware(void);
  * DÉFINITIONS PARAMÈTRES PHYSIQUES ET ASSERVISSEMENT
  * ========================================================================== */
 // Ces macros pourront être ajustées dynamiquement lors des tests
-#define ROBOT_WHEEL_DIAMETER_MM    50  // Diamètre des roues en mm (valeur d'exemple)
-#define ROBOT_WHEEL_DISTANCE_MM    120 // Entraxe entre les roues en mm (valeur d'exemple)
-#define MAX_SENSOR_ANGLE_DEG       10  // L'angle max fonctionnel du capteur inductif (+/-)
-#define MAX_SENSOR_DISTANCE_CM     10  // La distance max fonctionnelle du capteur inductif (+/-)
-
+#define ROBOT_WHEEL_DIAMETER_MM     50      // Diamètre des roues en mm
+#define ROBOT_WHEEL_DISTANCE_MM     120     // Entraxe entre les roues en mm
+#define MAX_SENSOR_ANGLE_DEG        15      // L'angle max fonctionnel du capteur inductif (+/-)
+#define MAX_SENSOR_DISTANCE_CM      15      // La distance max fonctionnelle du capteur inductif (+/-)
+#define DIST_AV_CENTRE_MM           460     // Distance du capteur inductif au centre du robot en mm
+#define DIST_AR_CENTRE_MM           690     // Distance du capteur inductif au centre du robot en mm
+#define DIST_WHEEL_CENTRE_MM        450     // Distance du centre du robot à l'axe de la roue en mm
+#define IND_DIST_GAIN               10   // Gain calibré (hauteur de la bobine Z en mm)
 
 // Longueur maximale d'une séquence IR
 #define MAX_SEQ_LENGTH 100
@@ -96,10 +99,12 @@ uint8_t get_vitesse_code_ir(void);
 
 // --- Variables d'Asservissement : Mesures et Odométrie ---
 typedef struct {
-    float y_mes;          // mesure latérale en m
-    float alpha_mes;        // mesure angulaire en rad
+    float y_mes;          // mesure latérale centrale en m
+    float y_mes_av;       // mesure latérale capteur 1 (AV) en m
+    float y_mes_ar;       // mesure latérale capteur 2 (AR) en m
+    float alpha_mes;      // mesure angulaire en rad
     uint8_t has_y;        // 1 si mesure y disponible
-    uint8_t has_alpha;      // 1 si mesure alpha disponible
+    uint8_t has_alpha;    // 1 si mesure alpha disponible
     uint8_t wire_valid;   // 1 si fil détecté et signal exploitable
 } WireMeasure;
 

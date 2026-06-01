@@ -54,6 +54,7 @@ volatile uint32_t volatile_adc_sum1 = 0;
 volatile uint32_t volatile_adc_sum2 = 0;
 volatile uint32_t volatile_adc_sum3 = 0;
 volatile uint16_t volatile_adc_sample_count = 0;
+volatile uint8_t flag_compute_inductif = 0;
 
 /* ==========================================================================
  * PROTOTYPES DES FONCTIONS PRIVÉES
@@ -142,8 +143,11 @@ void capteur_inductif_interrupt_routine(void) {
         LPC_GPIOINT->IO0IntClr = (PIN_IND_SW1 | PIN_IND_SW2 | PIN_IND_SW3);
     }
 
+    // P0.27 (clock) : front descendant
     if (LPC_GPIOINT->IO0IntStatF & CAPTEUR_IND_SW_CLOCK) {
+        if (LPC_GPIO0->FIOPIN & CAPTEUR_IND_SW_ENVELOP) {
             adc_start_inductif_sequence();
+        }
         LPC_GPIOINT->IO0IntClr = CAPTEUR_IND_SW_CLOCK; // Acquitter
     }
 
@@ -188,6 +192,7 @@ void capteur_inductif_interrupt_routine(void) {
         }
 
         last_fall_time = current_time;
+        flag_compute_inductif = 1; // Demander le calcul de la moyenne dans le main
 
         LPC_GPIOINT->IO0IntClr = CAPTEUR_IND_SW_ENVELOP; // Acquitter
     }
@@ -223,25 +228,57 @@ void capteur_inductif_update(void) {
     }
 
     // 2. Traitement global des ADC pour l'estimation de distance (Indépendant de la trame)
-    // On copie et on reset les sommes accumulées pendant les 20 dernières millisecondes
-    NVIC_DisableIRQ(ADC_IRQn);
-    uint32_t sum1 = volatile_adc_sum1;
-    uint32_t sum2 = volatile_adc_sum2;
-    uint32_t sum3 = volatile_adc_sum3;
-    uint16_t count = volatile_adc_sample_count;
+    // On copie et on reset les sommes accumulées pendant la salve
+    if (flag_compute_inductif) {
+        flag_compute_inductif = 0;
 
-    volatile_adc_sum1 = 0;
-    volatile_adc_sum2 = 0;
-    volatile_adc_sum3 = 0;
-    volatile_adc_sample_count = 0;
-    NVIC_EnableIRQ(ADC_IRQn);
+        NVIC_DisableIRQ(ADC_IRQn);
+        uint32_t sum1 = volatile_adc_sum1;
+        uint32_t sum2 = volatile_adc_sum2;
+        uint32_t sum3 = volatile_adc_sum3;
+        uint16_t count = volatile_adc_sample_count;
 
-    // Calcul de la moyenne hors interruption
-    if (count > 0) {
+        volatile_adc_sum1 = 0;
+        volatile_adc_sum2 = 0;
+        volatile_adc_sum3 = 0;
+        volatile_adc_sample_count = 0;
+        NVIC_EnableIRQ(ADC_IRQn);
+
+        // Calcul de la moyenne hors interruption
+        if (count > 0) {
         uint16_t avg1 = (uint16_t)(sum1 / count);
         uint16_t avg2 = (uint16_t)(sum2 / count);
         uint16_t avg3 = (uint16_t)(sum3 / count);
-        set_capteur_averages(avg1, avg2, avg3);
+
+        // Calcul des distances et angle à partir des moyennes
+        if (avg3 > 0) {
+            float dist_av = 0, dist_ar = 0, dist_mil = 0, angle = 0;
+            
+            // Soustraction de l'offset matériel mesuré (24.5 mV ~ 30 en valeurs ADC 12 bits)
+            // Cela est INDISPENSABLE pour que la division (rapport B_z / B_y) soit mathématiquement linéaire !
+            float offset = 30.0f;
+            float val1 = (avg1 > offset) ? (avg1 - offset) : 1.0f;
+            float val2 = (avg2 > offset) ? (avg2 - offset) : 1.0f;
+            float val3 = (avg3 > offset) ? (avg3 - offset) : 1.0f;
+
+            dist_av = (val1 / val3) * IND_DIST_GAIN;
+            dist_ar = (val2 / val3) * IND_DIST_GAIN;
+            angle = (dist_av - dist_ar) / (float)(DIST_AV_CENTRE_MM + DIST_AR_CENTRE_MM);
+
+            dist_mil = ((float)DIST_AR_CENTRE_MM * dist_av + (float)DIST_AV_CENTRE_MM * dist_ar) / ((float)DIST_AV_CENTRE_MM + (float)DIST_AR_CENTRE_MM);
+
+            // Création et mise à jour de la structure WireMeasure
+            WireMeasure measure;
+            measure.y_mes = dist_mil / 1000.0f;  // Conversion en mètres !
+            measure.y_mes_av = dist_av / 1000.0f;
+            measure.y_mes_ar = dist_ar / 1000.0f;
+            measure.alpha_mes = angle;
+            measure.has_y = 1;
+            measure.has_alpha = 1;
+            measure.wire_valid = 1;
+            set_wire_measure(&measure);
+        }
+        }
     }
 }
 
@@ -264,15 +301,18 @@ void debug_inductif_send_frame(void) {
             break;
         case 0b001:
             get_wire_measure(&measure);
-            sprintf(buffer, "a %drad\r\n", (int)(measure.alpha_mes * 1000));
+            // Angle en degrés (1 rad = 180 / PI = 57.2958)
+            sprintf(buffer, "a%d°\r\n", (int)(measure.alpha_mes * 57.2958f));
             break;
         case 0b010:
             get_wire_measure(&measure);
-            sprintf(buffer, "X%dmm\r\n", (int)(measure.y_mes * 1000));
+            // Capteur 2 (AR) avec un grand X
+            sprintf(buffer, "X%dmm\r\n", (int)(measure.y_mes_ar * 1000));
             break;
         case 0b011:
             get_wire_measure(&measure);
-            sprintf(buffer, "x%dmm\r\n", (int)(measure.y_mes * 1000));
+            // Capteur 1 (AV) avec un petit x
+            sprintf(buffer, "x%dmm\r\n", (int)(measure.y_mes_av * 1000));
             break;
         case 0b100:
             get_capteur_averages(&avg_av, &avg_ar, &avg_hor);

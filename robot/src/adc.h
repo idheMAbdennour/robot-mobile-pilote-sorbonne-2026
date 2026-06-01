@@ -13,7 +13,9 @@
 /* ==========================================================================
  * DÉFINITIONS ET MACROS
  * ========================================================================== */
-#define ADC_CLKDIV 4
+// Configuration de l'horloge ADC (PCLK / (CLKDIV+1) <= 13 MHz)
+// PCLK = 25 MHz, donc CLKDIV = 1 donne 12.5 MHz (très rapide, ~5.2 us par conversion)
+#define ADC_CLKDIV 1
 
 // Définition des canaux partagés
 #define PROXIMETRE_ADC_CH      0u

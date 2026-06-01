@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file adc.c
  * @brief Fichier du module adc.
  */
@@ -89,15 +89,22 @@ void adc_pin_config(uint8_t channel) {
  * INTERFACE PROXIMETRE
  * ========================================================================== */
 void adc_request_proximetre_avg(uint16_t num_samples) {
-    // Empêcher l'interruption ADC de modifier l'état pendant qu'on prépare
+    if (num_samples == 0) return; // Requête invalide
+    
     NVIC_DisableIRQ(ADC_IRQn);
+    
+    // Ne pas écraser une demande en cours
+    if (prox_samples_remaining > 0) {
+        NVIC_EnableIRQ(ADC_IRQn);
+        return;
+    }
     
     prox_samples_remaining = num_samples;
     prox_samples_total = num_samples;
     prox_accumulator = 0;
     prox_is_ready = 0;
     
-    if (adc_state == STATE_IDLE && num_samples > 0) {
+    if (adc_state == STATE_IDLE) {
         adc_state = STATE_PROX;
         LPC_ADC->ADCR &= ~0xFF;
         LPC_ADC->ADCR |= (1u << PROXIMETRE_ADC_CH);
@@ -114,8 +121,12 @@ int adc_is_proximetre_ready(void) {
 }
 
 uint16_t adc_get_proximetre_value(void) {
+    uint16_t val;
+    NVIC_DisableIRQ(ADC_IRQn);
+    val = prox_final_value;
     prox_is_ready = 0;
-    return prox_final_value;
+    NVIC_EnableIRQ(ADC_IRQn);
+    return val;
 }
 
 /* ==========================================================================
@@ -123,7 +134,13 @@ uint16_t adc_get_proximetre_value(void) {
  * ========================================================================== */
 void adc_start_inductif_sequence(void) {
     // Appelée depuis EINT3 (Très Haute Priorité)
-    // On avorte brutalement tout ce qui était en cours
+    
+    // Protection contre l'overrun : si la séquence précédente n'est pas terminée, on ignore ce déclenchement
+    if (adc_state == STATE_IND_AV || adc_state == STATE_IND_AR || adc_state == STATE_IND_HOR) {
+        return;
+    }
+    
+    // On avorte brutalement le proximètre s'il était en cours
     LPC_ADC->ADCR &= ~0xFF; 
     
     // On lance la séquence sur la première bobine
@@ -142,68 +159,89 @@ void adc_start_inductif_sequence(void) {
  * MACHINE D'ÉTAT PRINCIPALE (ADC_IRQHandler)
  * ========================================================================== */
 void ADC_IRQHandler(void) {
-    if (adc_state == STATE_IND_AV) {
-        // La macro CAPTEUR_IND_ADC_CH_AV vaut 1, on lit ADDR1
-        volatile_adc_sum1 += (uint16_t)((LPC_ADC->ADDR1 >> 4) & 0x0FFF);
-        
-        LPC_ADC->ADCR &= ~0xFF;
-        LPC_ADC->ADCR |= (1u << CAPTEUR_IND_ADC_CH_AR);
-        LPC_ADC->ADCR |= (1u << 24);
-        
-        adc_state = STATE_IND_AR;
-        return;
-    }
+    adc_state_t current_state = adc_state;
     
-    if (adc_state == STATE_IND_AR) {
-        // La macro CAPTEUR_IND_ADC_CH_AR vaut 2, on lit ADDR2
-        volatile_adc_sum2 += (uint16_t)((LPC_ADC->ADDR2 >> 4) & 0x0FFF);
+    if (current_state == STATE_IND_AV) {
+        uint16_t val = (uint16_t)((LPC_ADC->ADDR1 >> 4) & 0x0FFF);
         
-        LPC_ADC->ADCR &= ~0xFF;
-        LPC_ADC->ADCR |= (1u << CAPTEUR_IND_ADC_CH_HOR);
-        LPC_ADC->ADCR |= (1u << 24);
-        
-        adc_state = STATE_IND_HOR;
-        return;
-    }
-    
-    if (adc_state == STATE_IND_HOR) {
-        // La macro CAPTEUR_IND_ADC_CH_HOR vaut 3, on lit ADDR3
-        volatile_adc_sum3 += (uint16_t)((LPC_ADC->ADDR3 >> 4) & 0x0FFF);
-        volatile_adc_sample_count++;
-        
-        // Séquence inductive terminée. 
-        // L'arbitre décide s'il reprend le proximètre.
-        LPC_ADC->ADINTEN = 0; 
-        
-        if (prox_samples_remaining > 0) {
-            adc_state = STATE_PROX;
+        NVIC_DisableIRQ(EINT3_IRQn);
+        if (adc_state == STATE_IND_AV) {
+            volatile_adc_sum1 += val;
             LPC_ADC->ADCR &= ~0xFF;
-            LPC_ADC->ADCR |= (1u << PROXIMETRE_ADC_CH);
-            LPC_ADC->ADINTEN = (1u << PROXIMETRE_ADC_CH);
-            LPC_ADC->ADCR |= (1u << 24);
-        } else {
-            adc_state = STATE_IDLE;
+            LPC_ADC->ADCR |= (1u << CAPTEUR_IND_ADC_CH_AR);
+            LPC_ADC->ADCR &= ~(7u << 24); // Clear START bits
+            LPC_ADC->ADCR |= (1u << 24);  // Set START bit to 001
+            adc_state = STATE_IND_AR;
         }
+        NVIC_EnableIRQ(EINT3_IRQn);
         return;
     }
     
-    if (adc_state == STATE_PROX) {
-        // La macro PROXIMETRE_ADC_CH vaut 0, on lit ADDR0
-        prox_accumulator += (uint16_t)((LPC_ADC->ADDR0 >> 4) & 0x0FFF);
-        prox_samples_remaining--;
+    if (current_state == STATE_IND_AR) {
+        uint16_t val = (uint16_t)((LPC_ADC->ADDR2 >> 4) & 0x0FFF);
         
-        if (prox_samples_remaining > 0) {
-            // On relance pour le prochain échantillon
+        NVIC_DisableIRQ(EINT3_IRQn);
+        if (adc_state == STATE_IND_AR) {
+            volatile_adc_sum2 += val;
             LPC_ADC->ADCR &= ~0xFF;
-            LPC_ADC->ADCR |= (1u << PROXIMETRE_ADC_CH);
-            LPC_ADC->ADCR |= (1u << 24);
-        } else {
-            // Terminé !
-            prox_final_value = (uint16_t)(prox_accumulator / prox_samples_total);
-            prox_is_ready = 1;
-            adc_state = STATE_IDLE;
-            LPC_ADC->ADINTEN = 0;
+            LPC_ADC->ADCR |= (1u << CAPTEUR_IND_ADC_CH_HOR);
+            LPC_ADC->ADCR &= ~(7u << 24); // Clear START bits
+            LPC_ADC->ADCR |= (1u << 24);  // Set START bit to 001
+            adc_state = STATE_IND_HOR;
         }
+        NVIC_EnableIRQ(EINT3_IRQn);
+        return;
+    }
+    
+    if (current_state == STATE_IND_HOR) {
+        uint16_t val = (uint16_t)((LPC_ADC->ADDR3 >> 4) & 0x0FFF);
+        
+        NVIC_DisableIRQ(EINT3_IRQn);
+        if (adc_state == STATE_IND_HOR) {
+            volatile_adc_sum3 += val;
+            volatile_adc_sample_count++;
+            
+            // Séquence inductive terminée. 
+            LPC_ADC->ADINTEN = 0; 
+            
+            if (prox_samples_remaining > 0) {
+                adc_state = STATE_PROX;
+                LPC_ADC->ADCR &= ~0xFF;
+                LPC_ADC->ADCR |= (1u << PROXIMETRE_ADC_CH);
+                LPC_ADC->ADINTEN = (1u << PROXIMETRE_ADC_CH);
+                LPC_ADC->ADCR &= ~(7u << 24);
+                LPC_ADC->ADCR |= (1u << 24);
+            } else {
+                adc_state = STATE_IDLE;
+            }
+        }
+        NVIC_EnableIRQ(EINT3_IRQn);
+        return;
+    }
+    
+    if (current_state == STATE_PROX) {
+        uint16_t val = (uint16_t)((LPC_ADC->ADDR0 >> 4) & 0x0FFF);
+        
+        NVIC_DisableIRQ(EINT3_IRQn);
+        if (adc_state == STATE_PROX) {
+            prox_accumulator += val;
+            prox_samples_remaining--;
+            
+            if (prox_samples_remaining > 0) {
+                // On relance pour le prochain échantillon
+                LPC_ADC->ADCR &= ~0xFF;
+                LPC_ADC->ADCR |= (1u << PROXIMETRE_ADC_CH);
+                LPC_ADC->ADCR &= ~(7u << 24);
+                LPC_ADC->ADCR |= (1u << 24);
+            } else {
+                // Terminé !
+                prox_final_value = (uint16_t)(prox_accumulator / prox_samples_total);
+                prox_is_ready = 1;
+                adc_state = STATE_IDLE;
+                LPC_ADC->ADINTEN = 0;
+            }
+        }
+        NVIC_EnableIRQ(EINT3_IRQn);
         return;
     }
     

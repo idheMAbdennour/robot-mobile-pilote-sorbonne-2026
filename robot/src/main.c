@@ -22,6 +22,7 @@
 #include "uart.h"
 #include "ultrason_recep.h"
 #include "asservissement.h"
+#include "led_register.h"
 
 /* ==========================================================================
  * PROGRAMME PRINCIPAL ORIGINAL (RESTAURÉ)
@@ -54,6 +55,25 @@ int main(void)
 
     while (1)
     {
+        // ====================================================================
+        // TÂCHES "TEMPS RÉEL" (Boucle rapide Asynchrone / Polling)
+        // ====================================================================
+        
+        // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
+        capteur_inductif_update();
+        
+        // Traitement de la machine d'état DTMF
+        dtmf_service();
+
+        // Traitement de l'enveloppe (réception série par fil)
+        wire_trame_t trame;
+        if (get_wire_trame(&trame)) {
+            decode_enveloppe_process_command(&trame);
+        }
+
+        // ====================================================================
+        // TÂCHES PÉRIODIQUES (50 Hz)
+        // ====================================================================
         // Attente du tick de 50Hz géré par SysTick_Handler (dans interruptions.c)
         if (!get_flag_50hz())
         {
@@ -63,30 +83,16 @@ int main(void)
         // Acquittement du flag
         set_flag_50hz(0);
 
-        // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
-        capteur_inductif_update();
-
         // Lecture de l'ID du robot via les switchs
         update_robot_id_from_hardware();
 
         // Mise à jour de la LED RGB depuis l'état centralisé
         set_status_led(get_robot_status());
 
-        // Traitement de la machine d'état DTMF
-        dtmf_service();
-
         // Polling pour la lecture des capteurs via SPI
         static uint8_t spi_cs_index = 0;
         set_spi(spi_cs_index);
         spi_cs_index = (spi_cs_index + 1) % 4;
-
-        // -----------------------------------------------------
-        // Traitement de l'enveloppe (réception série par fil)
-        // -----------------------------------------------------
-        wire_trame_t trame;
-        if (get_wire_trame(&trame)) {
-            decode_enveloppe_process_command(&trame);
-        }
 
         // -----------------------------------------------------
         // Boucle d'asservissement (calcul PID / consigne moteurs)
