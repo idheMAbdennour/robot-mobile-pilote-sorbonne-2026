@@ -268,11 +268,12 @@ void proximetre_run_balayage(void) {
         prox_count = step_index;
         prox_dir = going_fwd ? 'T' : 't';
 
-        // Mise à jour du buzzer et statut avec la distance frontale minimale trouvée
+        // Mise à jour du buzzer avec la distance frontale minimale trouvée.
+        // NB (CdC) : la détection d'obstacle par le proximètre IR ne pilote QUE
+        // l'avertisseur sonore. Le statut de mission (libre / rdv_expedition /
+        // colispris / rdv_depose) est géré ailleurs et ne doit PAS être modifié
+        // ici. (L'arrêt/ralentissement éventuel relève des capteurs capacitifs.)
         buzzer_set_from_distance(front_dist);
-        if (front_dist < 30) {
-            set_robot_status(STATUS_RDV_EXPEDITION);
-        }
 
         // Préparation du prochain balayage (changement de sens)
         going_fwd = !going_fwd;
@@ -316,7 +317,8 @@ void debug_proximetre_send_frame(void) {
     offset += sprintf(buffer + offset, "%c", prox_dir);
     for (int i = 0; i < cnt; i++)
         offset += sprintf(buffer + offset, " %03d", (int)mesures[i]);
-    sprintf(buffer + offset, "\r\n");
+    // CdC : la trame est terminée par 0x0A 0x0D (LF puis CR), dans cet ordre.
+    sprintf(buffer + offset, "\n\r");
 
     uart0_send_string(buffer);
 }
