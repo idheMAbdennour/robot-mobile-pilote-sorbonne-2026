@@ -11,6 +11,7 @@
 #include "uart.h"
 #include "moteur.h"
 #include "capteur_inductif.h"
+#include "stepper.h"
 
 /* ==========================================================================
  * DÉFINITIONS ET MACROS
@@ -190,13 +191,14 @@ void decode_enveloppe_process_command(const wire_trame_t *trame) {
             break;
             
         // @todo: implémenter
-        case 0b001: // Direction
-            // À implémenter selon la logique de direction
+        case 0b001: // chargement, branche Sud
+        case 0b010: // chargement, branche Nord
+        {
+            // parametre 7 bits = LL(2 bits poids fort) + poste(5 bits)
+            uint8_t ll = (trame->parameter >> 5) & 0x03;  // 00->A, 01->B, 10->C, 11->D
+            stepper_show_letter('A' + ll);
             break;
-            
-        case 0b011: // Commande de la diode de signalisation
-            // À implémenter avec le module de statut
-            break;
+        }
             
         case 0b110: // Validation du mode Hardware pour le débuggage
             capteur_inductif_receive_wire_command(trame->type);

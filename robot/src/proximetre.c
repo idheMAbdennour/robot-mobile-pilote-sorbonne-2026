@@ -15,6 +15,7 @@
 #include "robot_state.h"
 #include "timers.h"
 #include "uart.h"
+#include "son.h"
 
 /* ==========================================================================
  * DÉFINITIONS PRIVÉES
@@ -161,9 +162,7 @@ static int distance_cm(uint16_t adc) {
 }
 
 static void buzzer_init(void) {
-    LPC_PINCON->PINSEL4 &= ~(3u << 8); // P2.4 GPIO
-    PORT_BUZZ->FIODIR   |=  BUZZ_PIN;
-    PORT_BUZZ->FIOCLR    =  BUZZ_PIN;
+    /* P2.4 et le ton 1 kHz sont geres par son.c (son_init). Rien a faire ici. */
 }
 
 static void buzzer_set_from_distance(int cm) {
@@ -174,7 +173,7 @@ static void buzzer_set_from_distance(int cm) {
 
 static void buzzer_service(void) {
     if (buzz_period_us == 0) {
-        if (buzz_on) { PORT_BUZZ->FIOCLR = BUZZ_PIN; buzz_on = 0; }
+        if (buzz_on) { son_tone_stop(); buzz_on = 0; }   // <— было FIOCLR
         return;
     }
     uint32_t off = (buzz_period_us > BUZZ_ON_US) ? (buzz_period_us - BUZZ_ON_US) : 1000u;
@@ -182,8 +181,8 @@ static void buzzer_service(void) {
     if ((uint32_t)(timer3_get_tc() - buzz_t0) >= dur) {
         buzz_on = !buzz_on;
         buzz_t0 = timer3_get_tc();
-        if (buzz_on) PORT_BUZZ->FIOSET = BUZZ_PIN;
-        else         PORT_BUZZ->FIOCLR = BUZZ_PIN;
+        if (buzz_on) son_tone_start();   // FIOSET
+        else         son_tone_stop();    // FIOCLR
     }
 }
 

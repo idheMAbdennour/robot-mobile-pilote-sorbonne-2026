@@ -23,6 +23,8 @@
 #include "ultrason_recep.h"
 #include "asservissement.h"
 #include "led_register.h"
+#include "son.h"
+#include "stepper.h"
 
 /* ==========================================================================
  * PROGRAMME PRINCIPAL ORIGINAL (RESTAURÉ)
@@ -41,14 +43,18 @@ int main(void)
     init_timer_enveloppe(250);
     init_moteur_pwm();
     init_moteurs_debug();
+    stepper_init();              
+    son_init();                  
+    stepper_set_zero_manually(); 
     init_proximetre();
     init_capteur_inductif();
-    init_ultrason_recep(); // Ajouté par la fusion (e7f9603)
+    init_ultrason_recep();// Ajouté par la fusion (e7f9603)
     init_robot_id_switches();
     init_buttons();
     init_status_led();
     init_dtmf();
     init_recep_spi();
+    
 
     // Configuration du SysTick à 50 Hz
     SysTick_Config(SystemCoreClock / 50);
