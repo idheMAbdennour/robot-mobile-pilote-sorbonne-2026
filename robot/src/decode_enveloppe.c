@@ -161,6 +161,11 @@ void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
 
     // Transmission au système principal
     if (decoded) {
+        char dbg_buf[64];
+        sprintf(dbg_buf, "Trame decodee: Type:%d Robot:%d Param:%d\r\n", 
+                final_trame.type, final_trame.robot_id, final_trame.parameter);
+        uart0_send_string(dbg_buf);
+        
         set_wire_trame(&final_trame);
     }
 }

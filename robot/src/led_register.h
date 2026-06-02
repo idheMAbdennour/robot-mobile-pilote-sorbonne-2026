@@ -22,13 +22,12 @@
  * ========================================================================== */
 #define LED_REG_DTMF_CONCERNE    (1 << 0)
 #define LED_REG_ETAT_JONCTION    (1 << 1)
-#define LED_REG_ID_POSTE_MASK    (0x0F << 2) // Bits 2 à 5
-#define LED_REG_ID_POSTE_SHIFT   2
+#define LED_REG_ID_POSTE_MASK    (0xF << 2) // Bits 2 à 5
 #define LED_REG_CAPA_AVANT       (1 << 6)
 #define LED_REG_CAPA_DROITE      (1 << 7)
 #define LED_REG_CAPA_ARRIERE     (1 << 8)
 #define LED_REG_CAPA_GAUCHE      (1 << 9)
-#define LED_REG_CAPA_MASK        (0x0F << 6) // Bits 6 à 9
+#define LED_REG_CAPA_MASK        (0xF << 6) // Bits 6 à 9
 
 /* ==========================================================================
  * PROTOTYPES DES FONCTIONS

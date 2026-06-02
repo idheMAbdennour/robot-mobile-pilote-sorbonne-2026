@@ -153,6 +153,7 @@ void capteur_inductif_interrupt_routine(void) {
 
     // P0.28 (enveloppe) : front montant (début de la salve).
     if (LPC_GPIOINT->IO0IntStatR & CAPTEUR_IND_SW_ENVELOP) {
+        uart0_send_string("^");
         uint32_t current_time = timer2_get_tc();
 
         if (last_fall_time > 0) {
@@ -172,6 +173,7 @@ void capteur_inductif_interrupt_routine(void) {
 
     // P0.28 (enveloppe) : front descendant (fin de la salve).
     if (LPC_GPIOINT->IO0IntStatF & CAPTEUR_IND_SW_ENVELOP) {
+        uart0_send_string("v");
         uint32_t current_time = timer2_get_tc();
 
         uint32_t period_ticks = (current_time >= last_rise_time) ?
@@ -281,6 +283,15 @@ void capteur_inductif_update(void) {
             measure.has_alpha = 1;
             measure.wire_valid = 1;
             set_wire_measure(&measure);
+            
+            char dbg_buf[128];
+            sprintf(dbg_buf, "Wire valid=%d y_mil=%dmm y_av=%dmm y_ar=%dmm a=%ddeg\r\n",
+                    measure.wire_valid,
+                    (int)(measure.y_mes * 1000),
+                    (int)(measure.y_mes_av * 1000),
+                    (int)(measure.y_mes_ar * 1000),
+                    (int)(measure.alpha_mes * 57.2958f));
+            uart0_send_string(dbg_buf);
         }
         }
     }
