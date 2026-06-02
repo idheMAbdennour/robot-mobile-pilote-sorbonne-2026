@@ -22,6 +22,9 @@
 #include "uart.h"
 #include "ultrason_recep.h"
 #include "asservissement.h"
+#include "led_register.h"
+#include "son.h"
+#include "stepper.h"
 
 /* ==========================================================================
  * PROGRAMME PRINCIPAL ORIGINAL (RESTAURÉ)
@@ -40,20 +43,43 @@ int main(void)
     init_timer_enveloppe(250);
     init_moteur_pwm();
     init_moteurs_debug();
+    stepper_init();              
+    son_init();                  
+    stepper_set_zero_manually(); 
     init_proximetre();
     init_capteur_inductif();
-    init_ultrason_recep(); // Ajouté par la fusion (e7f9603)
+    init_ultrason_recep();// Ajouté par la fusion (e7f9603)
     init_robot_id_switches();
     init_buttons();
     init_status_led();
     init_dtmf();
     init_recep_spi();
+    
 
     // Configuration du SysTick à 50 Hz
     SysTick_Config(SystemCoreClock / 50);
 
     while (1)
     {
+        // ====================================================================
+        // TÂCHES "TEMPS RÉEL" (Boucle rapide Asynchrone / Polling)
+        // ====================================================================
+        
+        // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
+        capteur_inductif_update();
+        
+        // Traitement de la machine d'état DTMF
+        dtmf_service();
+
+        // Traitement de l'enveloppe (réception série par fil)
+        wire_trame_t trame;
+        if (get_wire_trame(&trame)) {
+            decode_enveloppe_process_command(&trame);
+        }
+
+        // ====================================================================
+        // TÂCHES PÉRIODIQUES (50 Hz)
+        // ====================================================================
         // Attente du tick de 50Hz géré par SysTick_Handler (dans interruptions.c)
         if (!get_flag_50hz())
         {
@@ -63,30 +89,27 @@ int main(void)
         // Acquittement du flag
         set_flag_50hz(0);
 
-        // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
-        capteur_inductif_update();
-
         // Lecture de l'ID du robot via les switchs
         update_robot_id_from_hardware();
 
         // Mise à jour de la LED RGB depuis l'état centralisé
         set_status_led(get_robot_status());
 
-        // Traitement de la machine d'état DTMF
-        dtmf_service();
-
-        // Polling pour la lecture des capteurs via SPI
-        static uint8_t spi_cs_index = 0;
-        set_spi(spi_cs_index);
-        spi_cs_index = (spi_cs_index + 1) % 4;
-
         // -----------------------------------------------------
-        // Traitement de l'enveloppe (réception série par fil)
+        // Calcul de l'Odométrie (Conversion SPI -> Mètres)
         // -----------------------------------------------------
-        wire_trame_t trame;
-        if (get_wire_trame(&trame)) {
-            decode_enveloppe_process_command(&trame);
-        }
+        // Les variables g_Vg et g_Vd sont mises à jour par l'interruption EINT1 (Top 50Hz du FPGA)
+        extern volatile uint32_t g_Vg; 
+        extern volatile uint32_t g_Vd;
+
+        WheelDelta delta;
+        // Le FPGA fournit directement le nombre de ticks effectués sur la période de 20ms (1/50s)
+        delta.dd_g = (float)((int32_t)g_Vg) * ODO_TICKS_TO_METER;
+        delta.dd_d = (float)((int32_t)g_Vd) * ODO_TICKS_TO_METER;
+        delta.dt   = 0.02f; // Période fixe de 50Hz (1/50s)
+
+        // Transmission au robot_state pour utilisation par l'asservissement
+        set_wheel_delta(&delta);
 
         // -----------------------------------------------------
         // Boucle d'asservissement (calcul PID / consigne moteurs)

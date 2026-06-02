@@ -5,7 +5,7 @@
 #include "../InterfacePoste/ReceiveMessagePoste.h"
 
 #define IR_PIN_NORTH    21  // P0.21
-#define IR_PIN_SOUTH    22  // P0.22
+#define IR_PIN_SOUTH    23  // P0.23
 
 void init_recepteur_ir_centrale(void);
 void process_ir_edge(uint8_t pin_num, uint8_t is_north);

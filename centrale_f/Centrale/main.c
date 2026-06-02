@@ -25,17 +25,18 @@ void SysTick_Handler(void) {
 }
 
 int main(void) {
-    init_switch();
-    Centrale_Read_Configuration();
-    init_uart3_centrale();
-    init_leds();
+    //init_switch();
+    //Centrale_Read_Configuration();
+    //init_uart3_centrale();
+    //init_leds();
     
-    Init_Supervision_UART0(9600);
+    //Init_Supervision_UART0(9600);
 
-    init_systick_50us();          
-    init_recepteur_ir_centrale(); 
+    //init_systick_50us();          
+    //init_recepteur_ir_centrale(); 
     init_timer();                 
-    Generator_Init();             
+    //Generator_Init(); 
+		dtmf_send_command(5, 'D');
 
     volatile uint32_t delay;
     for(delay = 0; delay < 10000; delay++);

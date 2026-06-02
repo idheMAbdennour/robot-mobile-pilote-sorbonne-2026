@@ -10,7 +10,7 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6240000::V6.24::ARMCLANG</pCCUsed>
+      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -548,6 +548,36 @@
               <FileName>uart.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\src\uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>asservissement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\asservissement.c</FilePath>
+            </File>
+            <File>
+              <FileName>asservissement.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\asservissement.h</FilePath>
+            </File>
+            <File>
+              <FileName>BeeperMethods.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BeeperMethods.c</FilePath>
+            </File>
+            <File>
+              <FileName>BeeperMethods.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\BeeperMethods.h</FilePath>
+            </File>
+            <File>
+              <FileName>ultrason_recep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\ultrason_recep.c</FilePath>
+            </File>
+            <File>
+              <FileName>ultrason_recep.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\ultrason_recep.h</FilePath>
             </File>
           </Files>
         </Group>
