@@ -8,6 +8,14 @@
 #include "LPC17xx.h"
 
 /* ==========================================================================
+ * VARIABLES INTERNES
+ * ========================================================================== */
+#define UART_TX_BUFFER_SIZE 256
+static char tx_buffer[UART_TX_BUFFER_SIZE];
+static volatile uint16_t tx_head = 0;
+static volatile uint16_t tx_tail = 0;
+
+/* ==========================================================================
  * IMPLÉMENTATION DES FONCTIONS
  * ========================================================================== */
 
@@ -50,23 +58,31 @@ void init_uart0(void) {
     LPC_UART0->FCR = 0x07;
 }
 
-void uart0_send_char(char c) {
-    // Attendre que le registre THR (Transmitter Holding Register) soit vide
-    while (!(LPC_UART0->LSR & (1 << 5))) {
-        // Attente active
+void uart0_update(void) {
+    // Si on a des données à envoyer ET que le registre THR est vide (prêt à transmettre)
+    if (tx_head != tx_tail) {
+        if (LPC_UART0->LSR & (1 << 5)) {
+            LPC_UART0->THR = tx_buffer[tx_tail];
+            tx_tail = (tx_tail + 1) % UART_TX_BUFFER_SIZE;
+        }
     }
+}
 
-    LPC_UART0->THR = c;
+void uart0_send_char(char c) {
+    uint16_t next_head = (tx_head + 1) % UART_TX_BUFFER_SIZE;
+    
+    // Si le buffer est plein, on force le vidage actif pour ne pas perdre la donnée
+    while (next_head == tx_tail) {
+        uart0_update();
+    }
+    
+    tx_buffer[tx_head] = c;
+    tx_head = next_head;
 }
 
 void uart0_send_string(const char *str) {
     while (*str) {
         uart0_send_char(*str++);
-    }
-
-    // Attendre que la transmission soit complètement terminée
-    while (!(LPC_UART0->LSR & (1 << 6))) {
-        // Attente active
     }
 }
 

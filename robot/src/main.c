@@ -82,6 +82,9 @@ int main(void)
             decode_enveloppe_process_command(&trame);
         }
 
+        // Vidage non-bloquant du buffer de transmission UART
+        uart0_update();
+
         // ====================================================================
         // TÂCHES PÉRIODIQUES (50 Hz)
         // ====================================================================

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file uart.h
  * @brief Fichier du module uart.
  */
@@ -38,5 +38,11 @@ void uart0_send_string(const char *str);
  * @param str Pointeur vers la chaîne de caractères.
  */
 void uart0_send_frame(const char *str);
+
+/**
+ * @brief Fonction de mise à jour de l'UART à appeler régulièrement dans le main.
+ * Dépile le buffer et envoie les caractères dès que le matériel est prêt.
+ */
+void uart0_update(void);
 
 #endif // UART_H

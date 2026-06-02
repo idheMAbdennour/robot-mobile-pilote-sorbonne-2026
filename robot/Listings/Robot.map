@@ -624,6 +624,7 @@ Section Cross References
     main.o(.text.main) refers to dtmf.o(.text.dtmf_service) for dtmf_service
     main.o(.text.main) refers to robot_state.o(.text.get_wire_trame) for get_wire_trame
     main.o(.text.main) refers to decode_enveloppe.o(.text.decode_enveloppe_process_command) for decode_enveloppe_process_command
+    main.o(.text.main) refers to uart.o(.text.uart0_update) for uart0_update
     main.o(.text.main) refers to robot_state.o(.text.get_flag_50hz) for get_flag_50hz
     main.o(.text.main) refers to robot_state.o(.text.set_flag_50hz) for set_flag_50hz
     main.o(.text.main) refers to robot_state.o(.text.update_robot_id_from_hardware) for update_robot_id_from_hardware
@@ -1259,6 +1260,14 @@ Section Cross References
     timers.o(.ARM.exidx.text.timer3_clear_interrupt) refers to timers.o(.text.timer3_clear_interrupt) for [Anonymous Symbol]
     uart.o(.text.init_uart0) refers to system_lpc17xx.o(.data.SystemCoreClock) for SystemCoreClock
     uart.o(.ARM.exidx.text.init_uart0) refers to uart.o(.text.init_uart0) for [Anonymous Symbol]
+    uart.o(.text.uart0_update) refers to uart.o(.bss.tx_head) for tx_head
+    uart.o(.text.uart0_update) refers to uart.o(.bss.tx_tail) for tx_tail
+    uart.o(.text.uart0_update) refers to uart.o(.bss.tx_buffer) for tx_buffer
+    uart.o(.ARM.exidx.text.uart0_update) refers to uart.o(.text.uart0_update) for [Anonymous Symbol]
+    uart.o(.text.uart0_send_char) refers to uart.o(.bss.tx_head) for tx_head
+    uart.o(.text.uart0_send_char) refers to uart.o(.bss.tx_tail) for tx_tail
+    uart.o(.text.uart0_send_char) refers to uart.o(.text.uart0_update) for uart0_update
+    uart.o(.text.uart0_send_char) refers to uart.o(.bss.tx_buffer) for tx_buffer
     uart.o(.ARM.exidx.text.uart0_send_char) refers to uart.o(.text.uart0_send_char) for [Anonymous Symbol]
     uart.o(.text.uart0_send_string) refers to uart.o(.text.uart0_send_char) for uart0_send_char
     uart.o(.ARM.exidx.text.uart0_send_string) refers to uart.o(.text.uart0_send_string) for [Anonymous Symbol]
@@ -1945,6 +1954,7 @@ Removing Unused input sections from the image.
     Removing timers.o(.ARM.exidx.text.timer3_clear_interrupt), (8 bytes).
     Removing uart.o(.text), (0 bytes).
     Removing uart.o(.ARM.exidx.text.init_uart0), (8 bytes).
+    Removing uart.o(.ARM.exidx.text.uart0_update), (8 bytes).
     Removing uart.o(.ARM.exidx.text.uart0_send_char), (8 bytes).
     Removing uart.o(.ARM.exidx.text.uart0_send_string), (8 bytes).
     Removing uart.o(.text.uart0_send_frame), (8 bytes).
@@ -2016,7 +2026,7 @@ Removing Unused input sections from the image.
     Removing system_lpc17xx.o(.ARM.exidx.text.SystemCoreClockUpdate), (8 bytes).
     Removing system_lpc17xx.o(.ARM.exidx.text.SystemInit), (8 bytes).
 
-297 unused section(s) (total 3850 bytes) removed from the image.
+298 unused section(s) (total 3858 bytes) removed from the image.
 
 ==============================================================================
 
@@ -2391,135 +2401,136 @@ Image Symbol Table
     [Anonymous Symbol]                       0x00002304   Section        0  led_register.o(.text.led_register_clr)
     [Anonymous Symbol]                       0x0000231c   Section        0  led_register.o(.text.led_register_set)
     [Anonymous Symbol]                       0x00002334   Section        0  main.o(.text.main)
-    [Anonymous Symbol]                       0x0000245c   Section        0  moteur.o(.text.moteurs_interrupt_routine)
-    [Anonymous Symbol]                       0x00002484   Section        0  moteur.o(.text.moteurs_receive_wire_command)
-    moteurs_send_frame                       0x000024ad   Thumb Code   180  moteur.o(.text.moteurs_send_frame)
-    [Anonymous Symbol]                       0x000024ac   Section        0  moteur.o(.text.moteurs_send_frame)
-    moteurs_update_mode_from_gpio            0x00002561   Thumb Code    36  moteur.o(.text.moteurs_update_mode_from_gpio)
-    [Anonymous Symbol]                       0x00002560   Section        0  moteur.o(.text.moteurs_update_mode_from_gpio)
-    period_us_to_symbol                      0x00002585   Thumb Code    88  decode_enveloppe.o(.text.period_us_to_symbol)
-    [Anonymous Symbol]                       0x00002584   Section        0  decode_enveloppe.o(.text.period_us_to_symbol)
-    [Anonymous Symbol]                       0x000025dc   Section        0  emission_ir.o(.text.preparer_trame)
-    process_dtmf_commands                    0x00002671   Thumb Code   342  dtmf.o(.text.process_dtmf_commands)
-    [Anonymous Symbol]                       0x00002670   Section        0  dtmf.o(.text.process_dtmf_commands)
-    [Anonymous Symbol]                       0x000027c8   Section        0  proximetre.o(.text.proximetre_run_balayage)
-    [Anonymous Symbol]                       0x000029ac   Section        0  proximetre.o(.text.proximetre_timer_interrupt_routine)
-    proximetre_update_mode_from_gpio         0x00002a01   Thumb Code    36  proximetre.o(.text.proximetre_update_mode_from_gpio)
-    [Anonymous Symbol]                       0x00002a00   Section        0  proximetre.o(.text.proximetre_update_mode_from_gpio)
-    [Anonymous Symbol]                       0x00002a24   Section        0  pwm.o(.text.pwm_disable_ir_output)
-    [Anonymous Symbol]                       0x00002a38   Section        0  pwm.o(.text.pwm_enable_ir_output)
-    [Anonymous Symbol]                       0x00002a4c   Section        0  pwm.o(.text.pwm_init_ir)
-    [Anonymous Symbol]                       0x00002abc   Section        0  pwm.o(.text.pwm_init_moteurs)
-    [Anonymous Symbol]                       0x00002b38   Section        0  pwm.o(.text.pwm_reset_counter_ir)
-    [Anonymous Symbol]                       0x00002b54   Section        0  pwm.o(.text.pwm_set_moteurs)
-    pwm_to_u8                                0x00002b9d   Thumb Code    28  asservissement.o(.text.pwm_to_u8)
-    [Anonymous Symbol]                       0x00002b9c   Section        0  asservissement.o(.text.pwm_to_u8)
-    read_spi_channel                         0x00002bb9   Thumb Code   176  recep_spi.o(.text.read_spi_channel)
-    [Anonymous Symbol]                       0x00002bb8   Section        0  recep_spi.o(.text.read_spi_channel)
-    [Anonymous Symbol]                       0x00002c68   Section        0  recep_spi.o(.text.recep_spi_interrupt_routine)
-    servo_set_angle                          0x00002cf5   Thumb Code    46  proximetre.o(.text.servo_set_angle)
-    [Anonymous Symbol]                       0x00002cf4   Section        0  proximetre.o(.text.servo_set_angle)
-    [Anonymous Symbol]                       0x00002d24   Section        0  robot_state.o(.text.set_flag_50hz)
-    [Anonymous Symbol]                       0x00002d30   Section        0  robot_state.o(.text.set_ir_frame_counter)
-    [Anonymous Symbol]                       0x00002d3c   Section        0  robot_state.o(.text.set_ir_seq_index)
-    [Anonymous Symbol]                       0x00002d48   Section        0  robot_state.o(.text.set_ir_seq_length)
-    [Anonymous Symbol]                       0x00002d54   Section        0  robot_state.o(.text.set_ir_sequence_at)
-    [Anonymous Symbol]                       0x00002d64   Section        0  robot_state.o(.text.set_motor_pwms)
-    [Anonymous Symbol]                       0x00002d7c   Section        0  robot_state.o(.text.set_motor_speeds)
-    [Anonymous Symbol]                       0x00002d94   Section        0  robot_state.o(.text.set_proxi_distance_at_angle)
-    [Anonymous Symbol]                       0x00002dc0   Section        0  robot_state.o(.text.set_robot_number)
-    [Anonymous Symbol]                       0x00002dd0   Section        0  robot_state.o(.text.set_robot_status)
-    [Anonymous Symbol]                       0x00002ddc   Section        0  status.o(.text.set_status_led)
-    [Anonymous Symbol]                       0x00002e30   Section        0  robot_state.o(.text.set_vitesse_centrale)
-    [Anonymous Symbol]                       0x00002e3c   Section        0  robot_state.o(.text.set_vitesse_commande)
-    [Anonymous Symbol]                       0x00002e48   Section        0  robot_state.o(.text.set_wire_measure)
-    [Anonymous Symbol]                       0x00002e68   Section        0  robot_state.o(.text.set_wire_trame)
-    [Anonymous Symbol]                       0x00002ea0   Section        0  son.o(.text.son_init)
-    spi_delay                                0x00002f19   Thumb Code    28  recep_spi.o(.text.spi_delay)
-    [Anonymous Symbol]                       0x00002f18   Section        0  recep_spi.o(.text.spi_delay)
-    [Anonymous Symbol]                       0x00002f34   Section        0  beepermethods.o(.text.startBeep)
-    step_to_distance                         0x00002f85   Thumb Code    20  recep_spi.o(.text.step_to_distance)
-    [Anonymous Symbol]                       0x00002f84   Section        0  recep_spi.o(.text.step_to_distance)
-    [Anonymous Symbol]                       0x00002f98   Section        0  stepper.o(.text.stepper_init)
-    [Anonymous Symbol]                       0x00003018   Section        0  stepper.o(.text.stepper_move_to)
-    POSITION_STEPS                           0x000030ac   Number         0  stepper.o(.text.stepper_move_to)
-    stepper_off                              0x000030c1   Thumb Code    16  stepper.o(.text.stepper_off)
-    [Anonymous Symbol]                       0x000030c0   Section        0  stepper.o(.text.stepper_off)
-    [Anonymous Symbol]                       0x000030d0   Section        0  stepper.o(.text.stepper_set_zero_manually)
-    [Anonymous Symbol]                       0x0000310c   Section        0  stepper.o(.text.stepper_show_letter)
-    [Anonymous Symbol]                       0x0000315c   Section        0  beepermethods.o(.text.stopBeep)
-    [Anonymous Symbol]                       0x00003190   Section        0  suivi_fil.o(.text.suivi_fil_force_entrelacement)
-    [Anonymous Symbol]                       0x000031a0   Section        0  suivi_fil.o(.text.suivi_fil_update_distances)
-    [Anonymous Symbol]                       0x000031d8   Section        0  suivi_fil.o(.text.suivi_fil_update_state_machine)
-    [Anonymous Symbol]                       0x00003288   Section        0  timers.o(.text.timer0_init)
-    [Anonymous Symbol]                       0x000032d0   Section        0  timers.o(.text.timer0_start)
-    [Anonymous Symbol]                       0x000032e4   Section        0  timers.o(.text.timer2_get_tc)
-    [Anonymous Symbol]                       0x000032f0   Section        0  timers.o(.text.timer2_init_free_running)
-    [Anonymous Symbol]                       0x00003320   Section        0  timers.o(.text.timer3_clear_interrupt)
-    [Anonymous Symbol]                       0x0000332c   Section        0  timers.o(.text.timer3_get_match0)
-    [Anonymous Symbol]                       0x00003338   Section        0  timers.o(.text.timer3_get_tc)
-    [Anonymous Symbol]                       0x00003344   Section        0  timers.o(.text.timer3_init_servo)
-    [Anonymous Symbol]                       0x00003394   Section        0  timers.o(.text.timer3_set_match0)
-    [Anonymous Symbol]                       0x000033a0   Section        0  timers.o(.text.timer3_set_match1)
-    [Anonymous Symbol]                       0x000033ac   Section        0  uart.o(.text.uart0_send_char)
-    [Anonymous Symbol]                       0x000033c0   Section        0  uart.o(.text.uart0_send_string)
-    [Anonymous Symbol]                       0x000033e8   Section        0  ultrason_recep.o(.text.ultrason_decode_edge)
-    [Anonymous Symbol]                       0x00003490   Section        0  ultrason_recep.o(.text.ultrason_decode_timeout)
-    [Anonymous Symbol]                       0x000034c0   Section        0  ultrason_recep.o(.text.ultrason_recep_interrupt_routine)
-    [Anonymous Symbol]                       0x00003500   Section        0  ultrason_recep.o(.text.ultrason_recep_lire)
-    [Anonymous Symbol]                       0x00003538   Section        0  ultrason_recep.o(.text.ultrason_recep_tick)
-    update_pwm_state                         0x00003545   Thumb Code   160  emission_ir.o(.text.update_pwm_state)
-    [Anonymous Symbol]                       0x00003544   Section        0  emission_ir.o(.text.update_pwm_state)
-    [Anonymous Symbol]                       0x000035e4   Section        0  robot_state.o(.text.update_robot_id_from_hardware)
-    update_shift_register                    0x0000361d   Thumb Code    72  led_register.o(.text.update_shift_register)
-    [Anonymous Symbol]                       0x0000361c   Section        0  led_register.o(.text.update_shift_register)
-    update_status_leds                       0x00003665   Thumb Code    76  dtmf.o(.text.update_status_leds)
-    [Anonymous Symbol]                       0x00003664   Section        0  dtmf.o(.text.update_status_leds)
-    update_switch_mode_from_gpio             0x000036b1   Thumb Code    44  capteur_inductif.o(.text.update_switch_mode_from_gpio)
-    [Anonymous Symbol]                       0x000036b0   Section        0  capteur_inductif.o(.text.update_switch_mode_from_gpio)
-    i.__ARM_fpclassifyf                      0x000036dc   Section        0  fpclassifyf.o(i.__ARM_fpclassifyf)
-    i.__mathlib_flt_infnan                   0x00003702   Section        0  funder.o(i.__mathlib_flt_infnan)
-    i.__mathlib_flt_invalid                  0x00003708   Section        0  funder.o(i.__mathlib_flt_invalid)
-    i.__mathlib_flt_underflow                0x00003710   Section        0  funder.o(i.__mathlib_flt_underflow)
-    i.__mathlib_rredf2                       0x0000371c   Section        0  rredf.o(i.__mathlib_rredf2)
-    i._is_digit                              0x00003884   Section        0  __printf_wp.o(i._is_digit)
-    i.sinf                                   0x00003894   Section        0  sinf.o(i.sinf)
-    x$fpl$fadd                               0x00003a1c   Section      196  faddsub_clz.o(x$fpl$fadd)
-    _fadd1                                   0x00003a2b   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
-    x$fpl$fcheck1                            0x00003ae0   Section       12  fcheck1.o(x$fpl$fcheck1)
-    x$fpl$fcmp                               0x00003aec   Section       84  fcmp.o(x$fpl$fcmp)
-    x$fpl$fcmpinf                            0x00003b40   Section       24  fcmpi.o(x$fpl$fcmpinf)
-    _fdiv1                                   0x00003b59   Thumb Code     0  fdiv.o(x$fpl$fdiv)
-    x$fpl$fdiv                               0x00003b58   Section      388  fdiv.o(x$fpl$fdiv)
-    x$fpl$feqf                               0x00003cdc   Section      104  feqf.o(x$fpl$feqf)
-    x$fpl$ffix                               0x00003d44   Section       54  ffix.o(x$fpl$ffix)
-    x$fpl$fflt                               0x00003d7c   Section       48  fflt_clz.o(x$fpl$fflt)
-    x$fpl$ffltu                              0x00003dac   Section       38  fflt_clz.o(x$fpl$ffltu)
-    x$fpl$fgeqf                              0x00003dd4   Section      104  fgeqf.o(x$fpl$fgeqf)
-    x$fpl$fleqf                              0x00003e3c   Section      104  fleqf.o(x$fpl$fleqf)
-    x$fpl$fmul                               0x00003ea4   Section      258  fmul.o(x$fpl$fmul)
-    x$fpl$fnaninf                            0x00003fa6   Section      140  fnaninf.o(x$fpl$fnaninf)
-    x$fpl$fretinf                            0x00004032   Section       10  fretinf.o(x$fpl$fretinf)
-    x$fpl$frnd                               0x0000403c   Section       96  frnd.o(x$fpl$frnd)
-    x$fpl$frsb                               0x0000409c   Section       20  faddsub_clz.o(x$fpl$frsb)
-    x$fpl$fsub                               0x000040b0   Section      234  faddsub_clz.o(x$fpl$fsub)
-    _fsub1                                   0x000040bf   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
-    x$fpl$retnan                             0x0000419a   Section      100  retnan.o(x$fpl$retnan)
-    x$fpl$scalbnf                            0x000041fe   Section       76  scalbnf.o(x$fpl$scalbnf)
-    x$fpl$trapveneer                         0x0000424a   Section       48  trapv.o(x$fpl$trapveneer)
-    uc_hextab                                0x0000427a   Data          20  _printf_hex_int.o(.constdata)
-    .constdata                               0x0000427a   Section       40  _printf_hex_int.o(.constdata)
-    x$fpl$usenofp                            0x0000427a   Section        0  usenofp.o(x$fpl$usenofp)
-    lc_hextab                                0x0000428e   Data          20  _printf_hex_int.o(.constdata)
-    maptable                                 0x000042a2   Data          17  __printf_flags_ss_wp.o(.constdata)
-    .constdata                               0x000042a2   Section       17  __printf_flags_ss_wp.o(.constdata)
-    twooverpi                                0x000042b4   Data          32  rredf.o(.constdata)
-    .constdata                               0x000042b4   Section       32  rredf.o(.constdata)
-    LUT_CM                                   0x000042d4   Data          56  proximetre.o(.rodata.LUT_CM)
-    [Anonymous Symbol]                       0x000042d4   Section        0  proximetre.o(.rodata.LUT_CM)
-    LUT_V                                    0x0000430c   Data          56  proximetre.o(.rodata.LUT_V)
-    [Anonymous Symbol]                       0x0000430c   Section        0  proximetre.o(.rodata.LUT_V)
-    MODES                                    0x00004344   Data          32  proximetre.o(.rodata.cst32)
+    [Anonymous Symbol]                       0x00002460   Section        0  moteur.o(.text.moteurs_interrupt_routine)
+    [Anonymous Symbol]                       0x00002488   Section        0  moteur.o(.text.moteurs_receive_wire_command)
+    moteurs_send_frame                       0x000024b1   Thumb Code   180  moteur.o(.text.moteurs_send_frame)
+    [Anonymous Symbol]                       0x000024b0   Section        0  moteur.o(.text.moteurs_send_frame)
+    moteurs_update_mode_from_gpio            0x00002565   Thumb Code    36  moteur.o(.text.moteurs_update_mode_from_gpio)
+    [Anonymous Symbol]                       0x00002564   Section        0  moteur.o(.text.moteurs_update_mode_from_gpio)
+    period_us_to_symbol                      0x00002589   Thumb Code    88  decode_enveloppe.o(.text.period_us_to_symbol)
+    [Anonymous Symbol]                       0x00002588   Section        0  decode_enveloppe.o(.text.period_us_to_symbol)
+    [Anonymous Symbol]                       0x000025e0   Section        0  emission_ir.o(.text.preparer_trame)
+    process_dtmf_commands                    0x00002675   Thumb Code   342  dtmf.o(.text.process_dtmf_commands)
+    [Anonymous Symbol]                       0x00002674   Section        0  dtmf.o(.text.process_dtmf_commands)
+    [Anonymous Symbol]                       0x000027cc   Section        0  proximetre.o(.text.proximetre_run_balayage)
+    [Anonymous Symbol]                       0x000029b0   Section        0  proximetre.o(.text.proximetre_timer_interrupt_routine)
+    proximetre_update_mode_from_gpio         0x00002a05   Thumb Code    36  proximetre.o(.text.proximetre_update_mode_from_gpio)
+    [Anonymous Symbol]                       0x00002a04   Section        0  proximetre.o(.text.proximetre_update_mode_from_gpio)
+    [Anonymous Symbol]                       0x00002a28   Section        0  pwm.o(.text.pwm_disable_ir_output)
+    [Anonymous Symbol]                       0x00002a3c   Section        0  pwm.o(.text.pwm_enable_ir_output)
+    [Anonymous Symbol]                       0x00002a50   Section        0  pwm.o(.text.pwm_init_ir)
+    [Anonymous Symbol]                       0x00002ac0   Section        0  pwm.o(.text.pwm_init_moteurs)
+    [Anonymous Symbol]                       0x00002b3c   Section        0  pwm.o(.text.pwm_reset_counter_ir)
+    [Anonymous Symbol]                       0x00002b58   Section        0  pwm.o(.text.pwm_set_moteurs)
+    pwm_to_u8                                0x00002ba1   Thumb Code    28  asservissement.o(.text.pwm_to_u8)
+    [Anonymous Symbol]                       0x00002ba0   Section        0  asservissement.o(.text.pwm_to_u8)
+    read_spi_channel                         0x00002bbd   Thumb Code   176  recep_spi.o(.text.read_spi_channel)
+    [Anonymous Symbol]                       0x00002bbc   Section        0  recep_spi.o(.text.read_spi_channel)
+    [Anonymous Symbol]                       0x00002c6c   Section        0  recep_spi.o(.text.recep_spi_interrupt_routine)
+    servo_set_angle                          0x00002cf9   Thumb Code    46  proximetre.o(.text.servo_set_angle)
+    [Anonymous Symbol]                       0x00002cf8   Section        0  proximetre.o(.text.servo_set_angle)
+    [Anonymous Symbol]                       0x00002d28   Section        0  robot_state.o(.text.set_flag_50hz)
+    [Anonymous Symbol]                       0x00002d34   Section        0  robot_state.o(.text.set_ir_frame_counter)
+    [Anonymous Symbol]                       0x00002d40   Section        0  robot_state.o(.text.set_ir_seq_index)
+    [Anonymous Symbol]                       0x00002d4c   Section        0  robot_state.o(.text.set_ir_seq_length)
+    [Anonymous Symbol]                       0x00002d58   Section        0  robot_state.o(.text.set_ir_sequence_at)
+    [Anonymous Symbol]                       0x00002d68   Section        0  robot_state.o(.text.set_motor_pwms)
+    [Anonymous Symbol]                       0x00002d80   Section        0  robot_state.o(.text.set_motor_speeds)
+    [Anonymous Symbol]                       0x00002d98   Section        0  robot_state.o(.text.set_proxi_distance_at_angle)
+    [Anonymous Symbol]                       0x00002dc4   Section        0  robot_state.o(.text.set_robot_number)
+    [Anonymous Symbol]                       0x00002dd4   Section        0  robot_state.o(.text.set_robot_status)
+    [Anonymous Symbol]                       0x00002de0   Section        0  status.o(.text.set_status_led)
+    [Anonymous Symbol]                       0x00002e34   Section        0  robot_state.o(.text.set_vitesse_centrale)
+    [Anonymous Symbol]                       0x00002e40   Section        0  robot_state.o(.text.set_vitesse_commande)
+    [Anonymous Symbol]                       0x00002e4c   Section        0  robot_state.o(.text.set_wire_measure)
+    [Anonymous Symbol]                       0x00002e6c   Section        0  robot_state.o(.text.set_wire_trame)
+    [Anonymous Symbol]                       0x00002ea4   Section        0  son.o(.text.son_init)
+    spi_delay                                0x00002f1d   Thumb Code    28  recep_spi.o(.text.spi_delay)
+    [Anonymous Symbol]                       0x00002f1c   Section        0  recep_spi.o(.text.spi_delay)
+    [Anonymous Symbol]                       0x00002f38   Section        0  beepermethods.o(.text.startBeep)
+    step_to_distance                         0x00002f89   Thumb Code    20  recep_spi.o(.text.step_to_distance)
+    [Anonymous Symbol]                       0x00002f88   Section        0  recep_spi.o(.text.step_to_distance)
+    [Anonymous Symbol]                       0x00002f9c   Section        0  stepper.o(.text.stepper_init)
+    [Anonymous Symbol]                       0x0000301c   Section        0  stepper.o(.text.stepper_move_to)
+    POSITION_STEPS                           0x000030b0   Number         0  stepper.o(.text.stepper_move_to)
+    stepper_off                              0x000030c5   Thumb Code    16  stepper.o(.text.stepper_off)
+    [Anonymous Symbol]                       0x000030c4   Section        0  stepper.o(.text.stepper_off)
+    [Anonymous Symbol]                       0x000030d4   Section        0  stepper.o(.text.stepper_set_zero_manually)
+    [Anonymous Symbol]                       0x00003110   Section        0  stepper.o(.text.stepper_show_letter)
+    [Anonymous Symbol]                       0x00003160   Section        0  beepermethods.o(.text.stopBeep)
+    [Anonymous Symbol]                       0x00003194   Section        0  suivi_fil.o(.text.suivi_fil_force_entrelacement)
+    [Anonymous Symbol]                       0x000031a4   Section        0  suivi_fil.o(.text.suivi_fil_update_distances)
+    [Anonymous Symbol]                       0x000031dc   Section        0  suivi_fil.o(.text.suivi_fil_update_state_machine)
+    [Anonymous Symbol]                       0x0000328c   Section        0  timers.o(.text.timer0_init)
+    [Anonymous Symbol]                       0x000032d4   Section        0  timers.o(.text.timer0_start)
+    [Anonymous Symbol]                       0x000032e8   Section        0  timers.o(.text.timer2_get_tc)
+    [Anonymous Symbol]                       0x000032f4   Section        0  timers.o(.text.timer2_init_free_running)
+    [Anonymous Symbol]                       0x00003324   Section        0  timers.o(.text.timer3_clear_interrupt)
+    [Anonymous Symbol]                       0x00003330   Section        0  timers.o(.text.timer3_get_match0)
+    [Anonymous Symbol]                       0x0000333c   Section        0  timers.o(.text.timer3_get_tc)
+    [Anonymous Symbol]                       0x00003348   Section        0  timers.o(.text.timer3_init_servo)
+    [Anonymous Symbol]                       0x00003398   Section        0  timers.o(.text.timer3_set_match0)
+    [Anonymous Symbol]                       0x000033a4   Section        0  timers.o(.text.timer3_set_match1)
+    [Anonymous Symbol]                       0x000033b0   Section        0  uart.o(.text.uart0_send_char)
+    [Anonymous Symbol]                       0x000033f0   Section        0  uart.o(.text.uart0_send_string)
+    [Anonymous Symbol]                       0x0000340c   Section        0  uart.o(.text.uart0_update)
+    [Anonymous Symbol]                       0x0000344c   Section        0  ultrason_recep.o(.text.ultrason_decode_edge)
+    [Anonymous Symbol]                       0x000034f4   Section        0  ultrason_recep.o(.text.ultrason_decode_timeout)
+    [Anonymous Symbol]                       0x00003524   Section        0  ultrason_recep.o(.text.ultrason_recep_interrupt_routine)
+    [Anonymous Symbol]                       0x00003564   Section        0  ultrason_recep.o(.text.ultrason_recep_lire)
+    [Anonymous Symbol]                       0x0000359c   Section        0  ultrason_recep.o(.text.ultrason_recep_tick)
+    update_pwm_state                         0x000035a9   Thumb Code   160  emission_ir.o(.text.update_pwm_state)
+    [Anonymous Symbol]                       0x000035a8   Section        0  emission_ir.o(.text.update_pwm_state)
+    [Anonymous Symbol]                       0x00003648   Section        0  robot_state.o(.text.update_robot_id_from_hardware)
+    update_shift_register                    0x00003681   Thumb Code    72  led_register.o(.text.update_shift_register)
+    [Anonymous Symbol]                       0x00003680   Section        0  led_register.o(.text.update_shift_register)
+    update_status_leds                       0x000036c9   Thumb Code    76  dtmf.o(.text.update_status_leds)
+    [Anonymous Symbol]                       0x000036c8   Section        0  dtmf.o(.text.update_status_leds)
+    update_switch_mode_from_gpio             0x00003715   Thumb Code    44  capteur_inductif.o(.text.update_switch_mode_from_gpio)
+    [Anonymous Symbol]                       0x00003714   Section        0  capteur_inductif.o(.text.update_switch_mode_from_gpio)
+    i.__ARM_fpclassifyf                      0x00003740   Section        0  fpclassifyf.o(i.__ARM_fpclassifyf)
+    i.__mathlib_flt_infnan                   0x00003766   Section        0  funder.o(i.__mathlib_flt_infnan)
+    i.__mathlib_flt_invalid                  0x0000376c   Section        0  funder.o(i.__mathlib_flt_invalid)
+    i.__mathlib_flt_underflow                0x00003774   Section        0  funder.o(i.__mathlib_flt_underflow)
+    i.__mathlib_rredf2                       0x00003780   Section        0  rredf.o(i.__mathlib_rredf2)
+    i._is_digit                              0x000038e8   Section        0  __printf_wp.o(i._is_digit)
+    i.sinf                                   0x000038f8   Section        0  sinf.o(i.sinf)
+    x$fpl$fadd                               0x00003a80   Section      196  faddsub_clz.o(x$fpl$fadd)
+    _fadd1                                   0x00003a8f   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
+    x$fpl$fcheck1                            0x00003b44   Section       12  fcheck1.o(x$fpl$fcheck1)
+    x$fpl$fcmp                               0x00003b50   Section       84  fcmp.o(x$fpl$fcmp)
+    x$fpl$fcmpinf                            0x00003ba4   Section       24  fcmpi.o(x$fpl$fcmpinf)
+    _fdiv1                                   0x00003bbd   Thumb Code     0  fdiv.o(x$fpl$fdiv)
+    x$fpl$fdiv                               0x00003bbc   Section      388  fdiv.o(x$fpl$fdiv)
+    x$fpl$feqf                               0x00003d40   Section      104  feqf.o(x$fpl$feqf)
+    x$fpl$ffix                               0x00003da8   Section       54  ffix.o(x$fpl$ffix)
+    x$fpl$fflt                               0x00003de0   Section       48  fflt_clz.o(x$fpl$fflt)
+    x$fpl$ffltu                              0x00003e10   Section       38  fflt_clz.o(x$fpl$ffltu)
+    x$fpl$fgeqf                              0x00003e38   Section      104  fgeqf.o(x$fpl$fgeqf)
+    x$fpl$fleqf                              0x00003ea0   Section      104  fleqf.o(x$fpl$fleqf)
+    x$fpl$fmul                               0x00003f08   Section      258  fmul.o(x$fpl$fmul)
+    x$fpl$fnaninf                            0x0000400a   Section      140  fnaninf.o(x$fpl$fnaninf)
+    x$fpl$fretinf                            0x00004096   Section       10  fretinf.o(x$fpl$fretinf)
+    x$fpl$frnd                               0x000040a0   Section       96  frnd.o(x$fpl$frnd)
+    x$fpl$frsb                               0x00004100   Section       20  faddsub_clz.o(x$fpl$frsb)
+    x$fpl$fsub                               0x00004114   Section      234  faddsub_clz.o(x$fpl$fsub)
+    _fsub1                                   0x00004123   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
+    x$fpl$retnan                             0x000041fe   Section      100  retnan.o(x$fpl$retnan)
+    x$fpl$scalbnf                            0x00004262   Section       76  scalbnf.o(x$fpl$scalbnf)
+    x$fpl$trapveneer                         0x000042ae   Section       48  trapv.o(x$fpl$trapveneer)
+    uc_hextab                                0x000042de   Data          20  _printf_hex_int.o(.constdata)
+    .constdata                               0x000042de   Section       40  _printf_hex_int.o(.constdata)
+    x$fpl$usenofp                            0x000042de   Section        0  usenofp.o(x$fpl$usenofp)
+    lc_hextab                                0x000042f2   Data          20  _printf_hex_int.o(.constdata)
+    maptable                                 0x00004306   Data          17  __printf_flags_ss_wp.o(.constdata)
+    .constdata                               0x00004306   Section       17  __printf_flags_ss_wp.o(.constdata)
+    twooverpi                                0x00004318   Data          32  rredf.o(.constdata)
+    .constdata                               0x00004318   Section       32  rredf.o(.constdata)
+    LUT_CM                                   0x00004338   Data          56  proximetre.o(.rodata.LUT_CM)
+    [Anonymous Symbol]                       0x00004338   Section        0  proximetre.o(.rodata.LUT_CM)
+    LUT_V                                    0x00004370   Data          56  proximetre.o(.rodata.LUT_V)
+    [Anonymous Symbol]                       0x00004370   Section        0  proximetre.o(.rodata.LUT_V)
+    MODES                                    0x000043a8   Data          32  proximetre.o(.rodata.cst32)
     current_pwm_d                            0x10000014   Data           4  robot_state.o(.data.current_pwm_d)
     [Anonymous Symbol]                       0x10000014   Section        0  robot_state.o(.data.current_pwm_d)
     current_pwm_g                            0x10000018   Data           4  robot_state.o(.data.current_pwm_g)
@@ -2727,11 +2738,17 @@ Image Symbol Table
     [Anonymous Symbol]                       0x100003a0   Section        0  ultrason_recep.o(.bss.t_r2)
     target_wire                              0x100003a4   Data           1  suivi_fil.o(.bss.target_wire)
     [Anonymous Symbol]                       0x100003a4   Section        0  suivi_fil.o(.bss.target_wire)
-    Heap_Mem                                 0x100003b8   Data           0  startup_lpc17xx.o(HEAP)
-    Stack_Mem                                0x100003b8   Data         512  startup_lpc17xx.o(STACK)
-    HEAP                                     0x100003b8   Section        0  startup_lpc17xx.o(HEAP)
-    STACK                                    0x100003b8   Section      512  startup_lpc17xx.o(STACK)
-    __initial_sp                             0x100005b8   Data           0  startup_lpc17xx.o(STACK)
+    tx_buffer                                0x100003a5   Data         256  uart.o(.bss.tx_buffer)
+    [Anonymous Symbol]                       0x100003a5   Section        0  uart.o(.bss.tx_buffer)
+    tx_head                                  0x100004a6   Data           2  uart.o(.bss.tx_head)
+    [Anonymous Symbol]                       0x100004a6   Section        0  uart.o(.bss.tx_head)
+    tx_tail                                  0x100004a8   Data           2  uart.o(.bss.tx_tail)
+    [Anonymous Symbol]                       0x100004a8   Section        0  uart.o(.bss.tx_tail)
+    Heap_Mem                                 0x100004b8   Data           0  startup_lpc17xx.o(HEAP)
+    Stack_Mem                                0x100004b8   Data         512  startup_lpc17xx.o(STACK)
+    HEAP                                     0x100004b8   Section        0  startup_lpc17xx.o(HEAP)
+    STACK                                    0x100004b8   Section      512  startup_lpc17xx.o(STACK)
+    __initial_sp                             0x100006b8   Data           0  startup_lpc17xx.o(STACK)
 
     Global Symbols
 
@@ -2970,113 +2987,114 @@ Image Symbol Table
     init_ultrason_recep                      0x00002261   Thumb Code    94  ultrason_recep.o(.text.init_ultrason_recep)
     led_register_clr                         0x00002305   Thumb Code    24  led_register.o(.text.led_register_clr)
     led_register_set                         0x0000231d   Thumb Code    22  led_register.o(.text.led_register_set)
-    main                                     0x00002335   Thumb Code   296  main.o(.text.main)
-    moteurs_interrupt_routine                0x0000245d   Thumb Code    38  moteur.o(.text.moteurs_interrupt_routine)
-    moteurs_receive_wire_command             0x00002485   Thumb Code    38  moteur.o(.text.moteurs_receive_wire_command)
-    preparer_trame                           0x000025dd   Thumb Code   146  emission_ir.o(.text.preparer_trame)
-    proximetre_run_balayage                  0x000027c9   Thumb Code   484  proximetre.o(.text.proximetre_run_balayage)
-    proximetre_timer_interrupt_routine       0x000029ad   Thumb Code    84  proximetre.o(.text.proximetre_timer_interrupt_routine)
-    pwm_disable_ir_output                    0x00002a25   Thumb Code    18  pwm.o(.text.pwm_disable_ir_output)
-    pwm_enable_ir_output                     0x00002a39   Thumb Code    18  pwm.o(.text.pwm_enable_ir_output)
-    pwm_init_ir                              0x00002a4d   Thumb Code   110  pwm.o(.text.pwm_init_ir)
-    pwm_init_moteurs                         0x00002abd   Thumb Code   124  pwm.o(.text.pwm_init_moteurs)
-    pwm_reset_counter_ir                     0x00002b39   Thumb Code    26  pwm.o(.text.pwm_reset_counter_ir)
-    pwm_set_moteurs                          0x00002b55   Thumb Code    72  pwm.o(.text.pwm_set_moteurs)
-    recep_spi_interrupt_routine              0x00002c69   Thumb Code   138  recep_spi.o(.text.recep_spi_interrupt_routine)
-    set_flag_50hz                            0x00002d25   Thumb Code    12  robot_state.o(.text.set_flag_50hz)
-    set_ir_frame_counter                     0x00002d31   Thumb Code    12  robot_state.o(.text.set_ir_frame_counter)
-    set_ir_seq_index                         0x00002d3d   Thumb Code    12  robot_state.o(.text.set_ir_seq_index)
-    set_ir_seq_length                        0x00002d49   Thumb Code    12  robot_state.o(.text.set_ir_seq_length)
-    set_ir_sequence_at                       0x00002d55   Thumb Code    16  robot_state.o(.text.set_ir_sequence_at)
-    set_motor_pwms                           0x00002d65   Thumb Code    22  robot_state.o(.text.set_motor_pwms)
-    set_motor_speeds                         0x00002d7d   Thumb Code    22  robot_state.o(.text.set_motor_speeds)
-    set_proxi_distance_at_angle              0x00002d95   Thumb Code    44  robot_state.o(.text.set_proxi_distance_at_angle)
-    set_robot_number                         0x00002dc1   Thumb Code    16  robot_state.o(.text.set_robot_number)
-    set_robot_status                         0x00002dd1   Thumb Code    12  robot_state.o(.text.set_robot_status)
-    set_status_led                           0x00002ddd   Thumb Code    84  status.o(.text.set_status_led)
-    set_vitesse_centrale                     0x00002e31   Thumb Code    12  robot_state.o(.text.set_vitesse_centrale)
-    set_vitesse_commande                     0x00002e3d   Thumb Code    12  robot_state.o(.text.set_vitesse_commande)
-    set_wire_measure                         0x00002e49   Thumb Code    30  robot_state.o(.text.set_wire_measure)
-    set_wire_trame                           0x00002e69   Thumb Code    56  robot_state.o(.text.set_wire_trame)
-    son_init                                 0x00002ea1   Thumb Code   118  son.o(.text.son_init)
-    startBeep                                0x00002f35   Thumb Code    78  beepermethods.o(.text.startBeep)
-    stepper_init                             0x00002f99   Thumb Code   128  stepper.o(.text.stepper_init)
-    stepper_move_to                          0x00003019   Thumb Code   168  stepper.o(.text.stepper_move_to)
-    stepper_set_zero_manually                0x000030d1   Thumb Code    58  stepper.o(.text.stepper_set_zero_manually)
-    stepper_show_letter                      0x0000310d   Thumb Code    80  stepper.o(.text.stepper_show_letter)
-    stopBeep                                 0x0000315d   Thumb Code    50  beepermethods.o(.text.stopBeep)
-    suivi_fil_force_entrelacement            0x00003191   Thumb Code    14  suivi_fil.o(.text.suivi_fil_force_entrelacement)
-    suivi_fil_update_distances               0x000031a1   Thumb Code    54  suivi_fil.o(.text.suivi_fil_update_distances)
-    suivi_fil_update_state_machine           0x000031d9   Thumb Code   176  suivi_fil.o(.text.suivi_fil_update_state_machine)
-    timer0_init                              0x00003289   Thumb Code    70  timers.o(.text.timer0_init)
-    timer0_start                             0x000032d1   Thumb Code    18  timers.o(.text.timer0_start)
-    timer2_get_tc                            0x000032e5   Thumb Code    10  timers.o(.text.timer2_get_tc)
-    timer2_init_free_running                 0x000032f1   Thumb Code    46  timers.o(.text.timer2_init_free_running)
-    timer3_clear_interrupt                   0x00003321   Thumb Code    12  timers.o(.text.timer3_clear_interrupt)
-    timer3_get_match0                        0x0000332d   Thumb Code    12  timers.o(.text.timer3_get_match0)
-    timer3_get_tc                            0x00003339   Thumb Code    12  timers.o(.text.timer3_get_tc)
-    timer3_init_servo                        0x00003345   Thumb Code    80  timers.o(.text.timer3_init_servo)
-    timer3_set_match0                        0x00003395   Thumb Code    12  timers.o(.text.timer3_set_match0)
-    timer3_set_match1                        0x000033a1   Thumb Code    12  timers.o(.text.timer3_set_match1)
-    uart0_send_char                          0x000033ad   Thumb Code    18  uart.o(.text.uart0_send_char)
-    uart0_send_string                        0x000033c1   Thumb Code    40  uart.o(.text.uart0_send_string)
-    ultrason_decode_edge                     0x000033e9   Thumb Code   168  ultrason_recep.o(.text.ultrason_decode_edge)
-    ultrason_decode_timeout                  0x00003491   Thumb Code    48  ultrason_recep.o(.text.ultrason_decode_timeout)
-    ultrason_recep_interrupt_routine         0x000034c1   Thumb Code    64  ultrason_recep.o(.text.ultrason_recep_interrupt_routine)
-    ultrason_recep_lire                      0x00003501   Thumb Code    54  ultrason_recep.o(.text.ultrason_recep_lire)
-    ultrason_recep_tick                      0x00003539   Thumb Code    12  ultrason_recep.o(.text.ultrason_recep_tick)
-    update_robot_id_from_hardware            0x000035e5   Thumb Code    56  robot_state.o(.text.update_robot_id_from_hardware)
-    __ARM_fpclassifyf                        0x000036dd   Thumb Code    38  fpclassifyf.o(i.__ARM_fpclassifyf)
-    __mathlib_flt_infnan                     0x00003703   Thumb Code     6  funder.o(i.__mathlib_flt_infnan)
-    __mathlib_flt_invalid                    0x00003709   Thumb Code     8  funder.o(i.__mathlib_flt_invalid)
-    __mathlib_flt_underflow                  0x00003711   Thumb Code    10  funder.o(i.__mathlib_flt_underflow)
-    __mathlib_rredf2                         0x0000371d   Thumb Code   344  rredf.o(i.__mathlib_rredf2)
-    _is_digit                                0x00003885   Thumb Code    14  __printf_wp.o(i._is_digit)
-    sinf                                     0x00003895   Thumb Code   338  sinf.o(i.sinf)
-    __aeabi_fadd                             0x00003a1d   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
-    _fadd                                    0x00003a1d   Thumb Code   196  faddsub_clz.o(x$fpl$fadd)
-    __fpl_fcheck_NaN1                        0x00003ae1   Thumb Code     6  fcheck1.o(x$fpl$fcheck1)
-    __aeabi_fcmpeq                           0x00003aed   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _feq                                     0x00003aed   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    _fneq                                    0x00003afb   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmpgt                           0x00003b09   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fgr                                     0x00003b09   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmpge                           0x00003b17   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fgeq                                    0x00003b17   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmple                           0x00003b25   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fleq                                    0x00003b25   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __aeabi_fcmplt                           0x00003b33   Thumb Code     0  fcmp.o(x$fpl$fcmp)
-    _fls                                     0x00003b33   Thumb Code    14  fcmp.o(x$fpl$fcmp)
-    __fpl_fcmp_Inf                           0x00003b41   Thumb Code    24  fcmpi.o(x$fpl$fcmpinf)
-    __aeabi_fdiv                             0x00003b59   Thumb Code     0  fdiv.o(x$fpl$fdiv)
-    _fdiv                                    0x00003b59   Thumb Code   384  fdiv.o(x$fpl$fdiv)
-    __aeabi_cfcmpeq                          0x00003cdd   Thumb Code     0  feqf.o(x$fpl$feqf)
-    _fcmpeq                                  0x00003cdd   Thumb Code   104  feqf.o(x$fpl$feqf)
-    __aeabi_f2iz                             0x00003d45   Thumb Code     0  ffix.o(x$fpl$ffix)
-    _ffix                                    0x00003d45   Thumb Code    54  ffix.o(x$fpl$ffix)
-    __aeabi_i2f                              0x00003d7d   Thumb Code     0  fflt_clz.o(x$fpl$fflt)
-    _fflt                                    0x00003d7d   Thumb Code    48  fflt_clz.o(x$fpl$fflt)
-    __aeabi_ui2f                             0x00003dad   Thumb Code     0  fflt_clz.o(x$fpl$ffltu)
-    _ffltu                                   0x00003dad   Thumb Code    38  fflt_clz.o(x$fpl$ffltu)
-    _fcmpge                                  0x00003dd5   Thumb Code   104  fgeqf.o(x$fpl$fgeqf)
-    __aeabi_cfcmple                          0x00003e3d   Thumb Code     0  fleqf.o(x$fpl$fleqf)
-    _fcmple                                  0x00003e3d   Thumb Code   104  fleqf.o(x$fpl$fleqf)
-    __fpl_fcmple_InfNaN                      0x00003e8f   Thumb Code     0  fleqf.o(x$fpl$fleqf)
-    __aeabi_fmul                             0x00003ea5   Thumb Code     0  fmul.o(x$fpl$fmul)
-    _fmul                                    0x00003ea5   Thumb Code   258  fmul.o(x$fpl$fmul)
-    __fpl_fnaninf                            0x00003fa7   Thumb Code   140  fnaninf.o(x$fpl$fnaninf)
-    __fpl_fretinf                            0x00004033   Thumb Code    10  fretinf.o(x$fpl$fretinf)
-    _frnd                                    0x0000403d   Thumb Code    96  frnd.o(x$fpl$frnd)
-    __aeabi_frsub                            0x0000409d   Thumb Code     0  faddsub_clz.o(x$fpl$frsb)
-    _frsb                                    0x0000409d   Thumb Code    20  faddsub_clz.o(x$fpl$frsb)
-    __aeabi_fsub                             0x000040b1   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
-    _fsub                                    0x000040b1   Thumb Code   234  faddsub_clz.o(x$fpl$fsub)
-    __fpl_return_NaN                         0x0000419b   Thumb Code   100  retnan.o(x$fpl$retnan)
-    __ARM_scalbnf                            0x000041ff   Thumb Code    76  scalbnf.o(x$fpl$scalbnf)
-    __fpl_cmpreturn                          0x0000424b   Thumb Code    48  trapv.o(x$fpl$trapveneer)
-    __I$use$fp                               0x0000427a   Number         0  usenofp.o(x$fpl$usenofp)
-    Region$$Table$$Base                      0x00004364   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00004384   Number         0  anon$$obj.o(Region$$Table)
+    main                                     0x00002335   Thumb Code   300  main.o(.text.main)
+    moteurs_interrupt_routine                0x00002461   Thumb Code    38  moteur.o(.text.moteurs_interrupt_routine)
+    moteurs_receive_wire_command             0x00002489   Thumb Code    38  moteur.o(.text.moteurs_receive_wire_command)
+    preparer_trame                           0x000025e1   Thumb Code   146  emission_ir.o(.text.preparer_trame)
+    proximetre_run_balayage                  0x000027cd   Thumb Code   484  proximetre.o(.text.proximetre_run_balayage)
+    proximetre_timer_interrupt_routine       0x000029b1   Thumb Code    84  proximetre.o(.text.proximetre_timer_interrupt_routine)
+    pwm_disable_ir_output                    0x00002a29   Thumb Code    18  pwm.o(.text.pwm_disable_ir_output)
+    pwm_enable_ir_output                     0x00002a3d   Thumb Code    18  pwm.o(.text.pwm_enable_ir_output)
+    pwm_init_ir                              0x00002a51   Thumb Code   110  pwm.o(.text.pwm_init_ir)
+    pwm_init_moteurs                         0x00002ac1   Thumb Code   124  pwm.o(.text.pwm_init_moteurs)
+    pwm_reset_counter_ir                     0x00002b3d   Thumb Code    26  pwm.o(.text.pwm_reset_counter_ir)
+    pwm_set_moteurs                          0x00002b59   Thumb Code    72  pwm.o(.text.pwm_set_moteurs)
+    recep_spi_interrupt_routine              0x00002c6d   Thumb Code   138  recep_spi.o(.text.recep_spi_interrupt_routine)
+    set_flag_50hz                            0x00002d29   Thumb Code    12  robot_state.o(.text.set_flag_50hz)
+    set_ir_frame_counter                     0x00002d35   Thumb Code    12  robot_state.o(.text.set_ir_frame_counter)
+    set_ir_seq_index                         0x00002d41   Thumb Code    12  robot_state.o(.text.set_ir_seq_index)
+    set_ir_seq_length                        0x00002d4d   Thumb Code    12  robot_state.o(.text.set_ir_seq_length)
+    set_ir_sequence_at                       0x00002d59   Thumb Code    16  robot_state.o(.text.set_ir_sequence_at)
+    set_motor_pwms                           0x00002d69   Thumb Code    22  robot_state.o(.text.set_motor_pwms)
+    set_motor_speeds                         0x00002d81   Thumb Code    22  robot_state.o(.text.set_motor_speeds)
+    set_proxi_distance_at_angle              0x00002d99   Thumb Code    44  robot_state.o(.text.set_proxi_distance_at_angle)
+    set_robot_number                         0x00002dc5   Thumb Code    16  robot_state.o(.text.set_robot_number)
+    set_robot_status                         0x00002dd5   Thumb Code    12  robot_state.o(.text.set_robot_status)
+    set_status_led                           0x00002de1   Thumb Code    84  status.o(.text.set_status_led)
+    set_vitesse_centrale                     0x00002e35   Thumb Code    12  robot_state.o(.text.set_vitesse_centrale)
+    set_vitesse_commande                     0x00002e41   Thumb Code    12  robot_state.o(.text.set_vitesse_commande)
+    set_wire_measure                         0x00002e4d   Thumb Code    30  robot_state.o(.text.set_wire_measure)
+    set_wire_trame                           0x00002e6d   Thumb Code    56  robot_state.o(.text.set_wire_trame)
+    son_init                                 0x00002ea5   Thumb Code   118  son.o(.text.son_init)
+    startBeep                                0x00002f39   Thumb Code    78  beepermethods.o(.text.startBeep)
+    stepper_init                             0x00002f9d   Thumb Code   128  stepper.o(.text.stepper_init)
+    stepper_move_to                          0x0000301d   Thumb Code   168  stepper.o(.text.stepper_move_to)
+    stepper_set_zero_manually                0x000030d5   Thumb Code    58  stepper.o(.text.stepper_set_zero_manually)
+    stepper_show_letter                      0x00003111   Thumb Code    80  stepper.o(.text.stepper_show_letter)
+    stopBeep                                 0x00003161   Thumb Code    50  beepermethods.o(.text.stopBeep)
+    suivi_fil_force_entrelacement            0x00003195   Thumb Code    14  suivi_fil.o(.text.suivi_fil_force_entrelacement)
+    suivi_fil_update_distances               0x000031a5   Thumb Code    54  suivi_fil.o(.text.suivi_fil_update_distances)
+    suivi_fil_update_state_machine           0x000031dd   Thumb Code   176  suivi_fil.o(.text.suivi_fil_update_state_machine)
+    timer0_init                              0x0000328d   Thumb Code    70  timers.o(.text.timer0_init)
+    timer0_start                             0x000032d5   Thumb Code    18  timers.o(.text.timer0_start)
+    timer2_get_tc                            0x000032e9   Thumb Code    10  timers.o(.text.timer2_get_tc)
+    timer2_init_free_running                 0x000032f5   Thumb Code    46  timers.o(.text.timer2_init_free_running)
+    timer3_clear_interrupt                   0x00003325   Thumb Code    12  timers.o(.text.timer3_clear_interrupt)
+    timer3_get_match0                        0x00003331   Thumb Code    12  timers.o(.text.timer3_get_match0)
+    timer3_get_tc                            0x0000333d   Thumb Code    12  timers.o(.text.timer3_get_tc)
+    timer3_init_servo                        0x00003349   Thumb Code    80  timers.o(.text.timer3_init_servo)
+    timer3_set_match0                        0x00003399   Thumb Code    12  timers.o(.text.timer3_set_match0)
+    timer3_set_match1                        0x000033a5   Thumb Code    12  timers.o(.text.timer3_set_match1)
+    uart0_send_char                          0x000033b1   Thumb Code    64  uart.o(.text.uart0_send_char)
+    uart0_send_string                        0x000033f1   Thumb Code    28  uart.o(.text.uart0_send_string)
+    uart0_update                             0x0000340d   Thumb Code    64  uart.o(.text.uart0_update)
+    ultrason_decode_edge                     0x0000344d   Thumb Code   168  ultrason_recep.o(.text.ultrason_decode_edge)
+    ultrason_decode_timeout                  0x000034f5   Thumb Code    48  ultrason_recep.o(.text.ultrason_decode_timeout)
+    ultrason_recep_interrupt_routine         0x00003525   Thumb Code    64  ultrason_recep.o(.text.ultrason_recep_interrupt_routine)
+    ultrason_recep_lire                      0x00003565   Thumb Code    54  ultrason_recep.o(.text.ultrason_recep_lire)
+    ultrason_recep_tick                      0x0000359d   Thumb Code    12  ultrason_recep.o(.text.ultrason_recep_tick)
+    update_robot_id_from_hardware            0x00003649   Thumb Code    56  robot_state.o(.text.update_robot_id_from_hardware)
+    __ARM_fpclassifyf                        0x00003741   Thumb Code    38  fpclassifyf.o(i.__ARM_fpclassifyf)
+    __mathlib_flt_infnan                     0x00003767   Thumb Code     6  funder.o(i.__mathlib_flt_infnan)
+    __mathlib_flt_invalid                    0x0000376d   Thumb Code     8  funder.o(i.__mathlib_flt_invalid)
+    __mathlib_flt_underflow                  0x00003775   Thumb Code    10  funder.o(i.__mathlib_flt_underflow)
+    __mathlib_rredf2                         0x00003781   Thumb Code   344  rredf.o(i.__mathlib_rredf2)
+    _is_digit                                0x000038e9   Thumb Code    14  __printf_wp.o(i._is_digit)
+    sinf                                     0x000038f9   Thumb Code   338  sinf.o(i.sinf)
+    __aeabi_fadd                             0x00003a81   Thumb Code     0  faddsub_clz.o(x$fpl$fadd)
+    _fadd                                    0x00003a81   Thumb Code   196  faddsub_clz.o(x$fpl$fadd)
+    __fpl_fcheck_NaN1                        0x00003b45   Thumb Code     6  fcheck1.o(x$fpl$fcheck1)
+    __aeabi_fcmpeq                           0x00003b51   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _feq                                     0x00003b51   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    _fneq                                    0x00003b5f   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmpgt                           0x00003b6d   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fgr                                     0x00003b6d   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmpge                           0x00003b7b   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fgeq                                    0x00003b7b   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmple                           0x00003b89   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fleq                                    0x00003b89   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __aeabi_fcmplt                           0x00003b97   Thumb Code     0  fcmp.o(x$fpl$fcmp)
+    _fls                                     0x00003b97   Thumb Code    14  fcmp.o(x$fpl$fcmp)
+    __fpl_fcmp_Inf                           0x00003ba5   Thumb Code    24  fcmpi.o(x$fpl$fcmpinf)
+    __aeabi_fdiv                             0x00003bbd   Thumb Code     0  fdiv.o(x$fpl$fdiv)
+    _fdiv                                    0x00003bbd   Thumb Code   384  fdiv.o(x$fpl$fdiv)
+    __aeabi_cfcmpeq                          0x00003d41   Thumb Code     0  feqf.o(x$fpl$feqf)
+    _fcmpeq                                  0x00003d41   Thumb Code   104  feqf.o(x$fpl$feqf)
+    __aeabi_f2iz                             0x00003da9   Thumb Code     0  ffix.o(x$fpl$ffix)
+    _ffix                                    0x00003da9   Thumb Code    54  ffix.o(x$fpl$ffix)
+    __aeabi_i2f                              0x00003de1   Thumb Code     0  fflt_clz.o(x$fpl$fflt)
+    _fflt                                    0x00003de1   Thumb Code    48  fflt_clz.o(x$fpl$fflt)
+    __aeabi_ui2f                             0x00003e11   Thumb Code     0  fflt_clz.o(x$fpl$ffltu)
+    _ffltu                                   0x00003e11   Thumb Code    38  fflt_clz.o(x$fpl$ffltu)
+    _fcmpge                                  0x00003e39   Thumb Code   104  fgeqf.o(x$fpl$fgeqf)
+    __aeabi_cfcmple                          0x00003ea1   Thumb Code     0  fleqf.o(x$fpl$fleqf)
+    _fcmple                                  0x00003ea1   Thumb Code   104  fleqf.o(x$fpl$fleqf)
+    __fpl_fcmple_InfNaN                      0x00003ef3   Thumb Code     0  fleqf.o(x$fpl$fleqf)
+    __aeabi_fmul                             0x00003f09   Thumb Code     0  fmul.o(x$fpl$fmul)
+    _fmul                                    0x00003f09   Thumb Code   258  fmul.o(x$fpl$fmul)
+    __fpl_fnaninf                            0x0000400b   Thumb Code   140  fnaninf.o(x$fpl$fnaninf)
+    __fpl_fretinf                            0x00004097   Thumb Code    10  fretinf.o(x$fpl$fretinf)
+    _frnd                                    0x000040a1   Thumb Code    96  frnd.o(x$fpl$frnd)
+    __aeabi_frsub                            0x00004101   Thumb Code     0  faddsub_clz.o(x$fpl$frsb)
+    _frsb                                    0x00004101   Thumb Code    20  faddsub_clz.o(x$fpl$frsb)
+    __aeabi_fsub                             0x00004115   Thumb Code     0  faddsub_clz.o(x$fpl$fsub)
+    _fsub                                    0x00004115   Thumb Code   234  faddsub_clz.o(x$fpl$fsub)
+    __fpl_return_NaN                         0x000041ff   Thumb Code   100  retnan.o(x$fpl$retnan)
+    __ARM_scalbnf                            0x00004263   Thumb Code    76  scalbnf.o(x$fpl$scalbnf)
+    __fpl_cmpreturn                          0x000042af   Thumb Code    48  trapv.o(x$fpl$trapveneer)
+    __I$use$fp                               0x000042de   Number         0  usenofp.o(x$fpl$usenofp)
+    Region$$Table$$Base                      0x000043c8   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x000043e8   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x10000000   Data           4  system_lpc17xx.o(.data.SystemCoreClock)
     asserv_K_corr_alpha                      0x10000004   Data           4  asservissement.o(.data.asserv_K_corr_alpha)
     asserv_K_corr_y                          0x10000008   Data           4  asservissement.o(.data.asserv_K_corr_y)
@@ -3089,10 +3107,10 @@ Image Symbol Table
     flag_compute_inductif                    0x100001c7   Data           1  capteur_inductif.o(.bss.flag_compute_inductif)
     freqAsChanged                            0x100001c8   Data           4  beepermethods.o(.bss.freqAsChanged)
     nbFoisGlo                                0x1000026c   Data           4  beepermethods.o(.bss.nbFoisGlo)
-    volatile_adc_sample_count                0x100003a6   Data           2  capteur_inductif.o(.bss.volatile_adc_sample_count)
-    volatile_adc_sum1                        0x100003a8   Data           4  capteur_inductif.o(.bss.volatile_adc_sum1)
-    volatile_adc_sum2                        0x100003ac   Data           4  capteur_inductif.o(.bss.volatile_adc_sum2)
-    volatile_adc_sum3                        0x100003b0   Data           4  capteur_inductif.o(.bss.volatile_adc_sum3)
+    volatile_adc_sample_count                0x100004aa   Data           2  capteur_inductif.o(.bss.volatile_adc_sample_count)
+    volatile_adc_sum1                        0x100004ac   Data           4  capteur_inductif.o(.bss.volatile_adc_sum1)
+    volatile_adc_sum2                        0x100004b0   Data           4  capteur_inductif.o(.bss.volatile_adc_sum2)
+    volatile_adc_sum3                        0x100004b4   Data           4  capteur_inductif.o(.bss.volatile_adc_sum3)
 
 
 
@@ -3102,90 +3120,90 @@ Memory Map of the image
 
   Image Entry point : 0x00000185
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x000043c8, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x0000442c, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00004384, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x000043e8, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x00000000   0x00000000   0x000000cc   Data   RO          745    RESET               startup_lpc17xx.o
-    0x000000cc   0x000000cc   0x00000008   Code   RO          837  * !!!main             c_w.l(__main.o)
-    0x000000d4   0x000000d4   0x00000034   Code   RO         1102    !!!scatter          c_w.l(__scatter.o)
-    0x00000108   0x00000108   0x0000001a   Code   RO         1104    !!handler_copy      c_w.l(__scatter_copy.o)
+    0x00000000   0x00000000   0x000000cc   Data   RO          750    RESET               startup_lpc17xx.o
+    0x000000cc   0x000000cc   0x00000008   Code   RO          842  * !!!main             c_w.l(__main.o)
+    0x000000d4   0x000000d4   0x00000034   Code   RO         1107    !!!scatter          c_w.l(__scatter.o)
+    0x00000108   0x00000108   0x0000001a   Code   RO         1109    !!handler_copy      c_w.l(__scatter_copy.o)
     0x00000122   0x00000122   0x00000002   PAD
-    0x00000124   0x00000124   0x0000001c   Code   RO         1106    !!handler_zi        c_w.l(__scatter_zi.o)
-    0x00000140   0x00000140   0x00000000   Code   RO          828    .ARM.Collect$$_printf_percent$$00000000  c_w.l(_printf_percent.o)
-    0x00000140   0x00000140   0x00000006   Code   RO          826    .ARM.Collect$$_printf_percent$$00000009  c_w.l(_printf_d.o)
-    0x00000146   0x00000146   0x00000006   Code   RO          827    .ARM.Collect$$_printf_percent$$0000000A  c_w.l(_printf_u.o)
-    0x0000014c   0x0000014c   0x00000006   Code   RO          825    .ARM.Collect$$_printf_percent$$0000000C  c_w.l(_printf_x.o)
-    0x00000152   0x00000152   0x00000006   Code   RO          824    .ARM.Collect$$_printf_percent$$00000013  c_w.l(_printf_c.o)
-    0x00000158   0x00000158   0x00000004   Code   RO          886    .ARM.Collect$$_printf_percent$$00000017  c_w.l(_printf_percent_end.o)
-    0x0000015c   0x0000015c   0x00000002   Code   RO          963    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          975    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          977    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          980    .ARM.Collect$$libinit$$0000000A  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          982    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          984    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          987    .ARM.Collect$$libinit$$00000011  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          989    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          991    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          993    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          995    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          997    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO          999    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1001    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1003    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1005    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1007    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1011    .ARM.Collect$$libinit$$0000002C  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1013    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1015    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000000   Code   RO         1017    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
-    0x0000015e   0x0000015e   0x00000002   Code   RO         1018    .ARM.Collect$$libinit$$00000033  c_w.l(libinit2.o)
-    0x00000160   0x00000160   0x00000002   Code   RO         1057    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
-    0x00000162   0x00000162   0x00000000   Code   RO         1085    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
-    0x00000162   0x00000162   0x00000000   Code   RO         1087    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
-    0x00000162   0x00000162   0x00000000   Code   RO         1090    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
-    0x00000162   0x00000162   0x00000000   Code   RO         1093    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
-    0x00000162   0x00000162   0x00000000   Code   RO         1095    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
-    0x00000162   0x00000162   0x00000000   Code   RO         1098    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
-    0x00000162   0x00000162   0x00000002   Code   RO         1099    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
-    0x00000164   0x00000164   0x00000000   Code   RO          871    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
-    0x00000164   0x00000164   0x00000000   Code   RO          920    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
-    0x00000164   0x00000164   0x00000006   Code   RO          932    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
-    0x0000016a   0x0000016a   0x00000000   Code   RO          922    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
-    0x0000016a   0x0000016a   0x00000004   Code   RO          923    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
-    0x0000016e   0x0000016e   0x00000000   Code   RO          925    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
-    0x0000016e   0x0000016e   0x00000008   Code   RO          926    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
-    0x00000176   0x00000176   0x00000002   Code   RO          966    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
-    0x00000178   0x00000178   0x00000000   Code   RO         1026    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
-    0x00000178   0x00000178   0x00000004   Code   RO         1027    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
-    0x0000017c   0x0000017c   0x00000006   Code   RO         1028    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
+    0x00000124   0x00000124   0x0000001c   Code   RO         1111    !!handler_zi        c_w.l(__scatter_zi.o)
+    0x00000140   0x00000140   0x00000000   Code   RO          833    .ARM.Collect$$_printf_percent$$00000000  c_w.l(_printf_percent.o)
+    0x00000140   0x00000140   0x00000006   Code   RO          831    .ARM.Collect$$_printf_percent$$00000009  c_w.l(_printf_d.o)
+    0x00000146   0x00000146   0x00000006   Code   RO          832    .ARM.Collect$$_printf_percent$$0000000A  c_w.l(_printf_u.o)
+    0x0000014c   0x0000014c   0x00000006   Code   RO          830    .ARM.Collect$$_printf_percent$$0000000C  c_w.l(_printf_x.o)
+    0x00000152   0x00000152   0x00000006   Code   RO          829    .ARM.Collect$$_printf_percent$$00000013  c_w.l(_printf_c.o)
+    0x00000158   0x00000158   0x00000004   Code   RO          891    .ARM.Collect$$_printf_percent$$00000017  c_w.l(_printf_percent_end.o)
+    0x0000015c   0x0000015c   0x00000002   Code   RO          968    .ARM.Collect$$libinit$$00000000  c_w.l(libinit.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          980    .ARM.Collect$$libinit$$00000002  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          982    .ARM.Collect$$libinit$$00000004  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          985    .ARM.Collect$$libinit$$0000000A  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          987    .ARM.Collect$$libinit$$0000000C  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          989    .ARM.Collect$$libinit$$0000000E  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          992    .ARM.Collect$$libinit$$00000011  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          994    .ARM.Collect$$libinit$$00000013  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          996    .ARM.Collect$$libinit$$00000015  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO          998    .ARM.Collect$$libinit$$00000017  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1000    .ARM.Collect$$libinit$$00000019  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1002    .ARM.Collect$$libinit$$0000001B  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1004    .ARM.Collect$$libinit$$0000001D  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1006    .ARM.Collect$$libinit$$0000001F  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1008    .ARM.Collect$$libinit$$00000021  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1010    .ARM.Collect$$libinit$$00000023  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1012    .ARM.Collect$$libinit$$00000025  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1016    .ARM.Collect$$libinit$$0000002C  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1018    .ARM.Collect$$libinit$$0000002E  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1020    .ARM.Collect$$libinit$$00000030  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000000   Code   RO         1022    .ARM.Collect$$libinit$$00000032  c_w.l(libinit2.o)
+    0x0000015e   0x0000015e   0x00000002   Code   RO         1023    .ARM.Collect$$libinit$$00000033  c_w.l(libinit2.o)
+    0x00000160   0x00000160   0x00000002   Code   RO         1062    .ARM.Collect$$libshutdown$$00000000  c_w.l(libshutdown.o)
+    0x00000162   0x00000162   0x00000000   Code   RO         1090    .ARM.Collect$$libshutdown$$00000002  c_w.l(libshutdown2.o)
+    0x00000162   0x00000162   0x00000000   Code   RO         1092    .ARM.Collect$$libshutdown$$00000004  c_w.l(libshutdown2.o)
+    0x00000162   0x00000162   0x00000000   Code   RO         1095    .ARM.Collect$$libshutdown$$00000007  c_w.l(libshutdown2.o)
+    0x00000162   0x00000162   0x00000000   Code   RO         1098    .ARM.Collect$$libshutdown$$0000000A  c_w.l(libshutdown2.o)
+    0x00000162   0x00000162   0x00000000   Code   RO         1100    .ARM.Collect$$libshutdown$$0000000C  c_w.l(libshutdown2.o)
+    0x00000162   0x00000162   0x00000000   Code   RO         1103    .ARM.Collect$$libshutdown$$0000000F  c_w.l(libshutdown2.o)
+    0x00000162   0x00000162   0x00000002   Code   RO         1104    .ARM.Collect$$libshutdown$$00000010  c_w.l(libshutdown2.o)
+    0x00000164   0x00000164   0x00000000   Code   RO          876    .ARM.Collect$$rtentry$$00000000  c_w.l(__rtentry.o)
+    0x00000164   0x00000164   0x00000000   Code   RO          925    .ARM.Collect$$rtentry$$00000002  c_w.l(__rtentry2.o)
+    0x00000164   0x00000164   0x00000006   Code   RO          937    .ARM.Collect$$rtentry$$00000004  c_w.l(__rtentry4.o)
+    0x0000016a   0x0000016a   0x00000000   Code   RO          927    .ARM.Collect$$rtentry$$00000009  c_w.l(__rtentry2.o)
+    0x0000016a   0x0000016a   0x00000004   Code   RO          928    .ARM.Collect$$rtentry$$0000000A  c_w.l(__rtentry2.o)
+    0x0000016e   0x0000016e   0x00000000   Code   RO          930    .ARM.Collect$$rtentry$$0000000C  c_w.l(__rtentry2.o)
+    0x0000016e   0x0000016e   0x00000008   Code   RO          931    .ARM.Collect$$rtentry$$0000000D  c_w.l(__rtentry2.o)
+    0x00000176   0x00000176   0x00000002   Code   RO          971    .ARM.Collect$$rtexit$$00000000  c_w.l(rtexit.o)
+    0x00000178   0x00000178   0x00000000   Code   RO         1031    .ARM.Collect$$rtexit$$00000002  c_w.l(rtexit2.o)
+    0x00000178   0x00000178   0x00000004   Code   RO         1032    .ARM.Collect$$rtexit$$00000003  c_w.l(rtexit2.o)
+    0x0000017c   0x0000017c   0x00000006   Code   RO         1033    .ARM.Collect$$rtexit$$00000004  c_w.l(rtexit2.o)
     0x00000182   0x00000182   0x00000002   PAD
-    0x00000184   0x00000184   0x0000003c   Code   RO          747  * .text               startup_lpc17xx.o
-    0x000001c0   0x000001c0   0x0000002c   Code   RO          771    .text               c_w.l(__2sprintf.o)
-    0x000001ec   0x000001ec   0x0000004e   Code   RO          777    .text               c_w.l(_printf_pad.o)
-    0x0000023a   0x0000023a   0x00000052   Code   RO          779    .text               c_w.l(_printf_str.o)
-    0x0000028c   0x0000028c   0x00000058   Code   RO          786    .text               c_w.l(_printf_hex_int.o)
-    0x000002e4   0x000002e4   0x00000006   Code   RO          835    .text               c_w.l(heapauxi.o)
-    0x000002ea   0x000002ea   0x0000000a   Code   RO          882    .text               c_w.l(_sputc.o)
-    0x000002f4   0x000002f4   0x00000008   Code   RO          939    .text               c_w.l(rt_errno_addr_intlibspace.o)
-    0x000002fc   0x000002fc   0x00000004   Code   RO          746    .ARM.__at_0x02FC    startup_lpc17xx.o
-    0x00000300   0x00000300   0x00000078   Code   RO          781    .text               c_w.l(_printf_dec.o)
-    0x00000378   0x00000378   0x00000188   Code   RO          821    .text               c_w.l(__printf_flags_ss_wp.o)
-    0x00000500   0x00000500   0x0000003e   Code   RO          829    .text               c_w.l(strlen.o)
-    0x0000053e   0x0000053e   0x0000008a   Code   RO          831    .text               c_w.l(rt_memcpy_v6.o)
-    0x000005c8   0x000005c8   0x00000064   Code   RO          833    .text               c_w.l(rt_memcpy_w.o)
-    0x0000062c   0x0000062c   0x00000016   Code   RO          876    .text               c_w.l(_rserrno.o)
-    0x00000642   0x00000642   0x000000b2   Code   RO          878    .text               c_w.l(_printf_intcommon.o)
-    0x000006f4   0x000006f4   0x00000030   Code   RO          880    .text               c_w.l(_printf_char_common.o)
-    0x00000724   0x00000724   0x0000002c   Code   RO          884    .text               c_w.l(_printf_char.o)
-    0x00000750   0x00000750   0x00000008   Code   RO          947    .text               c_w.l(libspace.o)
-    0x00000758   0x00000758   0x0000004a   Code   RO          950    .text               c_w.l(sys_stackheap_outer.o)
-    0x000007a2   0x000007a2   0x00000012   Code   RO          952    .text               c_w.l(exit.o)
-    0x000007b4   0x000007b4   0x0000000c   Code   RO         1021    .text               c_w.l(sys_exit.o)
-    0x000007c0   0x000007c0   0x00000002   Code   RO         1046    .text               c_w.l(use_no_semi.o)
-    0x000007c2   0x000007c2   0x00000000   Code   RO         1048    .text               c_w.l(indicate_semi.o)
+    0x00000184   0x00000184   0x0000003c   Code   RO          752  * .text               startup_lpc17xx.o
+    0x000001c0   0x000001c0   0x0000002c   Code   RO          776    .text               c_w.l(__2sprintf.o)
+    0x000001ec   0x000001ec   0x0000004e   Code   RO          782    .text               c_w.l(_printf_pad.o)
+    0x0000023a   0x0000023a   0x00000052   Code   RO          784    .text               c_w.l(_printf_str.o)
+    0x0000028c   0x0000028c   0x00000058   Code   RO          791    .text               c_w.l(_printf_hex_int.o)
+    0x000002e4   0x000002e4   0x00000006   Code   RO          840    .text               c_w.l(heapauxi.o)
+    0x000002ea   0x000002ea   0x0000000a   Code   RO          887    .text               c_w.l(_sputc.o)
+    0x000002f4   0x000002f4   0x00000008   Code   RO          944    .text               c_w.l(rt_errno_addr_intlibspace.o)
+    0x000002fc   0x000002fc   0x00000004   Code   RO          751    .ARM.__at_0x02FC    startup_lpc17xx.o
+    0x00000300   0x00000300   0x00000078   Code   RO          786    .text               c_w.l(_printf_dec.o)
+    0x00000378   0x00000378   0x00000188   Code   RO          826    .text               c_w.l(__printf_flags_ss_wp.o)
+    0x00000500   0x00000500   0x0000003e   Code   RO          834    .text               c_w.l(strlen.o)
+    0x0000053e   0x0000053e   0x0000008a   Code   RO          836    .text               c_w.l(rt_memcpy_v6.o)
+    0x000005c8   0x000005c8   0x00000064   Code   RO          838    .text               c_w.l(rt_memcpy_w.o)
+    0x0000062c   0x0000062c   0x00000016   Code   RO          881    .text               c_w.l(_rserrno.o)
+    0x00000642   0x00000642   0x000000b2   Code   RO          883    .text               c_w.l(_printf_intcommon.o)
+    0x000006f4   0x000006f4   0x00000030   Code   RO          885    .text               c_w.l(_printf_char_common.o)
+    0x00000724   0x00000724   0x0000002c   Code   RO          889    .text               c_w.l(_printf_char.o)
+    0x00000750   0x00000750   0x00000008   Code   RO          952    .text               c_w.l(libspace.o)
+    0x00000758   0x00000758   0x0000004a   Code   RO          955    .text               c_w.l(sys_stackheap_outer.o)
+    0x000007a2   0x000007a2   0x00000012   Code   RO          957    .text               c_w.l(exit.o)
+    0x000007b4   0x000007b4   0x0000000c   Code   RO         1026    .text               c_w.l(sys_exit.o)
+    0x000007c0   0x000007c0   0x00000002   Code   RO         1051    .text               c_w.l(use_no_semi.o)
+    0x000007c2   0x000007c2   0x00000000   Code   RO         1053    .text               c_w.l(indicate_semi.o)
     0x000007c2   0x000007c2   0x00000002   PAD
     0x000007c4   0x000007c4   0x000001ce   Code   RO           20    .text.ADC_IRQHandler  adc.o
     0x00000992   0x00000992   0x00000002   PAD
@@ -3198,16 +3216,16 @@ Memory Map of the image
     0x00000a6a   0x00000a6a   0x00000002   PAD
     0x00000a6c   0x00000a6c   0x0000000a   Code   RO          186    .text.SysTick_Handler  interruptions.o
     0x00000a76   0x00000a76   0x00000002   PAD
-    0x00000a78   0x00000a78   0x000000cc   Code   RO          758    .text.SystemInit    system_lpc17xx.o
+    0x00000a78   0x00000a78   0x000000cc   Code   RO          763    .text.SystemInit    system_lpc17xx.o
     0x00000b44   0x00000b44   0x00000008   Code   RO          192    .text.TIMER0_IRQHandler  interruptions.o
-    0x00000b4c   0x00000b4c   0x00000076   Code   RO          617    .text.TIMER1_IRQHandler  beepermethods.o
+    0x00000b4c   0x00000b4c   0x00000076   Code   RO          622    .text.TIMER1_IRQHandler  beepermethods.o
     0x00000bc2   0x00000bc2   0x00000002   PAD
     0x00000bc4   0x00000bc4   0x00000008   Code   RO          194    .text.TIMER3_IRQHandler  interruptions.o
     0x00000bcc   0x00000bcc   0x0000001a   Code   RO          383    .text.TOP_CLK       recep_spi.o
     0x00000be6   0x00000be6   0x00000002   PAD
     0x00000be8   0x00000be8   0x00000028   Code   RO           12    .text.__NVIC_DisableIRQ  adc.o
     0x00000c10   0x00000c10   0x00000028   Code   RO           73    .text.__NVIC_DisableIRQ  capteur_inductif.o
-    0x00000c38   0x00000c38   0x00000016   Code   RO          714    .text.__NVIC_DisableIRQ  stepper.o
+    0x00000c38   0x00000c38   0x00000016   Code   RO          719    .text.__NVIC_DisableIRQ  stepper.o
     0x00000c4e   0x00000c4e   0x00000002   PAD
     0x00000c50   0x00000c50   0x00000020   Code   RO            6    .text.__NVIC_EnableIRQ  adc.o
     0x00000c70   0x00000c70   0x00000010   Code   RO           38    .text.__NVIC_EnableIRQ  buttons.o
@@ -3217,10 +3235,10 @@ Memory Map of the image
     0x00000cc0   0x00000cc0   0x00000010   Code   RO          294    .text.__NVIC_EnableIRQ  proximetre.o
     0x00000cd0   0x00000cd0   0x00000010   Code   RO          363    .text.__NVIC_EnableIRQ  recep_spi.o
     0x00000ce0   0x00000ce0   0x00000020   Code   RO          536    .text.__NVIC_EnableIRQ  timers.o
-    0x00000d00   0x00000d00   0x00000010   Code   RO          640    .text.__NVIC_EnableIRQ  ultrason_recep.o
-    0x00000d10   0x00000d10   0x0000000e   Code   RO          692    .text.__NVIC_EnableIRQ  son.o
+    0x00000d00   0x00000d00   0x00000010   Code   RO          645    .text.__NVIC_EnableIRQ  ultrason_recep.o
+    0x00000d10   0x00000d10   0x0000000e   Code   RO          697    .text.__NVIC_EnableIRQ  son.o
     0x00000d1e   0x00000d1e   0x00000002   PAD
-    0x00000d20   0x00000d20   0x0000000e   Code   RO          716    .text.__NVIC_EnableIRQ  stepper.o
+    0x00000d20   0x00000d20   0x0000000e   Code   RO          721    .text.__NVIC_EnableIRQ  stepper.o
     0x00000d2e   0x00000d2e   0x00000002   PAD
     0x00000d30   0x00000d30   0x00000022   Code   RO            4    .text.__NVIC_SetPriority  adc.o
     0x00000d52   0x00000d52   0x00000002   PAD
@@ -3241,7 +3259,7 @@ Memory Map of the image
     0x00000f3a   0x00000f3a   0x00000002   PAD
     0x00000f3c   0x00000f3c   0x0000004e   Code   RO           18    .text.adc_start_inductif_sequence  adc.o
     0x00000f8a   0x00000f8a   0x00000002   PAD
-    0x00000f8c   0x00000f8c   0x0000022c   Code   RO          582    .text.asservissement_update  asservissement.o
+    0x00000f8c   0x00000f8c   0x0000022c   Code   RO          587    .text.asservissement_update  asservissement.o
     0x000011b8   0x000011b8   0x0000002e   Code   RO           40    .text.buttons_interrupt_routine  buttons.o
     0x000011e6   0x000011e6   0x00000002   PAD
     0x000011e8   0x000011e8   0x00000042   Code   RO          371    .text.calc_filtered_velocity  recep_spi.o
@@ -3251,26 +3269,26 @@ Memory Map of the image
     0x00001350   0x00001350   0x00000026   Code   RO           67    .text.capteur_inductif_receive_wire_command  capteur_inductif.o
     0x00001376   0x00001376   0x00000002   PAD
     0x00001378   0x00001378   0x0000025c   Code   RO           71    .text.capteur_inductif_update  capteur_inductif.o
-    0x000015d4   0x000015d4   0x00000018   Code   RO          605    .text.changeDist    beepermethods.o
+    0x000015d4   0x000015d4   0x00000018   Code   RO          610    .text.changeDist    beepermethods.o
     0x000015ec   0x000015ec   0x00000008   Code   RO          247    .text.changer_pwm_moteurs  moteur.o
-    0x000015f4   0x000015f4   0x0000002a   Code   RO          584    .text.clampf        asservissement.o
+    0x000015f4   0x000015f4   0x0000002a   Code   RO          589    .text.clampf        asservissement.o
     0x0000161e   0x0000161e   0x00000002   PAD
     0x00001620   0x00001620   0x00000168   Code   RO           75    .text.debug_inductif_send_frame  capteur_inductif.o
     0x00001788   0x00001788   0x00000050   Code   RO          261    .text.debug_moteurs_send_frame  moteur.o
     0x000017d8   0x000017d8   0x00000080   Code   RO          306    .text.debug_proximetre_send_frame  proximetre.o
     0x00001858   0x00001858   0x0000018c   Code   RO          102    .text.decode_enveloppe_commande  decode_enveloppe.o
     0x000019e4   0x000019e4   0x000000c0   Code   RO          112    .text.decode_enveloppe_process_command  decode_enveloppe.o
-    0x00001aa4   0x00001aa4   0x00000070   Code   RO          634    .text.decoder       ultrason_recep.o
+    0x00001aa4   0x00001aa4   0x00000070   Code   RO          639    .text.decoder       ultrason_recep.o
     0x00001b14   0x00001b14   0x0000001c   Code   RO          215    .text.delay_cd4015  led_register.o
     0x00001b30   0x00001b30   0x0000002a   Code   RO          292    .text.delay_ms      proximetre.o
     0x00001b5a   0x00001b5a   0x00000002   PAD
     0x00001b5c   0x00001b5c   0x000000c0   Code   RO          298    .text.distance_cm   proximetre.o
     0x00001c1c   0x00001c1c   0x0000005c   Code   RO          143    .text.dtmf_interrupt_routine  dtmf.o
     0x00001c78   0x00001c78   0x0000000c   Code   RO          137    .text.dtmf_service  dtmf.o
-    0x00001c84   0x00001c84   0x0000000a   Code   RO          632    .text.duree_us      ultrason_recep.o
+    0x00001c84   0x00001c84   0x0000000a   Code   RO          637    .text.duree_us      ultrason_recep.o
     0x00001c8e   0x00001c8e   0x00000002   PAD
     0x00001c90   0x00001c90   0x00000010   Code   RO          172    .text.emission_ir_interrupt_routine  emission_ir.o
-    0x00001ca0   0x00001ca0   0x0000001c   Code   RO          607    .text.freqChanged   beepermethods.o
+    0x00001ca0   0x00001ca0   0x0000001c   Code   RO          612    .text.freqChanged   beepermethods.o
     0x00001cbc   0x00001cbc   0x00000030   Code   RO          444    .text.get_capteur_averages  robot_state.o
     0x00001cec   0x00001cec   0x0000000c   Code   RO           69    .text.get_envelope_period_us  capteur_inductif.o
     0x00001cf8   0x00001cf8   0x0000000c   Code   RO          464    .text.get_flag_50hz  robot_state.o
@@ -3322,7 +3340,7 @@ Memory Map of the image
     0x000021dc   0x000021dc   0x00000008   Code   RO          168    .text.init_timer_enveloppe  emission_ir.o
     0x000021e4   0x000021e4   0x0000007a   Code   RO          566    .text.init_uart0    uart.o
     0x0000225e   0x0000225e   0x00000002   PAD
-    0x00002260   0x00002260   0x0000005e   Code   RO          638    .text.init_ultrason_recep  ultrason_recep.o
+    0x00002260   0x00002260   0x0000005e   Code   RO          643    .text.init_ultrason_recep  ultrason_recep.o
     0x000022be   0x000022be   0x00000002   PAD
     0x000022c0   0x000022c0   0x00000016   Code   RO          108    .text.is_nord_symbol  decode_enveloppe.o
     0x000022d6   0x000022d6   0x00000002   PAD
@@ -3333,237 +3351,237 @@ Memory Map of the image
     0x00002304   0x00002304   0x00000018   Code   RO          209    .text.led_register_clr  led_register.o
     0x0000231c   0x0000231c   0x00000016   Code   RO          207    .text.led_register_set  led_register.o
     0x00002332   0x00002332   0x00000002   PAD
-    0x00002334   0x00002334   0x00000128   Code   RO          226    .text.main          main.o
-    0x0000245c   0x0000245c   0x00000026   Code   RO          257    .text.moteurs_interrupt_routine  moteur.o
-    0x00002482   0x00002482   0x00000002   PAD
-    0x00002484   0x00002484   0x00000026   Code   RO          259    .text.moteurs_receive_wire_command  moteur.o
-    0x000024aa   0x000024aa   0x00000002   PAD
-    0x000024ac   0x000024ac   0x000000b4   Code   RO          263    .text.moteurs_send_frame  moteur.o
-    0x00002560   0x00002560   0x00000024   Code   RO          253    .text.moteurs_update_mode_from_gpio  moteur.o
-    0x00002584   0x00002584   0x00000058   Code   RO          104    .text.period_us_to_symbol  decode_enveloppe.o
-    0x000025dc   0x000025dc   0x00000092   Code   RO          170    .text.preparer_trame  emission_ir.o
-    0x0000266e   0x0000266e   0x00000002   PAD
-    0x00002670   0x00002670   0x00000156   Code   RO          139    .text.process_dtmf_commands  dtmf.o
-    0x000027c6   0x000027c6   0x00000002   PAD
-    0x000027c8   0x000027c8   0x000001e4   Code   RO          296    .text.proximetre_run_balayage  proximetre.o
-    0x000029ac   0x000029ac   0x00000054   Code   RO          278    .text.proximetre_timer_interrupt_routine  proximetre.o
-    0x00002a00   0x00002a00   0x00000024   Code   RO          288    .text.proximetre_update_mode_from_gpio  proximetre.o
-    0x00002a24   0x00002a24   0x00000012   Code   RO          347    .text.pwm_disable_ir_output  pwm.o
-    0x00002a36   0x00002a36   0x00000002   PAD
-    0x00002a38   0x00002a38   0x00000012   Code   RO          345    .text.pwm_enable_ir_output  pwm.o
-    0x00002a4a   0x00002a4a   0x00000002   PAD
-    0x00002a4c   0x00002a4c   0x0000006e   Code   RO          343    .text.pwm_init_ir   pwm.o
-    0x00002aba   0x00002aba   0x00000002   PAD
-    0x00002abc   0x00002abc   0x0000007c   Code   RO          335    .text.pwm_init_moteurs  pwm.o
-    0x00002b38   0x00002b38   0x0000001a   Code   RO          349    .text.pwm_reset_counter_ir  pwm.o
-    0x00002b52   0x00002b52   0x00000002   PAD
-    0x00002b54   0x00002b54   0x00000048   Code   RO          341    .text.pwm_set_moteurs  pwm.o
-    0x00002b9c   0x00002b9c   0x0000001c   Code   RO          586    .text.pwm_to_u8     asservissement.o
-    0x00002bb8   0x00002bb8   0x000000b0   Code   RO          367    .text.read_spi_channel  recep_spi.o
-    0x00002c68   0x00002c68   0x0000008a   Code   RO          365    .text.recep_spi_interrupt_routine  recep_spi.o
-    0x00002cf2   0x00002cf2   0x00000002   PAD
-    0x00002cf4   0x00002cf4   0x0000002e   Code   RO          290    .text.servo_set_angle  proximetre.o
-    0x00002d22   0x00002d22   0x00000002   PAD
-    0x00002d24   0x00002d24   0x0000000c   Code   RO          462    .text.set_flag_50hz  robot_state.o
-    0x00002d30   0x00002d30   0x0000000c   Code   RO          478    .text.set_ir_frame_counter  robot_state.o
-    0x00002d3c   0x00002d3c   0x0000000c   Code   RO          470    .text.set_ir_seq_index  robot_state.o
-    0x00002d48   0x00002d48   0x0000000c   Code   RO          474    .text.set_ir_seq_length  robot_state.o
-    0x00002d54   0x00002d54   0x00000010   Code   RO          466    .text.set_ir_sequence_at  robot_state.o
-    0x00002d64   0x00002d64   0x00000016   Code   RO          434    .text.set_motor_pwms  robot_state.o
-    0x00002d7a   0x00002d7a   0x00000002   PAD
-    0x00002d7c   0x00002d7c   0x00000016   Code   RO          438    .text.set_motor_speeds  robot_state.o
-    0x00002d92   0x00002d92   0x00000002   PAD
-    0x00002d94   0x00002d94   0x0000002c   Code   RO          450    .text.set_proxi_distance_at_angle  robot_state.o
-    0x00002dc0   0x00002dc0   0x00000010   Code   RO          404    .text.set_robot_number  robot_state.o
-    0x00002dd0   0x00002dd0   0x0000000c   Code   RO          430    .text.set_robot_status  robot_state.o
-    0x00002ddc   0x00002ddc   0x00000054   Code   RO          520    .text.set_status_led  status.o
-    0x00002e30   0x00002e30   0x0000000c   Code   RO          408    .text.set_vitesse_centrale  robot_state.o
-    0x00002e3c   0x00002e3c   0x0000000c   Code   RO          412    .text.set_vitesse_commande  robot_state.o
-    0x00002e48   0x00002e48   0x0000001e   Code   RO          422    .text.set_wire_measure  robot_state.o
-    0x00002e66   0x00002e66   0x00000002   PAD
-    0x00002e68   0x00002e68   0x00000038   Code   RO          454    .text.set_wire_trame  robot_state.o
-    0x00002ea0   0x00002ea0   0x00000076   Code   RO          690    .text.son_init      son.o
-    0x00002f16   0x00002f16   0x00000002   PAD
-    0x00002f18   0x00002f18   0x0000001c   Code   RO          379    .text.spi_delay     recep_spi.o
-    0x00002f34   0x00002f34   0x0000004e   Code   RO          611    .text.startBeep     beepermethods.o
-    0x00002f82   0x00002f82   0x00000002   PAD
-    0x00002f84   0x00002f84   0x00000014   Code   RO          369    .text.step_to_distance  recep_spi.o
-    0x00002f98   0x00002f98   0x00000080   Code   RO          708    .text.stepper_init  stepper.o
-    0x00003018   0x00003018   0x000000a8   Code   RO          722    .text.stepper_move_to  stepper.o
-    0x000030c0   0x000030c0   0x00000010   Code   RO          710    .text.stepper_off   stepper.o
-    0x000030d0   0x000030d0   0x0000003a   Code   RO          712    .text.stepper_set_zero_manually  stepper.o
-    0x0000310a   0x0000310a   0x00000002   PAD
-    0x0000310c   0x0000310c   0x00000050   Code   RO          724    .text.stepper_show_letter  stepper.o
-    0x0000315c   0x0000315c   0x00000032   Code   RO          603    .text.stopBeep      beepermethods.o
-    0x0000318e   0x0000318e   0x00000002   PAD
-    0x00003190   0x00003190   0x0000000e   Code   RO          670    .text.suivi_fil_force_entrelacement  suivi_fil.o
-    0x0000319e   0x0000319e   0x00000002   PAD
-    0x000031a0   0x000031a0   0x00000036   Code   RO          666    .text.suivi_fil_update_distances  suivi_fil.o
-    0x000031d6   0x000031d6   0x00000002   PAD
-    0x000031d8   0x000031d8   0x000000b0   Code   RO          668    .text.suivi_fil_update_state_machine  suivi_fil.o
-    0x00003288   0x00003288   0x00000046   Code   RO          534    .text.timer0_init   timers.o
-    0x000032ce   0x000032ce   0x00000002   PAD
-    0x000032d0   0x000032d0   0x00000012   Code   RO          538    .text.timer0_start  timers.o
-    0x000032e2   0x000032e2   0x00000002   PAD
-    0x000032e4   0x000032e4   0x0000000a   Code   RO          544    .text.timer2_get_tc  timers.o
-    0x000032ee   0x000032ee   0x00000002   PAD
-    0x000032f0   0x000032f0   0x0000002e   Code   RO          542    .text.timer2_init_free_running  timers.o
-    0x0000331e   0x0000331e   0x00000002   PAD
-    0x00003320   0x00003320   0x0000000c   Code   RO          556    .text.timer3_clear_interrupt  timers.o
-    0x0000332c   0x0000332c   0x0000000c   Code   RO          550    .text.timer3_get_match0  timers.o
-    0x00003338   0x00003338   0x0000000c   Code   RO          548    .text.timer3_get_tc  timers.o
-    0x00003344   0x00003344   0x00000050   Code   RO          546    .text.timer3_init_servo  timers.o
-    0x00003394   0x00003394   0x0000000c   Code   RO          552    .text.timer3_set_match0  timers.o
-    0x000033a0   0x000033a0   0x0000000c   Code   RO          554    .text.timer3_set_match1  timers.o
-    0x000033ac   0x000033ac   0x00000012   Code   RO          568    .text.uart0_send_char  uart.o
-    0x000033be   0x000033be   0x00000002   PAD
-    0x000033c0   0x000033c0   0x00000028   Code   RO          570    .text.uart0_send_string  uart.o
-    0x000033e8   0x000033e8   0x000000a8   Code   RO          630    .text.ultrason_decode_edge  ultrason_recep.o
-    0x00003490   0x00003490   0x00000030   Code   RO          636    .text.ultrason_decode_timeout  ultrason_recep.o
-    0x000034c0   0x000034c0   0x00000040   Code   RO          642    .text.ultrason_recep_interrupt_routine  ultrason_recep.o
-    0x00003500   0x00003500   0x00000036   Code   RO          646    .text.ultrason_recep_lire  ultrason_recep.o
-    0x00003536   0x00003536   0x00000002   PAD
-    0x00003538   0x00003538   0x0000000c   Code   RO          644    .text.ultrason_recep_tick  ultrason_recep.o
-    0x00003544   0x00003544   0x000000a0   Code   RO          174    .text.update_pwm_state  emission_ir.o
-    0x000035e4   0x000035e4   0x00000038   Code   RO          402    .text.update_robot_id_from_hardware  robot_state.o
-    0x0000361c   0x0000361c   0x00000048   Code   RO          205    .text.update_shift_register  led_register.o
-    0x00003664   0x00003664   0x0000004c   Code   RO          141    .text.update_status_leds  dtmf.o
-    0x000036b0   0x000036b0   0x0000002c   Code   RO           65    .text.update_switch_mode_from_gpio  capteur_inductif.o
-    0x000036dc   0x000036dc   0x00000026   Code   RO          900    i.__ARM_fpclassifyf  m_ws.l(fpclassifyf.o)
-    0x00003702   0x00003702   0x00000006   Code   RO          903    i.__mathlib_flt_infnan  m_ws.l(funder.o)
-    0x00003708   0x00003708   0x00000008   Code   RO          905    i.__mathlib_flt_invalid  m_ws.l(funder.o)
-    0x00003710   0x00003710   0x0000000a   Code   RO          908    i.__mathlib_flt_underflow  m_ws.l(funder.o)
-    0x0000371a   0x0000371a   0x00000002   PAD
-    0x0000371c   0x0000371c   0x00000168   Code   RO          916    i.__mathlib_rredf2  m_ws.l(rredf.o)
-    0x00003884   0x00003884   0x0000000e   Code   RO          814    i._is_digit         c_w.l(__printf_wp.o)
-    0x00003892   0x00003892   0x00000002   PAD
-    0x00003894   0x00003894   0x00000188   Code   RO          864    i.sinf              m_ws.l(sinf.o)
-    0x00003a1c   0x00003a1c   0x000000c4   Code   RO          839    x$fpl$fadd          fz_ws.l(faddsub_clz.o)
-    0x00003ae0   0x00003ae0   0x0000000c   Code   RO          964    x$fpl$fcheck1       fz_ws.l(fcheck1.o)
-    0x00003aec   0x00003aec   0x00000054   Code   RO          845    x$fpl$fcmp          fz_ws.l(fcmp.o)
-    0x00003b40   0x00003b40   0x00000018   Code   RO          943    x$fpl$fcmpinf       fz_ws.l(fcmpi.o)
-    0x00003b58   0x00003b58   0x00000184   Code   RO          848    x$fpl$fdiv          fz_ws.l(fdiv.o)
-    0x00003cdc   0x00003cdc   0x00000068   Code   RO          887    x$fpl$feqf          fz_ws.l(feqf.o)
-    0x00003d44   0x00003d44   0x00000036   Code   RO          851    x$fpl$ffix          fz_ws.l(ffix.o)
-    0x00003d7a   0x00003d7a   0x00000002   PAD
-    0x00003d7c   0x00003d7c   0x00000030   Code   RO          856    x$fpl$fflt          fz_ws.l(fflt_clz.o)
-    0x00003dac   0x00003dac   0x00000026   Code   RO          855    x$fpl$ffltu         fz_ws.l(fflt_clz.o)
-    0x00003dd2   0x00003dd2   0x00000002   PAD
-    0x00003dd4   0x00003dd4   0x00000068   Code   RO          889    x$fpl$fgeqf         fz_ws.l(fgeqf.o)
-    0x00003e3c   0x00003e3c   0x00000068   Code   RO          891    x$fpl$fleqf         fz_ws.l(fleqf.o)
-    0x00003ea4   0x00003ea4   0x00000102   Code   RO          861    x$fpl$fmul          fz_ws.l(fmul.o)
-    0x00003fa6   0x00003fa6   0x0000008c   Code   RO          893    x$fpl$fnaninf       fz_ws.l(fnaninf.o)
-    0x00004032   0x00004032   0x0000000a   Code   RO          895    x$fpl$fretinf       fz_ws.l(fretinf.o)
-    0x0000403c   0x0000403c   0x00000060   Code   RO          897    x$fpl$frnd          fz_ws.l(frnd.o)
-    0x0000409c   0x0000409c   0x00000014   Code   RO          840    x$fpl$frsb          fz_ws.l(faddsub_clz.o)
-    0x000040b0   0x000040b0   0x000000ea   Code   RO          841    x$fpl$fsub          fz_ws.l(faddsub_clz.o)
-    0x0000419a   0x0000419a   0x00000064   Code   RO         1019    x$fpl$retnan        fz_ws.l(retnan.o)
-    0x000041fe   0x000041fe   0x0000004c   Code   RO          945    x$fpl$scalbnf       fz_ws.l(scalbnf.o)
-    0x0000424a   0x0000424a   0x00000030   Code   RO         1040    x$fpl$trapveneer    fz_ws.l(trapv.o)
-    0x0000427a   0x0000427a   0x00000000   Code   RO          899    x$fpl$usenofp       fz_ws.l(usenofp.o)
-    0x0000427a   0x0000427a   0x00000028   Data   RO          787    .constdata          c_w.l(_printf_hex_int.o)
-    0x000042a2   0x000042a2   0x00000011   Data   RO          822    .constdata          c_w.l(__printf_flags_ss_wp.o)
-    0x000042b3   0x000042b3   0x00000001   PAD
-    0x000042b4   0x000042b4   0x00000020   Data   RO          917    .constdata          m_ws.l(rredf.o)
-    0x000042d4   0x000042d4   0x00000038   Data   RO          326    .rodata.LUT_CM      proximetre.o
-    0x0000430c   0x0000430c   0x00000038   Data   RO          325    .rodata.LUT_V       proximetre.o
-    0x00004344   0x00004344   0x00000020   Data   RO          317    .rodata.cst32       proximetre.o
-    0x00004364   0x00004364   0x00000020   Data   RO         1101    Region$$Table       anon$$obj.o
+    0x00002334   0x00002334   0x0000012c   Code   RO          226    .text.main          main.o
+    0x00002460   0x00002460   0x00000026   Code   RO          257    .text.moteurs_interrupt_routine  moteur.o
+    0x00002486   0x00002486   0x00000002   PAD
+    0x00002488   0x00002488   0x00000026   Code   RO          259    .text.moteurs_receive_wire_command  moteur.o
+    0x000024ae   0x000024ae   0x00000002   PAD
+    0x000024b0   0x000024b0   0x000000b4   Code   RO          263    .text.moteurs_send_frame  moteur.o
+    0x00002564   0x00002564   0x00000024   Code   RO          253    .text.moteurs_update_mode_from_gpio  moteur.o
+    0x00002588   0x00002588   0x00000058   Code   RO          104    .text.period_us_to_symbol  decode_enveloppe.o
+    0x000025e0   0x000025e0   0x00000092   Code   RO          170    .text.preparer_trame  emission_ir.o
+    0x00002672   0x00002672   0x00000002   PAD
+    0x00002674   0x00002674   0x00000156   Code   RO          139    .text.process_dtmf_commands  dtmf.o
+    0x000027ca   0x000027ca   0x00000002   PAD
+    0x000027cc   0x000027cc   0x000001e4   Code   RO          296    .text.proximetre_run_balayage  proximetre.o
+    0x000029b0   0x000029b0   0x00000054   Code   RO          278    .text.proximetre_timer_interrupt_routine  proximetre.o
+    0x00002a04   0x00002a04   0x00000024   Code   RO          288    .text.proximetre_update_mode_from_gpio  proximetre.o
+    0x00002a28   0x00002a28   0x00000012   Code   RO          347    .text.pwm_disable_ir_output  pwm.o
+    0x00002a3a   0x00002a3a   0x00000002   PAD
+    0x00002a3c   0x00002a3c   0x00000012   Code   RO          345    .text.pwm_enable_ir_output  pwm.o
+    0x00002a4e   0x00002a4e   0x00000002   PAD
+    0x00002a50   0x00002a50   0x0000006e   Code   RO          343    .text.pwm_init_ir   pwm.o
+    0x00002abe   0x00002abe   0x00000002   PAD
+    0x00002ac0   0x00002ac0   0x0000007c   Code   RO          335    .text.pwm_init_moteurs  pwm.o
+    0x00002b3c   0x00002b3c   0x0000001a   Code   RO          349    .text.pwm_reset_counter_ir  pwm.o
+    0x00002b56   0x00002b56   0x00000002   PAD
+    0x00002b58   0x00002b58   0x00000048   Code   RO          341    .text.pwm_set_moteurs  pwm.o
+    0x00002ba0   0x00002ba0   0x0000001c   Code   RO          591    .text.pwm_to_u8     asservissement.o
+    0x00002bbc   0x00002bbc   0x000000b0   Code   RO          367    .text.read_spi_channel  recep_spi.o
+    0x00002c6c   0x00002c6c   0x0000008a   Code   RO          365    .text.recep_spi_interrupt_routine  recep_spi.o
+    0x00002cf6   0x00002cf6   0x00000002   PAD
+    0x00002cf8   0x00002cf8   0x0000002e   Code   RO          290    .text.servo_set_angle  proximetre.o
+    0x00002d26   0x00002d26   0x00000002   PAD
+    0x00002d28   0x00002d28   0x0000000c   Code   RO          462    .text.set_flag_50hz  robot_state.o
+    0x00002d34   0x00002d34   0x0000000c   Code   RO          478    .text.set_ir_frame_counter  robot_state.o
+    0x00002d40   0x00002d40   0x0000000c   Code   RO          470    .text.set_ir_seq_index  robot_state.o
+    0x00002d4c   0x00002d4c   0x0000000c   Code   RO          474    .text.set_ir_seq_length  robot_state.o
+    0x00002d58   0x00002d58   0x00000010   Code   RO          466    .text.set_ir_sequence_at  robot_state.o
+    0x00002d68   0x00002d68   0x00000016   Code   RO          434    .text.set_motor_pwms  robot_state.o
+    0x00002d7e   0x00002d7e   0x00000002   PAD
+    0x00002d80   0x00002d80   0x00000016   Code   RO          438    .text.set_motor_speeds  robot_state.o
+    0x00002d96   0x00002d96   0x00000002   PAD
+    0x00002d98   0x00002d98   0x0000002c   Code   RO          450    .text.set_proxi_distance_at_angle  robot_state.o
+    0x00002dc4   0x00002dc4   0x00000010   Code   RO          404    .text.set_robot_number  robot_state.o
+    0x00002dd4   0x00002dd4   0x0000000c   Code   RO          430    .text.set_robot_status  robot_state.o
+    0x00002de0   0x00002de0   0x00000054   Code   RO          520    .text.set_status_led  status.o
+    0x00002e34   0x00002e34   0x0000000c   Code   RO          408    .text.set_vitesse_centrale  robot_state.o
+    0x00002e40   0x00002e40   0x0000000c   Code   RO          412    .text.set_vitesse_commande  robot_state.o
+    0x00002e4c   0x00002e4c   0x0000001e   Code   RO          422    .text.set_wire_measure  robot_state.o
+    0x00002e6a   0x00002e6a   0x00000002   PAD
+    0x00002e6c   0x00002e6c   0x00000038   Code   RO          454    .text.set_wire_trame  robot_state.o
+    0x00002ea4   0x00002ea4   0x00000076   Code   RO          695    .text.son_init      son.o
+    0x00002f1a   0x00002f1a   0x00000002   PAD
+    0x00002f1c   0x00002f1c   0x0000001c   Code   RO          379    .text.spi_delay     recep_spi.o
+    0x00002f38   0x00002f38   0x0000004e   Code   RO          616    .text.startBeep     beepermethods.o
+    0x00002f86   0x00002f86   0x00000002   PAD
+    0x00002f88   0x00002f88   0x00000014   Code   RO          369    .text.step_to_distance  recep_spi.o
+    0x00002f9c   0x00002f9c   0x00000080   Code   RO          713    .text.stepper_init  stepper.o
+    0x0000301c   0x0000301c   0x000000a8   Code   RO          727    .text.stepper_move_to  stepper.o
+    0x000030c4   0x000030c4   0x00000010   Code   RO          715    .text.stepper_off   stepper.o
+    0x000030d4   0x000030d4   0x0000003a   Code   RO          717    .text.stepper_set_zero_manually  stepper.o
+    0x0000310e   0x0000310e   0x00000002   PAD
+    0x00003110   0x00003110   0x00000050   Code   RO          729    .text.stepper_show_letter  stepper.o
+    0x00003160   0x00003160   0x00000032   Code   RO          608    .text.stopBeep      beepermethods.o
+    0x00003192   0x00003192   0x00000002   PAD
+    0x00003194   0x00003194   0x0000000e   Code   RO          675    .text.suivi_fil_force_entrelacement  suivi_fil.o
+    0x000031a2   0x000031a2   0x00000002   PAD
+    0x000031a4   0x000031a4   0x00000036   Code   RO          671    .text.suivi_fil_update_distances  suivi_fil.o
+    0x000031da   0x000031da   0x00000002   PAD
+    0x000031dc   0x000031dc   0x000000b0   Code   RO          673    .text.suivi_fil_update_state_machine  suivi_fil.o
+    0x0000328c   0x0000328c   0x00000046   Code   RO          534    .text.timer0_init   timers.o
+    0x000032d2   0x000032d2   0x00000002   PAD
+    0x000032d4   0x000032d4   0x00000012   Code   RO          538    .text.timer0_start  timers.o
+    0x000032e6   0x000032e6   0x00000002   PAD
+    0x000032e8   0x000032e8   0x0000000a   Code   RO          544    .text.timer2_get_tc  timers.o
+    0x000032f2   0x000032f2   0x00000002   PAD
+    0x000032f4   0x000032f4   0x0000002e   Code   RO          542    .text.timer2_init_free_running  timers.o
+    0x00003322   0x00003322   0x00000002   PAD
+    0x00003324   0x00003324   0x0000000c   Code   RO          556    .text.timer3_clear_interrupt  timers.o
+    0x00003330   0x00003330   0x0000000c   Code   RO          550    .text.timer3_get_match0  timers.o
+    0x0000333c   0x0000333c   0x0000000c   Code   RO          548    .text.timer3_get_tc  timers.o
+    0x00003348   0x00003348   0x00000050   Code   RO          546    .text.timer3_init_servo  timers.o
+    0x00003398   0x00003398   0x0000000c   Code   RO          552    .text.timer3_set_match0  timers.o
+    0x000033a4   0x000033a4   0x0000000c   Code   RO          554    .text.timer3_set_match1  timers.o
+    0x000033b0   0x000033b0   0x00000040   Code   RO          570    .text.uart0_send_char  uart.o
+    0x000033f0   0x000033f0   0x0000001c   Code   RO          572    .text.uart0_send_string  uart.o
+    0x0000340c   0x0000340c   0x00000040   Code   RO          568    .text.uart0_update  uart.o
+    0x0000344c   0x0000344c   0x000000a8   Code   RO          635    .text.ultrason_decode_edge  ultrason_recep.o
+    0x000034f4   0x000034f4   0x00000030   Code   RO          641    .text.ultrason_decode_timeout  ultrason_recep.o
+    0x00003524   0x00003524   0x00000040   Code   RO          647    .text.ultrason_recep_interrupt_routine  ultrason_recep.o
+    0x00003564   0x00003564   0x00000036   Code   RO          651    .text.ultrason_recep_lire  ultrason_recep.o
+    0x0000359a   0x0000359a   0x00000002   PAD
+    0x0000359c   0x0000359c   0x0000000c   Code   RO          649    .text.ultrason_recep_tick  ultrason_recep.o
+    0x000035a8   0x000035a8   0x000000a0   Code   RO          174    .text.update_pwm_state  emission_ir.o
+    0x00003648   0x00003648   0x00000038   Code   RO          402    .text.update_robot_id_from_hardware  robot_state.o
+    0x00003680   0x00003680   0x00000048   Code   RO          205    .text.update_shift_register  led_register.o
+    0x000036c8   0x000036c8   0x0000004c   Code   RO          141    .text.update_status_leds  dtmf.o
+    0x00003714   0x00003714   0x0000002c   Code   RO           65    .text.update_switch_mode_from_gpio  capteur_inductif.o
+    0x00003740   0x00003740   0x00000026   Code   RO          905    i.__ARM_fpclassifyf  m_ws.l(fpclassifyf.o)
+    0x00003766   0x00003766   0x00000006   Code   RO          908    i.__mathlib_flt_infnan  m_ws.l(funder.o)
+    0x0000376c   0x0000376c   0x00000008   Code   RO          910    i.__mathlib_flt_invalid  m_ws.l(funder.o)
+    0x00003774   0x00003774   0x0000000a   Code   RO          913    i.__mathlib_flt_underflow  m_ws.l(funder.o)
+    0x0000377e   0x0000377e   0x00000002   PAD
+    0x00003780   0x00003780   0x00000168   Code   RO          921    i.__mathlib_rredf2  m_ws.l(rredf.o)
+    0x000038e8   0x000038e8   0x0000000e   Code   RO          819    i._is_digit         c_w.l(__printf_wp.o)
+    0x000038f6   0x000038f6   0x00000002   PAD
+    0x000038f8   0x000038f8   0x00000188   Code   RO          869    i.sinf              m_ws.l(sinf.o)
+    0x00003a80   0x00003a80   0x000000c4   Code   RO          844    x$fpl$fadd          fz_ws.l(faddsub_clz.o)
+    0x00003b44   0x00003b44   0x0000000c   Code   RO          969    x$fpl$fcheck1       fz_ws.l(fcheck1.o)
+    0x00003b50   0x00003b50   0x00000054   Code   RO          850    x$fpl$fcmp          fz_ws.l(fcmp.o)
+    0x00003ba4   0x00003ba4   0x00000018   Code   RO          948    x$fpl$fcmpinf       fz_ws.l(fcmpi.o)
+    0x00003bbc   0x00003bbc   0x00000184   Code   RO          853    x$fpl$fdiv          fz_ws.l(fdiv.o)
+    0x00003d40   0x00003d40   0x00000068   Code   RO          892    x$fpl$feqf          fz_ws.l(feqf.o)
+    0x00003da8   0x00003da8   0x00000036   Code   RO          856    x$fpl$ffix          fz_ws.l(ffix.o)
+    0x00003dde   0x00003dde   0x00000002   PAD
+    0x00003de0   0x00003de0   0x00000030   Code   RO          861    x$fpl$fflt          fz_ws.l(fflt_clz.o)
+    0x00003e10   0x00003e10   0x00000026   Code   RO          860    x$fpl$ffltu         fz_ws.l(fflt_clz.o)
+    0x00003e36   0x00003e36   0x00000002   PAD
+    0x00003e38   0x00003e38   0x00000068   Code   RO          894    x$fpl$fgeqf         fz_ws.l(fgeqf.o)
+    0x00003ea0   0x00003ea0   0x00000068   Code   RO          896    x$fpl$fleqf         fz_ws.l(fleqf.o)
+    0x00003f08   0x00003f08   0x00000102   Code   RO          866    x$fpl$fmul          fz_ws.l(fmul.o)
+    0x0000400a   0x0000400a   0x0000008c   Code   RO          898    x$fpl$fnaninf       fz_ws.l(fnaninf.o)
+    0x00004096   0x00004096   0x0000000a   Code   RO          900    x$fpl$fretinf       fz_ws.l(fretinf.o)
+    0x000040a0   0x000040a0   0x00000060   Code   RO          902    x$fpl$frnd          fz_ws.l(frnd.o)
+    0x00004100   0x00004100   0x00000014   Code   RO          845    x$fpl$frsb          fz_ws.l(faddsub_clz.o)
+    0x00004114   0x00004114   0x000000ea   Code   RO          846    x$fpl$fsub          fz_ws.l(faddsub_clz.o)
+    0x000041fe   0x000041fe   0x00000064   Code   RO         1024    x$fpl$retnan        fz_ws.l(retnan.o)
+    0x00004262   0x00004262   0x0000004c   Code   RO          950    x$fpl$scalbnf       fz_ws.l(scalbnf.o)
+    0x000042ae   0x000042ae   0x00000030   Code   RO         1045    x$fpl$trapveneer    fz_ws.l(trapv.o)
+    0x000042de   0x000042de   0x00000000   Code   RO          904    x$fpl$usenofp       fz_ws.l(usenofp.o)
+    0x000042de   0x000042de   0x00000028   Data   RO          792    .constdata          c_w.l(_printf_hex_int.o)
+    0x00004306   0x00004306   0x00000011   Data   RO          827    .constdata          c_w.l(__printf_flags_ss_wp.o)
+    0x00004317   0x00004317   0x00000001   PAD
+    0x00004318   0x00004318   0x00000020   Data   RO          922    .constdata          m_ws.l(rredf.o)
+    0x00004338   0x00004338   0x00000038   Data   RO          326    .rodata.LUT_CM      proximetre.o
+    0x00004370   0x00004370   0x00000038   Data   RO          325    .rodata.LUT_V       proximetre.o
+    0x000043a8   0x000043a8   0x00000020   Data   RO          317    .rodata.cst32       proximetre.o
+    0x000043c8   0x000043c8   0x00000020   Data   RO         1106    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Exec base: 0x10000000, Load base: 0x00004384, Size: 0x00000044, Max: 0xffffffff, ABSOLUTE)
-
-    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x10000000   0x00004384   0x00000004   Data   RW          760    .data.SystemCoreClock  system_lpc17xx.o
-    0x10000004   0x00004388   0x00000004   Data   RW          591    .data.asserv_K_corr_alpha  asservissement.o
-    0x10000008   0x0000438c   0x00000004   Data   RW          590    .data.asserv_K_corr_y  asservissement.o
-    0x1000000c   0x00004390   0x00000004   Data   RW          589    .data.asserv_Kp_alpha  asservissement.o
-    0x10000010   0x00004394   0x00000004   Data   RW          588    .data.asserv_Kp_y   asservissement.o
-    0x10000014   0x00004398   0x00000004   Data   RW          490    .data.current_pwm_d  robot_state.o
-    0x10000018   0x0000439c   0x00000004   Data   RW          489    .data.current_pwm_g  robot_state.o
-    0x1000001c   0x000043a0   0x00000001   Data   RW          488    .data.current_status  robot_state.o
-    0x1000001d   0x000043a1   0x00000003   PAD
-    0x10000020   0x000043a4   0x00000004   Data   RW          491    .data.current_v_moy  robot_state.o
-    0x10000024   0x000043a8   0x00000004   Data   RW          492    .data.current_w_ang  robot_state.o
-    0x10000028   0x000043ac   0x00000001   Data   RW          148    .data.dtmf_char     dtmf.o
-    0x10000029   0x000043ad   0x00000001   Data   RW           84    .data.ind_hw_mode   capteur_inductif.o
-    0x1000002a   0x000043ae   0x00000002   Data   RW           86    .data.last_rest_duration_us  capteur_inductif.o
-    0x1000002c   0x000043b0   0x00000004   Data   RW          619    .data.mSec          beepermethods.o
-    0x10000030   0x000043b4   0x00000001   Data   RW          269    .data.mot_hw_mode   moteur.o
-    0x10000031   0x000043b5   0x00000001   Data   RW          153    .data.process_dtmf_commands.parsed_action  dtmf.o
-    0x10000032   0x000043b6   0x00000001   Data   RW          321    .data.prox_dir      proximetre.o
-    0x10000033   0x000043b7   0x00000001   PAD
-    0x10000034   0x000043b8   0x00000004   Data   RW          314    .data.proximetre_run_balayage.front_dist  proximetre.o
-    0x10000038   0x000043bc   0x00000004   Data   RW          311    .data.proximetre_run_balayage.going_fwd  proximetre.o
-    0x1000003c   0x000043c0   0x00000001   Data   RW          655    .data.res_cote      ultrason_recep.o
-    0x1000003d   0x000043c1   0x00000001   Data   RW          156    .data.robot_status  dtmf.o
-    0x1000003e   0x000043c2   0x00000002   PAD
-    0x10000040   0x000043c4   0x00000004   Data   RW          310    .data.servo_pulse_us  proximetre.o
-
-
-    Execution Region ER_ZI (Exec base: 0x10000048, Load base: 0x000043c8, Size: 0x00000570, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x10000000, Load base: 0x000043e8, Size: 0x00000044, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x10000048        -       0x00000060   Zero   RW          948    .bss                c_w.l(libspace.o)
+    0x10000000   0x000043e8   0x00000004   Data   RW          765    .data.SystemCoreClock  system_lpc17xx.o
+    0x10000004   0x000043ec   0x00000004   Data   RW          596    .data.asserv_K_corr_alpha  asservissement.o
+    0x10000008   0x000043f0   0x00000004   Data   RW          595    .data.asserv_K_corr_y  asservissement.o
+    0x1000000c   0x000043f4   0x00000004   Data   RW          594    .data.asserv_Kp_alpha  asservissement.o
+    0x10000010   0x000043f8   0x00000004   Data   RW          593    .data.asserv_Kp_y   asservissement.o
+    0x10000014   0x000043fc   0x00000004   Data   RW          490    .data.current_pwm_d  robot_state.o
+    0x10000018   0x00004400   0x00000004   Data   RW          489    .data.current_pwm_g  robot_state.o
+    0x1000001c   0x00004404   0x00000001   Data   RW          488    .data.current_status  robot_state.o
+    0x1000001d   0x00004405   0x00000003   PAD
+    0x10000020   0x00004408   0x00000004   Data   RW          491    .data.current_v_moy  robot_state.o
+    0x10000024   0x0000440c   0x00000004   Data   RW          492    .data.current_w_ang  robot_state.o
+    0x10000028   0x00004410   0x00000001   Data   RW          148    .data.dtmf_char     dtmf.o
+    0x10000029   0x00004411   0x00000001   Data   RW           84    .data.ind_hw_mode   capteur_inductif.o
+    0x1000002a   0x00004412   0x00000002   Data   RW           86    .data.last_rest_duration_us  capteur_inductif.o
+    0x1000002c   0x00004414   0x00000004   Data   RW          624    .data.mSec          beepermethods.o
+    0x10000030   0x00004418   0x00000001   Data   RW          269    .data.mot_hw_mode   moteur.o
+    0x10000031   0x00004419   0x00000001   Data   RW          153    .data.process_dtmf_commands.parsed_action  dtmf.o
+    0x10000032   0x0000441a   0x00000001   Data   RW          321    .data.prox_dir      proximetre.o
+    0x10000033   0x0000441b   0x00000001   PAD
+    0x10000034   0x0000441c   0x00000004   Data   RW          314    .data.proximetre_run_balayage.front_dist  proximetre.o
+    0x10000038   0x00004420   0x00000004   Data   RW          311    .data.proximetre_run_balayage.going_fwd  proximetre.o
+    0x1000003c   0x00004424   0x00000001   Data   RW          660    .data.res_cote      ultrason_recep.o
+    0x1000003d   0x00004425   0x00000001   Data   RW          156    .data.robot_status  dtmf.o
+    0x1000003e   0x00004426   0x00000002   PAD
+    0x10000040   0x00004428   0x00000004   Data   RW          310    .data.servo_pulse_us  proximetre.o
+
+
+    Execution Region ER_ZI (Exec base: 0x10000048, Load base: 0x0000442c, Size: 0x00000670, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x10000048        -       0x00000060   Zero   RW          953    .bss                c_w.l(libspace.o)
     0x100000a8        -       0x00000001   Zero   RW           26    .bss.adc_state      adc.o
-    0x100000a9   0x000043c8   0x00000003   PAD
-    0x100000ac        -       0x00000004   Zero   RW          594    .bss.base_pwm       asservissement.o
+    0x100000a9   0x0000442c   0x00000003   PAD
+    0x100000ac        -       0x00000004   Zero   RW          599    .bss.base_pwm       asservissement.o
     0x100000b0        -       0x00000004   Zero   RW          157    .bss.blink_counter  dtmf.o
     0x100000b4        -       0x00000001   Zero   RW          150    .bss.c              dtmf.o
-    0x100000b5   0x000043c8   0x00000003   PAD
-    0x100000b8        -       0x00000004   Zero   RW          731    .bss.current_abs_step  stepper.o
+    0x100000b5   0x0000442c   0x00000003   PAD
+    0x100000b8        -       0x00000004   Zero   RW          736    .bss.current_abs_step  stepper.o
     0x100000bc        -       0x00000002   Zero   RW          494    .bss.current_avg_ar  robot_state.o
     0x100000be        -       0x00000002   Zero   RW          493    .bss.current_avg_av  robot_state.o
     0x100000c0        -       0x00000002   Zero   RW          495    .bss.current_avg_hor  robot_state.o
     0x100000c2        -       0x00000002   Zero   RW          217    .bss.current_led_state  led_register.o
     0x100000c4        -       0x00000002   Zero   RW           88    .bss.current_period_us  capteur_inductif.o
-    0x100000c6   0x000043c8   0x00000002   PAD
-    0x100000c8        -       0x00000004   Zero   RW          730    .bss.current_position  stepper.o
+    0x100000c6   0x0000442c   0x00000002   PAD
+    0x100000c8        -       0x00000004   Zero   RW          735    .bss.current_position  stepper.o
     0x100000cc        -       0x00000001   Zero   RW          482    .bss.current_robot_number  robot_state.o
-    0x100000cd        -       0x00000001   Zero   RW          676    .bss.current_state  suivi_fil.o
-    0x100000ce   0x000043c8   0x00000002   PAD
-    0x100000d0        -       0x00000004   Zero   RW          732    .bss.current_step_idx  stepper.o
+    0x100000cd        -       0x00000001   Zero   RW          681    .bss.current_state  suivi_fil.o
+    0x100000ce   0x0000442c   0x00000002   PAD
+    0x100000d0        -       0x00000004   Zero   RW          737    .bss.current_step_idx  stepper.o
     0x100000d4        -       0x00000004   Zero   RW          483    .bss.current_vitesse_centrale  robot_state.o
     0x100000d8        -       0x00000004   Zero   RW          484    .bss.current_vitesse_commande  robot_state.o
     0x100000dc        -       0x00000004   Zero   RW          485    .bss.current_vitesse_reelle  robot_state.o
     0x100000e0        -       0x0000000c   Zero   RW          487    .bss.current_wheel_delta  robot_state.o
     0x100000ec        -       0x00000014   Zero   RW          486    .bss.current_wire_measure  robot_state.o
     0x10000100        -       0x00000001   Zero   RW          507    .bss.current_wire_trame.0  robot_state.o
-    0x10000101   0x000043c8   0x00000001   PAD
+    0x10000101   0x0000442c   0x00000001   PAD
     0x10000102        -       0x00000001   Zero   RW          508    .bss.current_wire_trame.1  robot_state.o
-    0x10000103   0x000043c8   0x00000001   PAD
+    0x10000103   0x0000442c   0x00000001   PAD
     0x10000104        -       0x00000002   Zero   RW          509    .bss.current_wire_trame.2  robot_state.o
-    0x10000106   0x000043c8   0x00000002   PAD
+    0x10000106   0x0000442c   0x00000002   PAD
     0x10000108        -       0x00000001   Zero   RW          119    .bss.decoder_nord.0  decode_enveloppe.o
-    0x10000109   0x000043c8   0x00000003   PAD
+    0x10000109   0x0000442c   0x00000003   PAD
     0x1000010c        -       0x00000001   Zero   RW          120    .bss.decoder_nord.1  decode_enveloppe.o
-    0x1000010d   0x000043c8   0x00000003   PAD
+    0x1000010d   0x0000442c   0x00000003   PAD
     0x10000110        -       0x00000004   Zero   RW          121    .bss.decoder_nord.2  decode_enveloppe.o
     0x10000114        -       0x00000001   Zero   RW          122    .bss.decoder_sud.0  decode_enveloppe.o
-    0x10000115   0x000043c8   0x00000003   PAD
+    0x10000115   0x0000442c   0x00000003   PAD
     0x10000118        -       0x00000001   Zero   RW          123    .bss.decoder_sud.1  decode_enveloppe.o
-    0x10000119   0x000043c8   0x00000003   PAD
+    0x10000119   0x0000442c   0x00000003   PAD
     0x1000011c        -       0x00000004   Zero   RW          124    .bss.decoder_sud.2  decode_enveloppe.o
-    0x10000120        -       0x00000004   Zero   RW          679    .bss.distance_nord_ar  suivi_fil.o
-    0x10000124        -       0x00000004   Zero   RW          678    .bss.distance_nord_av  suivi_fil.o
-    0x10000128        -       0x00000004   Zero   RW          681    .bss.distance_sud_ar  suivi_fil.o
-    0x1000012c        -       0x00000004   Zero   RW          680    .bss.distance_sud_av  suivi_fil.o
+    0x10000120        -       0x00000004   Zero   RW          684    .bss.distance_nord_ar  suivi_fil.o
+    0x10000124        -       0x00000004   Zero   RW          683    .bss.distance_nord_av  suivi_fil.o
+    0x10000128        -       0x00000004   Zero   RW          686    .bss.distance_sud_ar  suivi_fil.o
+    0x1000012c        -       0x00000004   Zero   RW          685    .bss.distance_sud_av  suivi_fil.o
     0x10000130        -       0x00000001   Zero   RW          154    .bss.dtmf_retour_active  dtmf.o
-    0x10000131   0x000043c8   0x00000003   PAD
+    0x10000131   0x0000442c   0x00000003   PAD
     0x10000134        -       0x00000004   Zero   RW          155    .bss.dtmf_retour_start_time  dtmf.o
     0x10000138        -       0x00000001   Zero   RW          147    .bss.dtmf_tone      dtmf.o
-    0x10000139   0x000043c8   0x00000001   PAD
+    0x10000139   0x0000442c   0x00000001   PAD
     0x1000013a        -       0x00000080   Zero   RW           91    .bss.env_fifo       capteur_inductif.o
-    0x100001ba   0x000043c8   0x00000002   PAD
-    0x100001bc        -       0x00000004   Zero   RW          593    .bss.est_alpha      asservissement.o
-    0x100001c0        -       0x00000004   Zero   RW          592    .bss.est_y          asservissement.o
+    0x100001ba   0x0000442c   0x00000002   PAD
+    0x100001bc        -       0x00000004   Zero   RW          598    .bss.est_alpha      asservissement.o
+    0x100001c0        -       0x00000004   Zero   RW          597    .bss.est_y          asservissement.o
     0x100001c4        -       0x00000001   Zero   RW           89    .bss.fifo_head      capteur_inductif.o
     0x100001c5        -       0x00000001   Zero   RW           90    .bss.fifo_tail      capteur_inductif.o
     0x100001c6        -       0x00000001   Zero   RW          502    .bss.flag_50hz      robot_state.o
     0x100001c7        -       0x00000001   Zero   RW           83    .bss.flag_compute_inductif  capteur_inductif.o
-    0x100001c8        -       0x00000004   Zero   RW          620    .bss.freqAsChanged  beepermethods.o
+    0x100001c8        -       0x00000004   Zero   RW          625    .bss.freqAsChanged  beepermethods.o
     0x100001cc        -       0x00000004   Zero   RW          387    .bss.g_Pd           recep_spi.o
     0x100001d0        -       0x00000004   Zero   RW          385    .bss.g_Pg           recep_spi.o
     0x100001d4        -       0x00000004   Zero   RW          390    .bss.g_Vd           recep_spi.o
@@ -3576,60 +3594,62 @@ Memory Map of the image
     0x100001f7        -       0x00000001   Zero   RW          504    .bss.ir_seq_index   robot_state.o
     0x100001f8        -       0x00000001   Zero   RW          505    .bss.ir_seq_length  robot_state.o
     0x100001f9        -       0x00000064   Zero   RW          503    .bss.ir_sequence    robot_state.o
-    0x1000025d   0x000043c8   0x00000003   PAD
+    0x1000025d   0x0000442c   0x00000003   PAD
     0x10000260        -       0x00000004   Zero   RW           85    .bss.last_fall_time  capteur_inductif.o
     0x10000264        -       0x00000004   Zero   RW           87    .bss.last_rise_time  capteur_inductif.o
     0x10000268        -       0x00000001   Zero   RW          267    .bss.mot_wire_mode  moteur.o
     0x10000269        -       0x00000001   Zero   RW          268    .bss.mot_wire_pending  moteur.o
-    0x1000026a   0x000043c8   0x00000002   PAD
-    0x1000026c        -       0x00000004   Zero   RW          621    .bss.nbFoisGlo      beepermethods.o
+    0x1000026a   0x0000442c   0x00000002   PAD
+    0x1000026c        -       0x00000004   Zero   RW          626    .bss.nbFoisGlo      beepermethods.o
     0x10000270        -       0x00000001   Zero   RW          149    .bss.new_dtmf_flag  dtmf.o
     0x10000271        -       0x00000001   Zero   RW          497    .bss.new_wire_trame  robot_state.o
-    0x10000272   0x000043c8   0x00000002   PAD
+    0x10000272   0x0000442c   0x00000002   PAD
     0x10000274        -       0x00000018   Zero   RW          386    .bss.odo_shared_metrics  recep_spi.o
-    0x1000028c        -       0x00000004   Zero   RW          733    .bss.pending_position  stepper.o
+    0x1000028c        -       0x00000004   Zero   RW          738    .bss.pending_position  stepper.o
     0x10000290        -       0x00000001   Zero   RW          151    .bss.process_dtmf_commands.current_state  dtmf.o
     0x10000291        -       0x00000001   Zero   RW          152    .bss.process_dtmf_commands.parsed_robot_id  dtmf.o
-    0x10000292   0x000043c8   0x00000002   PAD
+    0x10000292   0x0000442c   0x00000002   PAD
     0x10000294        -       0x00000004   Zero   RW           24    .bss.prox_accumulator  adc.o
     0x10000298        -       0x00000064   Zero   RW          319    .bss.prox_buf       proximetre.o
     0x100002fc        -       0x00000004   Zero   RW          320    .bss.prox_count     proximetre.o
     0x10000300        -       0x00000002   Zero   RW           27    .bss.prox_final_value  adc.o
     0x10000302        -       0x00000001   Zero   RW          322    .bss.prox_frame_ready  proximetre.o
-    0x10000303   0x000043c8   0x00000001   PAD
+    0x10000303   0x0000442c   0x00000001   PAD
     0x10000304        -       0x00000004   Zero   RW           25    .bss.prox_is_ready  adc.o
     0x10000308        -       0x00000001   Zero   RW          318    .bss.prox_mode      proximetre.o
-    0x10000309   0x000043c8   0x00000001   PAD
+    0x10000309   0x0000442c   0x00000001   PAD
     0x1000030a        -       0x00000002   Zero   RW           22    .bss.prox_samples_remaining  adc.o
     0x1000030c        -       0x00000002   Zero   RW           23    .bss.prox_samples_total  adc.o
-    0x1000030e   0x000043c8   0x00000002   PAD
+    0x1000030e   0x0000442c   0x00000002   PAD
     0x10000310        -       0x00000064   Zero   RW          496    .bss.proxi_dists    robot_state.o
     0x10000374        -       0x00000001   Zero   RW          323    .bss.proximetre_run_balayage.beeper_running  proximetre.o
-    0x10000375   0x000043c8   0x00000003   PAD
+    0x10000375   0x0000442c   0x00000003   PAD
     0x10000378        -       0x00000004   Zero   RW          313    .bss.proximetre_run_balayage.current_angle  proximetre.o
     0x1000037c        -       0x00000001   Zero   RW          316    .bss.proximetre_run_balayage.initialized  proximetre.o
-    0x1000037d   0x000043c8   0x00000003   PAD
+    0x1000037d   0x0000442c   0x00000003   PAD
     0x10000380        -       0x00000004   Zero   RW          315    .bss.proximetre_run_balayage.ms_accumulated  proximetre.o
     0x10000384        -       0x00000004   Zero   RW          312    .bss.proximetre_run_balayage.step_index  proximetre.o
-    0x10000388        -       0x00000001   Zero   RW          653    .bss.res_nouveau    ultrason_recep.o
-    0x10000389        -       0x00000001   Zero   RW          654    .bss.res_poste      ultrason_recep.o
-    0x1000038a        -       0x00000001   Zero   RW          649    .bss.st             ultrason_recep.o
-    0x1000038b   0x000043c8   0x00000001   PAD
-    0x1000038c        -       0x00000004   Zero   RW          735    .bss.step_dir       stepper.o
-    0x10000390        -       0x00000004   Zero   RW          734    .bss.steps_remaining  stepper.o
-    0x10000394        -       0x00000004   Zero   RW          652    .bss.t_f1           ultrason_recep.o
-    0x10000398        -       0x00000004   Zero   RW          648    .bss.t_last         ultrason_recep.o
-    0x1000039c        -       0x00000004   Zero   RW          651    .bss.t_r1           ultrason_recep.o
-    0x100003a0        -       0x00000004   Zero   RW          650    .bss.t_r2           ultrason_recep.o
-    0x100003a4        -       0x00000001   Zero   RW          677    .bss.target_wire    suivi_fil.o
-    0x100003a5   0x000043c8   0x00000001   PAD
-    0x100003a6        -       0x00000002   Zero   RW           82    .bss.volatile_adc_sample_count  capteur_inductif.o
-    0x100003a8        -       0x00000004   Zero   RW           79    .bss.volatile_adc_sum1  capteur_inductif.o
-    0x100003ac        -       0x00000004   Zero   RW           80    .bss.volatile_adc_sum2  capteur_inductif.o
-    0x100003b0        -       0x00000004   Zero   RW           81    .bss.volatile_adc_sum3  capteur_inductif.o
-    0x100003b4   0x000043c8   0x00000004   PAD
-    0x100003b8        -       0x00000000   Zero   RW          744    HEAP                startup_lpc17xx.o
-    0x100003b8        -       0x00000200   Zero   RW          743    STACK               startup_lpc17xx.o
+    0x10000388        -       0x00000001   Zero   RW          658    .bss.res_nouveau    ultrason_recep.o
+    0x10000389        -       0x00000001   Zero   RW          659    .bss.res_poste      ultrason_recep.o
+    0x1000038a        -       0x00000001   Zero   RW          654    .bss.st             ultrason_recep.o
+    0x1000038b   0x0000442c   0x00000001   PAD
+    0x1000038c        -       0x00000004   Zero   RW          740    .bss.step_dir       stepper.o
+    0x10000390        -       0x00000004   Zero   RW          739    .bss.steps_remaining  stepper.o
+    0x10000394        -       0x00000004   Zero   RW          657    .bss.t_f1           ultrason_recep.o
+    0x10000398        -       0x00000004   Zero   RW          653    .bss.t_last         ultrason_recep.o
+    0x1000039c        -       0x00000004   Zero   RW          656    .bss.t_r1           ultrason_recep.o
+    0x100003a0        -       0x00000004   Zero   RW          655    .bss.t_r2           ultrason_recep.o
+    0x100003a4        -       0x00000001   Zero   RW          682    .bss.target_wire    suivi_fil.o
+    0x100003a5        -       0x00000100   Zero   RW          578    .bss.tx_buffer      uart.o
+    0x100004a5   0x0000442c   0x00000001   PAD
+    0x100004a6        -       0x00000002   Zero   RW          576    .bss.tx_head        uart.o
+    0x100004a8        -       0x00000002   Zero   RW          577    .bss.tx_tail        uart.o
+    0x100004aa        -       0x00000002   Zero   RW           82    .bss.volatile_adc_sample_count  capteur_inductif.o
+    0x100004ac        -       0x00000004   Zero   RW           79    .bss.volatile_adc_sum1  capteur_inductif.o
+    0x100004b0        -       0x00000004   Zero   RW           80    .bss.volatile_adc_sum2  capteur_inductif.o
+    0x100004b4        -       0x00000004   Zero   RW           81    .bss.volatile_adc_sum3  capteur_inductif.o
+    0x100004b8        -       0x00000000   Zero   RW          749    HEAP                startup_lpc17xx.o
+    0x100004b8        -       0x00000200   Zero   RW          748    STACK               startup_lpc17xx.o
 
 
 ==============================================================================
@@ -3649,7 +3669,7 @@ Image component sizes
        376          0          0          0          0       4330   emission_ir.o
         78          0          0          0          0       1979   interruptions.o
        146          0          0          0          2       2883   led_register.o
-       372         24          0          0          0       3598   main.o
+       376         24          0          0          0       3601   main.o
        478         64          0          1          2       6721   moteur.o
       1264          8        144         13        120       8491   proximetre.o
        368          0          0          0          0       3717   pwm.o
@@ -3662,13 +3682,13 @@ Image component sizes
        244          0          0          0         18       2090   suivi_fil.o
        204          0          0          4          0       2122   system_lpc17xx.o
        316          0          0          0          0       4846   timers.o
-       180          0          0          0          0       3396   uart.o
+       278          0          0          0        260       3758   uart.o
        578          0          0          1         19       6802   ultrason_recep.o
 
     ----------------------------------------------------------------------
-     12120        484        380         68       1296     123183   Object Totals
+     12220        484        380         68       1552     123548   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-       138          0          0          6         57          0   (incl. Padding)
+       136          0          0          6         53          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -3761,15 +3781,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     16814        726        470         68       1392     124607   Grand Totals
-     16814        726        470         68       1392     124607   ELF Image Totals
-     16814        726        470         68          0          0   ROM Totals
+     16914        726        470         68       1648     124972   Grand Totals
+     16914        726        470         68       1648     124972   ELF Image Totals
+     16914        726        470         68          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                17284 (  16.88kB)
-    Total RW  Size (RW Data + ZI Data)              1460 (   1.43kB)
-    Total ROM Size (Code + RO Data + RW Data)      17352 (  16.95kB)
+    Total RO  Size (Code + RO Data)                17384 (  16.98kB)
+    Total RW  Size (RW Data + ZI Data)              1716 (   1.68kB)
+    Total ROM Size (Code + RO Data + RW Data)      17452 (  17.04kB)
 
 ==============================================================================
 
