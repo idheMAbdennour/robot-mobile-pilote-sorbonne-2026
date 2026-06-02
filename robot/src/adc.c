@@ -61,8 +61,9 @@ void adc_pin_config(uint8_t channel) {
         case 0: // AD0.0 -> P0.23
             LPC_PINCON->PINSEL1 &= ~(3u << 14);
             LPC_PINCON->PINSEL1 |=  (1u << 14);
-            LPC_PINCON->PINMODE1 &= ~(3u << 14);
-            LPC_PINCON->PINMODE1 |=  (2u << 14);
+            //LPC_PINCON->PINMODE1 &= ~(3u << 14);
+            //LPC_PINCON->PINMODE1 |=  (2u << 14);
+            LPC_PINCON->PINMODE1 |= (3u << 14);
             break;
         case 1: // AD0.1 -> P0.24
             LPC_PINCON->PINSEL1 &= ~(3u << 16);
