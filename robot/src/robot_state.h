@@ -46,8 +46,8 @@ void update_robot_id_from_hardware(void);
  * DÉFINITIONS PARAMÈTRES PHYSIQUES ET ASSERVISSEMENT
  * ========================================================================== */
 // Ces macros pourront être ajustées dynamiquement lors des tests
-#define ROBOT_WHEEL_DIAMETER_MM    50  // Diamètre des roues en mm (valeur d'exemple)
-#define ROBOT_WHEEL_DISTANCE_MM    120 // Entraxe entre les roues en mm (valeur d'exemple)
+#define ROBOT_WHEEL_DIAMETER_MM    96  // Diamètre des roues en mm (valeur d'exemple)
+#define ROBOT_WHEEL_DISTANCE_MM    398 // Entraxe entre les roues en mm (valeur d'exemple)
 #define MAX_SENSOR_ANGLE_DEG       10  // L'angle max fonctionnel du capteur inductif (+/-)
 #define MAX_SENSOR_DISTANCE_CM     10  // La distance max fonctionnelle du capteur inductif (+/-)
 
