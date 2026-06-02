@@ -89,6 +89,8 @@ static void read_spi_channel(int cs_num) {
         case 2: g_Pg = raw_data & 0x000000FF; break;
         case 3: g_Pd = raw_data & 0x000000FF; break;
     }
+
+    WheelDelta delta = 
 }
 
 static float step_to_distance(uint32_t steps) {

@@ -4,8 +4,8 @@ volatile int mSec = 1250;
 volatile int freqAsChanged = 0;
 volatile int nbFoisGlo = 0;
 
-#define GPIO_BEEP LPC_GPIO0
-#define GPIO_BEEP_NUM 0
+#define GPIO_BEEP LPC_GPIO2
+#define GPIO_BEEP_NUM 4
 
 void stopBeep() {
 	GPIO_BEEP->FIOCLR = 1 << GPIO_BEEP_NUM;
@@ -53,6 +53,9 @@ void startBeep(int msecVal) {
 }
 
 void initBeepeur() {
+	// Configurer P2.4 en tant que GPIO
+	LPC_PINCON->PINSEL4 &= ~(3 << 8);
+
 	// GPIO
 	GPIO_BEEP->FIODIR |= 1 << GPIO_BEEP_NUM;
 	GPIO_BEEP->FIOCLR = 1 << GPIO_BEEP_NUM;

@@ -14,8 +14,8 @@
 #include "adc.h"
 #include "robot_state.h"
 #include "timers.h"
+#include "BeeperMethods.h"
 #include "uart.h"
-#include "son.h"
 
 /* ==========================================================================
  * DÉFINITIONS PRIVÉES
@@ -31,8 +31,6 @@
 #define US_PER_DEG      11
 #define SERVO_CENTER_US 1500
 #define SERVO_PERIOD_US 20000u
-
-#define BUZZ_ON_US      250000u
 
 #define USE_LUT         1
 
@@ -65,10 +63,6 @@ static char prox_dir = 'T';
 
 static volatile uint32_t servo_pulse_us = SERVO_CENTER_US;
 
-static volatile uint32_t buzz_period_us = 0;
-static uint32_t buzz_t0 = 0;
-static uint8_t buzz_on = 0;
-
 /* ==========================================================================
  * PROTOTYPES DES FONCTIONS PRIVÉES
  * ========================================================================== */
@@ -79,9 +73,6 @@ static void servo_set_angle(int angle_deg);
 static void adc_init(void);
 static uint16_t adc_read_avg(void);
 static int distance_cm(uint16_t adc);
-static void buzzer_init(void);
-static void buzzer_set_from_distance(int cm);
-static void buzzer_service(void);
 static void delay_ms(uint32_t ms);
 
 /* ==========================================================================
@@ -115,7 +106,7 @@ void proximetre_timer_interrupt_routine(void) {
 static void delay_ms(uint32_t ms) {
     uint32_t start = timer3_get_tc();
     while ((uint32_t)(timer3_get_tc() - start) < ms * 1000u) {
-        buzzer_service();
+        __NOP();
     }
 }
 
@@ -162,30 +153,6 @@ static int distance_cm(uint16_t adc) {
 #endif
 }
 
-static void buzzer_init(void) {
-    /* P2.4 et le ton 1 kHz sont geres par son.c (son_init). Rien a faire ici. */
-}
-
-static void buzzer_set_from_distance(int cm) {
-    if (cm < DIST_MIN_CM || cm > 100) { buzz_period_us = 0; return; }
-    float f = 0.5f + (100 - cm) * 0.025f;
-    buzz_period_us = (uint32_t)(1000000.0f / f + 0.5f);
-}
-
-static void buzzer_service(void) {
-    if (buzz_period_us == 0) {
-        if (buzz_on) { son_tone_stop(); buzz_on = 0; }   // <— было FIOCLR
-        return;
-    }
-    uint32_t off = (buzz_period_us > BUZZ_ON_US) ? (buzz_period_us - BUZZ_ON_US) : 1000u;
-    uint32_t dur = buzz_on ? BUZZ_ON_US : off;
-    if ((uint32_t)(timer3_get_tc() - buzz_t0) >= dur) {
-        buzz_on = !buzz_on;
-        buzz_t0 = timer3_get_tc();
-        if (buzz_on) son_tone_start();   // FIOSET
-        else         son_tone_stop();    // FIOCLR
-    }
-}
 
 static void init_proximetre_switches(void) {
     // Configurer P1.30 et P1.31 en GPIO (PINSEL3 bits 28:29 et 30:31)
@@ -207,7 +174,8 @@ static void proximetre_update_mode_from_gpio(void) {
 void init_proximetre(void) {
     init_servo_hardware();
     adc_init();
-    buzzer_init();
+    PORT_SCOPE->FIODIR |= SCOPE_PIN;
+    PORT_SCOPE->FIOCLR  = SCOPE_PIN;
     init_proximetre_switches();
     proximetre_update_mode_from_gpio();
     servo_set_angle(0);
@@ -218,10 +186,7 @@ void init_proximetre(void) {
 
 
 void proximetre_run_balayage(void) {
-    // 1. Service du buzzer (non-bloquant, appelé à 50Hz)
-    buzzer_service();
-
-    // 2. Variables de la machine d'état
+    // 1. Variables de la machine d'état
     static int going_fwd = 1;
     static int step_index = 0;
     static int current_angle = 0;
@@ -252,7 +217,9 @@ void proximetre_run_balayage(void) {
 
     // --- ÉTAPE DE MESURE ---
     // On mesure la distance pour l'angle actuel (qui a eu le temps de se stabiliser)
+    PORT_SCOPE->FIOSET = SCOPE_PIN;
     int cm = distance_cm(adc_read_avg());
+    PORT_SCOPE->FIOCLR = SCOPE_PIN;
     prox_buf[step_index] = cm;
     set_proxi_distance_at_angle(current_angle, (int32_t)cm);
 
@@ -273,7 +240,22 @@ void proximetre_run_balayage(void) {
         // l'avertisseur sonore. Le statut de mission (libre / rdv_expedition /
         // colispris / rdv_depose) est géré ailleurs et ne doit PAS être modifié
         // ici. (L'arrêt/ralentissement éventuel relève des capteurs capacitifs.)
-        buzzer_set_from_distance(front_dist);
+        static int beeper_running = 0;
+        if (front_dist < DIST_MIN_CM || front_dist > 100) {
+            if (beeper_running) {
+                stopBeep();
+                beeper_running = 0;
+            }
+        } else {
+            float f = 0.5f + (100 - front_dist) * 0.025f;
+            int msecVal = (int)(1000.0f / f + 0.5f);
+            if (!beeper_running) {
+                startBeep(msecVal);
+                beeper_running = 1;
+            } else {
+                changeDist(msecVal);
+            }
+        }
 
         // Préparation du prochain balayage (changement de sens)
         going_fwd = !going_fwd;

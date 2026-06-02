@@ -14,11 +14,11 @@
 #define PIN_PROX_SW1            (1u << 30)  // P1.30 - Mode Proximetre bit 0
 #define PIN_PROX_SW2            (1u << 31)  // P1.31 - Mode Proximetre bit 1
 #define SERVO_PIN               (1u << 3)   // P2.3  - Signal Servo
-#define BUZZ_PIN                (1u << 4)   // P2.4  - Buzzer
+#define SCOPE_PIN               (1u << 9)   // P1.9  - Top mesure oscillo
 
 #define PORT_PROX_SW            LPC_GPIO1
 #define PORT_SERVO              LPC_GPIO2
-#define PORT_BUZZ               LPC_GPIO2
+#define PORT_SCOPE              LPC_GPIO1
 
 // L'angle maximal de balayage (ex: 60 pour ±60°)
 #define PROXI_MAX_ANGLE_DEG     60

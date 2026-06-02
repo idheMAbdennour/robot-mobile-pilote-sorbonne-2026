@@ -9,6 +9,8 @@
 
 #include "led_register.h"
 #include "robot_state.h"
+#include "timers.h"
+#include "suivi_fil.h"
 
 /* ==========================================================================
  * DÉFINITIONS ET TYPES PRIVÉS
@@ -59,13 +61,13 @@ void init_dtmf(void) {
     // Désactiver les pull-up/pull-down pour P0.16 à P0.19
     LPC_PINCON->PINMODE1 |= (0xFF << 0);
     LPC_PINCON->PINSEL1 &= ~(0xFF << 0);
-    
+
     // Configurer P2.12 en GPIO (Valid)
     LPC_PINCON->PINSEL4 &= ~(3u << 24);
-    
+
     // Configurer P0.16 à P0.19 en entrée
     LPC_GPIO0->FIODIR &= ~(PIN_DTMF_D0 | PIN_DTMF_D1 | PIN_DTMF_D2 | PIN_DTMF_D3);
-    
+
     // Configurer P2.12 en entrée
     LPC_GPIO2->FIODIR &= ~PIN_DTMF_VALID;
 
@@ -75,11 +77,30 @@ void init_dtmf(void) {
 }
 
 char c;
+#define RETOUR_TIMEOUT_US 2000000 // 2 secondes
+static uint32_t dtmf_retour_start_time = 0;
+static uint8_t dtmf_retour_active = 0;
+
 static void process_dtmf_commands(void) {
     static dtmf_state_t current_state = DTMF_STATE_IDLE;
     static uint8_t parsed_robot_id = 0;
     static char parsed_action = ' ';
 		//uart0_send_char('c');
+
+    if (dtmf_retour_active) {
+        // En supposant que le timer2 fonctionne par défaut avec des ticks de 10us (cf capteur_inductif.c)
+        // 2 secondes = 2000000 us = 200000 ticks de 10 us
+        uint32_t current_time = timer2_get_tc();
+        uint32_t elapsed = (current_time >= dtmf_retour_start_time) ?
+            (current_time - dtmf_retour_start_time) :
+            (0xFFFFFFFF - dtmf_retour_start_time) + current_time;
+
+        // Convertir en microsecondes (10us par tick d'après capteur_inductif.c)
+        if (elapsed * 10 >= RETOUR_TIMEOUT_US) {
+            suivi_fil_force_entrelacement();
+            dtmf_retour_active = 0;
+        }
+    }
 
     if (!new_dtmf_flag) {
         return;
@@ -101,7 +122,7 @@ static void process_dtmf_commands(void) {
             if (c >= '0' && c <= '9') {
                 // Accumulation pour gérer les identifiants robots (ex: 11, 15...)
                 parsed_robot_id = (parsed_robot_id * 10) + (c - '0');
-            } else if (c == 'A' || c == 'D') { // Action détectée ('A' = Arrêt, 'D' = Départ)
+            } else if (c == 'A' || c == 'D' || c == 'C') { // Action détectée ('A' = Arrêt, 'D' = Départ, 'C' = Croisement/Retour)
                 parsed_action = c;
                 current_state = DTMF_STATE_WAIT_END;
             } else {
@@ -124,6 +145,9 @@ static void process_dtmf_commands(void) {
                         robot_status = ROBOT_RUNNING;
                         // TODO: Démarrer les moteurs ici
 												//uart0_send_string("\r\n[DTMF_DEBUG] Commande ARRET executee pour ce robot.\r\n");
+                    } else if (parsed_action == 'C') { // Ordre de Retour
+                        dtmf_retour_start_time = timer2_get_tc();
+                        dtmf_retour_active = 1;
                     }
                 } else {
                     // Ce message ne concerne pas notre robot, on éteint la LED

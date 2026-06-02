@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file timers.c
  * @brief Fichier du module timers.
  */
@@ -88,7 +88,7 @@ void timer3_init_servo(uint32_t periode_us, uint32_t pulse_us) {
 }
 
 uint32_t timer3_get_tc(void) {
-    return LPC_TIM3->TC;
+			return LPC_TIM3->TC;
 }
 
 uint32_t timer3_get_match0(void) {
