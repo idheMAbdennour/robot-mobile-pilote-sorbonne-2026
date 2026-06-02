@@ -58,6 +58,7 @@ static const int   LUT_CM[] = { 20, 30, 40, 50, 60, 70, 80,
  * VARIABLES PRIVÉES
  * ========================================================================== */
 static volatile uint8_t prox_mode = 0;
+static volatile uint8_t prox_frame_ready = 0;   
 static int32_t prox_buf[NUM_PROXI_MEASUREMENTS];
 static int prox_count = 0;
 static char prox_dir = 'T';
@@ -266,7 +267,7 @@ void proximetre_run_balayage(void) {
         // Fin du balayage dans un sens
         prox_count = step_index;
         prox_dir = going_fwd ? 'T' : 't';
-
+        prox_frame_ready = 1;          // <-- ДОБАВИТЬ: новый кадр готов
         // Mise à jour du buzzer avec la distance frontale minimale trouvée.
         // NB (CdC) : la détection d'obstacle par le proximètre IR ne pilote QUE
         // l'avertisseur sonore. Le statut de mission (libre / rdv_expedition /
@@ -306,6 +307,8 @@ int get_proxi_count(void) {
 }
 
 void debug_proximetre_send_frame(void) {
+    if (!prox_frame_ready) return;     // <-- ДОБАВИТЬ: нет нового кадра -> не шлём дубль
+    prox_frame_ready = 0;              // <-- ДОБАВИТЬ
     char buffer[160];
     int  offset = 0;
     int32_t mesures[NUM_PROXI_MEASUREMENTS];

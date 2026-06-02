@@ -54,7 +54,13 @@ int main(void)
     init_status_led();
     init_dtmf();
     init_recep_spi();
-    
+    ODO_Init();
+
+    NVIC_SetPriority(TIMER3_IRQn, 0);  // servo : le plus prioritaire (impulsion nette)
+    NVIC_SetPriority(EINT3_IRQn,  1);  // capteurs (dtmf/inductif/boutons/...)
+    NVIC_SetPriority(EINT1_IRQn,  1);  // SPI FPGA
+    NVIC_SetPriority(TIMER1_IRQn, 2);  // son / stepper : tolèrent du jitter
+    NVIC_SetPriority(ADC_IRQn,    2);
 
     // Configuration du SysTick à 50 Hz
     SysTick_Config(SystemCoreClock / 50);
@@ -102,14 +108,6 @@ int main(void)
         extern volatile uint32_t g_Vg; 
         extern volatile uint32_t g_Vd;
 
-        WheelDelta delta;
-        // Le FPGA fournit directement le nombre de ticks effectués sur la période de 20ms (1/50s)
-        delta.dd_g = (float)((int32_t)g_Vg) * ODO_TICKS_TO_METER;
-        delta.dd_d = (float)((int32_t)g_Vd) * ODO_TICKS_TO_METER;
-        delta.dt   = 0.02f; // Période fixe de 50Hz (1/50s)
-
-        // Transmission au robot_state pour utilisation par l'asservissement
-        set_wheel_delta(&delta);
 
         // -----------------------------------------------------
         // Boucle d'asservissement (calcul PID / consigne moteurs)
