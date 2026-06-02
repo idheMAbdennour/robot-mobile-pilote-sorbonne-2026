@@ -186,7 +186,6 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -589,6 +588,26 @@
               <FileType>5</FileType>
               <FilePath>.\src\suivi_fil.h</FilePath>
             </File>
+            <File>
+              <FileName>son.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\son.c</FilePath>
+            </File>
+            <File>
+              <FileName>son.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\son.h</FilePath>
+            </File>
+            <File>
+              <FileName>stepper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\stepper.c</FilePath>
+            </File>
+            <File>
+              <FileName>stepper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\stepper.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -649,6 +668,11 @@
     <Layers>
       <Layer>
         <LayName>&lt;Project Info&gt;</LayName>
+        <LayDesc></LayDesc>
+        <LayUrl></LayUrl>
+        <LayKeys></LayKeys>
+        <LayCat></LayCat>
+        <LayLic></LayLic>
         <LayTarg>0</LayTarg>
         <LayPrjMark>1</LayPrjMark>
       </Layer>

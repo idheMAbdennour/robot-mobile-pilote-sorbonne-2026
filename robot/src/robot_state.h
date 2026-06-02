@@ -49,8 +49,6 @@ void update_robot_id_from_hardware(void);
 
 #define ROBOT_WHEEL_DIAMETER_MM     50      // Diamètre des roues en mm
 #define ROBOT_WHEEL_DISTANCE_MM     120     // Entraxe entre les roues en mm
-#define MAX_SENSOR_ANGLE_DEG       10  // L'angle max fonctionnel du capteur inductif (+/-)
-#define MAX_SENSOR_DISTANCE_CM     10  // La distance max fonctionnelle du capteur inductif (+/-)
 
 
 // Odométrie : Paramètres des codeurs [VALEURS A CALIBRER]

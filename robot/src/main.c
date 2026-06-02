@@ -53,7 +53,6 @@ int main(void)
     init_buttons();
     init_status_led();
     init_dtmf();
-    init_recep_spi();
     ODO_Init();
 
     NVIC_SetPriority(TIMER3_IRQn, 0);  // servo : le plus prioritaire (impulsion nette)
@@ -104,9 +103,7 @@ int main(void)
         // -----------------------------------------------------
         // Calcul de l'Odométrie (Conversion SPI -> Mètres)
         // -----------------------------------------------------
-        // Les variables g_Vg et g_Vd sont mises à jour par l'interruption EINT1 (Top 50Hz du FPGA)
-        extern volatile uint32_t g_Vg; 
-        extern volatile uint32_t g_Vd;
+        // Les variables g_Vg et g_Vd sont gérées en interne par recep_spi.c via ODO_Init()
 
 
         // -----------------------------------------------------

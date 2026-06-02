@@ -52,7 +52,9 @@ void init_uart0(void) {
 
 void uart0_send_char(char c) {
     // Attendre que le registre THR (Transmitter Holding Register) soit vide
-    while (!(LPC_UART0->LSR & (1 << 5)));
+    while (!(LPC_UART0->LSR & (1 << 5))) {
+        // Attente active
+    }
 
     LPC_UART0->THR = c;
 }
@@ -63,7 +65,9 @@ void uart0_send_string(const char *str) {
     }
 
     // Attendre que la transmission soit complètement terminée
-    while (!(LPC_UART0->LSR & (1 << 6)));
+    while (!(LPC_UART0->LSR & (1 << 6))) {
+        // Attente active
+    }
 }
 
 void uart0_send_frame(const char *str) {

@@ -89,8 +89,6 @@ static void read_spi_channel(int cs_num) {
         case 2: g_Pg = raw_data & 0x000000FF; break;
         case 3: g_Pd = raw_data & 0x000000FF; break;
     }
-
-    WheelDelta delta = 
 }
 
 static float step_to_distance(uint32_t steps) {
@@ -138,19 +136,16 @@ void ODO_Init(void) {
 }
 
 /**
- * @brief Gestionnaire d'interruption EINT1 (Déclenché 50 fois par seconde par le FPGA)
+ * @brief Routine de réception appelée par EINT1_IRQHandler (Déclenché 50 fois par seconde par le FPGA)
  */
-void EINT1_IRQHandler(void) {
-    // 1. Acquitter l'interruption matérielle
-    LPC_SC->EXTINT = (1 << 1);
-    
-    // 2. Lecture séquentielle via le bus SPI simulé
+void recep_spi_interrupt_routine(void) {
+    // 1. Lecture séquentielle via le bus SPI simulé
     read_spi_channel(0); // Vg
     read_spi_channel(1); // Vd
     read_spi_channel(2); // Pg
     read_spi_channel(3); // Pd
     
-    // 3. Traitement des données et écriture dans la structure partagée
+    // 2. Traitement des données et écriture dans la structure partagée
     odo_shared_metrics.distance_g    = step_to_distance(g_Pg);
     odo_shared_metrics.distance_d    = step_to_distance(g_Pd);
     odo_shared_metrics.vitesse_g     = calc_filtered_velocity(g_Vg, hist_vg);

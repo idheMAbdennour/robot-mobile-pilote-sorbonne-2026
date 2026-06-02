@@ -40,21 +40,21 @@ void son_tone_start(void) { tone_on = 1; }
 void son_tone_stop(void)  { tone_on = 0; SPK_PORT->FIOCLR = SPK_PIN; }
 int  son_tone_is_on(void) { return tone_on; }
 
-void TIMER1_IRQHandler(void) {
-    uint32_t ir = LPC_TIM1->IR;
+// void TIMER1_IRQHandler(void) {
+//     uint32_t ir = LPC_TIM1->IR;
 
-    if (ir & (1u << 0)) {                    /* --- MR0 : ton 1 kHz --- */
-        LPC_TIM1->IR = (1u << 0);
-        if (tone_on) {
-            if (SPK_PORT->FIOPIN & SPK_PIN) SPK_PORT->FIOCLR = SPK_PIN;
-            else                            SPK_PORT->FIOSET = SPK_PIN;
-        }
-        LPC_TIM1->MR0 = LPC_TIM1->TC + TONE_HALF_US;
-    }
+//     if (ir & (1u << 0)) {                    /* --- MR0 : ton 1 kHz --- */
+//         LPC_TIM1->IR = (1u << 0);
+//         if (tone_on) {
+//             if (SPK_PORT->FIOPIN & SPK_PIN) SPK_PORT->FIOCLR = SPK_PIN;
+//             else                            SPK_PORT->FIOSET = SPK_PIN;
+//         }
+//         LPC_TIM1->MR0 = LPC_TIM1->TC + TONE_HALF_US;
+//     }
 
-    if (ir & (1u << 1)) {                    /* --- MR1 : un demi-pas stepper --- */
-        LPC_TIM1->IR = (1u << 1);
-        stepper_isr_step();                  /* ne fait rien si aucun pas en attente */
-        LPC_TIM1->MR1 = LPC_TIM1->TC + STEP_PERIOD_US;
-    }
-}
+//     if (ir & (1u << 1)) {                    /* --- MR1 : un demi-pas stepper --- */
+//         LPC_TIM1->IR = (1u << 1);
+//         stepper_isr_step();                  /* ne fait rien si aucun pas en attente */
+//         LPC_TIM1->MR1 = LPC_TIM1->TC + STEP_PERIOD_US;
+//     }
+// }

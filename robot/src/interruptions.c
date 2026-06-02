@@ -44,7 +44,7 @@ void EINT3_IRQHandler(void) {
     buttons_interrupt_routine();
 
     // --- Routine Recepteur Ultrason ---
-    // ultrason_recep_interrupt_routine();
+    ultrason_recep_interrupt_routine();
 }
 
 /**

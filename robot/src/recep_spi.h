@@ -41,6 +41,11 @@ typedef struct {
 void ODO_Init(void);
 
 /**
+ * @brief Routine d'interruption SPI (à appeler depuis EINT1_IRQHandler)
+ */
+void recep_spi_interrupt_routine(void);
+
+/**
  * @brief Récupère une copie sécurisée des dernières données physiques calculées.
  * @param data Pointeur vers la structure qui va recevoir les données.
  */
