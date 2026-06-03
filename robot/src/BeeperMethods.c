@@ -20,7 +20,7 @@ void freqChanged() { LPC_TIM1->MR0 = 100000 * mSec / 4; }
 void changeDist(int msecVal) {
   // freqAsChanged = 1;
   int diff = mSec - msecVal;
-  if (diff > 200 | diff < -200) {
+  if (diff > 200 || diff < -200) {
     LPC_TIM1->TCR |= 1 << 1; // Reset
     GPIO_BEEP->FIOSET = 1 << GPIO_BEEP_NUM;
     mSec = msecVal;
