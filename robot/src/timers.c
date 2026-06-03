@@ -35,6 +35,11 @@ void timer0_init(uint16_t delai_us) {
 
 void timer0_start(void) {
     LPC_TIM0->TCR = (1 << 1); // Reset
+    // Attendre au moins 1 cycle PCLK (4 cycles CCLK max) de façon non-bloquante
+    __ASM volatile ("nop");
+    __ASM volatile ("nop");
+    __ASM volatile ("nop");
+    __ASM volatile ("nop");
     LPC_TIM0->TCR = (1 << 0); // Start
 }
 

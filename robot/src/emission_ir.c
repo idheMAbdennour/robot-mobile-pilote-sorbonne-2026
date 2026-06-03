@@ -77,8 +77,10 @@ void preparer_trame(uint8_t id, uint8_t vitesse, uint8_t status) {
     // Lever la patte de synchro au début de la trame (entête)
     LPC_GPIO1->FIOSET = PIN_SYNC_IR;
 
-    // Démarrer le timer d'enveloppe
-    timer0_start();
+    // Démarrer le timer d'enveloppe uniquement s'il n'est pas déjà lancé
+    if ((LPC_TIM0->TCR & 1) == 0) {
+        timer0_start();
+    }
 }
 
 void emission_ir_interrupt_routine(void) {
@@ -116,10 +118,12 @@ static void update_pwm_state(void) {
 
     // PHASE D'ÉMISSION LORS DES CYCLES 0, 1, 2
     if (get_ir_sequence_at(seq_index) == 1) {
-        // Reset le compteur pour synchroniser la phase à 38kHz
-        pwm_reset_counter_ir();
-        // Activer la sortie
         pwm_enable_ir_output();
+        // Reset le compteur pour synchroniser la phase à 38kHz
+        // Seulement si on vient d'un blanc pour ne pas casser une émission continue
+        if (seq_index == 0 || get_ir_sequence_at(seq_index - 1) == 0) {
+            pwm_reset_counter_ir();
+        }
     } else {
         // Blanc : Désactiver la sortie
         pwm_disable_ir_output();
