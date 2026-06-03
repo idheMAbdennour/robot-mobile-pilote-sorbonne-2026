@@ -8,6 +8,7 @@
 #include "LPC17xx.h"
 
 #include "led_register.h"
+#include "moteur.h"
 #include "robot_state.h"
 #include "timers.h"
 #include "suivi_fil.h"
@@ -139,10 +140,11 @@ static void process_dtmf_commands(void) {
 
                     if (parsed_action == 'A') { // Ordre d'arrêt
                         robot_status = ROBOT_WAITING_JUNCTION;
-                        //pwm_set_moteurs(0, 0);
+                        changer_pwm_moteurs(0, 0);
 												//uart0_send_string("\r\n[DTMF_DEBUG] Commande DEPART executee pour ce robot.\r\n");
                     } else if (parsed_action == 'D') { // Ordre de départ
                         robot_status = ROBOT_RUNNING;
+                        changer_pwm_moteurs(50, 50);
                         // TODO: Démarrer les moteurs ici
 												//uart0_send_string("\r\n[DTMF_DEBUG] Commande ARRET executee pour ce robot.\r\n");
                     } else if (parsed_action == 'C') { // Ordre de Retour

@@ -25,6 +25,7 @@
 #include "led_register.h"
 #include "son.h"
 #include "stepper.h"
+#include "BeeperMethods.h"
 
 /* ==========================================================================
  * PROGRAMME PRINCIPAL ORIGINAL (RESTAURÉ)
@@ -43,9 +44,10 @@ int main(void)
     init_timer_enveloppe(250);
     init_moteur_pwm();
     init_moteurs_debug();
-    stepper_init();              
-    son_init();                  
-    stepper_set_zero_manually(); 
+    stepper_init();
+    // son_init();
+    initBeepeur();
+    stepper_set_zero_manually();
     init_proximetre();
     init_capteur_inductif();
     init_ultrason_recep();// Ajouté par la fusion (e7f9603)
@@ -64,15 +66,20 @@ int main(void)
     // Configuration du SysTick à 50 Hz
     SysTick_Config(SystemCoreClock / 50);
 
+    changer_pwm_moteurs(20, 80);
+
+    // Initialiser la première trame pour démarrer le timer d'enveloppe
+    preparer_trame(get_robot_number(), get_vitesse_code_ir(), (uint8_t)get_robot_status());
+
     while (1)
     {
         // ====================================================================
         // TÂCHES "TEMPS RÉEL" (Boucle rapide Asynchrone / Polling)
         // ====================================================================
-        
+
         // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
         capteur_inductif_update();
-        
+
         // Traitement de la machine d'état DTMF
         dtmf_service();
 
@@ -128,21 +135,21 @@ int main(void)
 
         // --- Ultrason : identification du poste --- (Ajouté par la fusion e7f9603)
         ultrason_recep_tick();
-        uint8_t poste; 
+        uint8_t poste;
         char cote;
         if (ultrason_recep_lire(&poste, &cote)) {
             char us_buf[48];
             sprintf(us_buf, "US: poste=%u cote=%c\r\n", poste, cote);
             uart0_send_string(us_buf);
-        }   
+        }
     }
 }
 
 
 /* ==========================================================================
  * ANCIEN CODE DE TEST DE RÉCEPTION SPI (MIS EN COMMENTAIRE)
- * ========================================================================== 
- 
+ * ==========================================================================
+
 // Récupération des variables globales du module SPI
 extern volatile uint32_t g_Vg;
 extern volatile uint32_t g_Vd;
@@ -178,7 +185,7 @@ int main_test_spi(void) {
             g_Vg_filtree = filtrer_vitesse(g_Vg, hist_Vg);
             g_Vd_filtree = filtrer_vitesse(g_Vd, hist_Vd);
         }
-        __WFI(); 
+        __WFI();
     }
 }
 */

@@ -74,14 +74,17 @@ void pwm_set_moteurs(uint8_t pourcent_gauche, uint8_t pourcent_droite) {
 
 // --- PWM IR (PWM1.3) ---
 void pwm_init_ir(void) {
-    // Note: P2.2 est configuré en mode PWM1.3 par emission_ir.c
-
     // 1. Activation de l'alimentation du bloc PWM1 (au cas où)
     LPC_SC->PCONP |= (1 << 6);
 
     // 2. Configurer l'horloge du PWM1 (PCLK_PWM1 = CCLK/4 = 25MHz)
     LPC_SC->PCLKSEL0 &= ~(3 << 12);
     LPC_PWM1->PR = 0;
+
+    // 2b. *** FIX *** Router la broche P2.2 sur la fonction PWM1.3 (PINSEL4[5:4] = 01).
+    //     Sans ça, P2.2 reste en GPIO et la porteuse 38 kHz ne sort jamais sur la patte.
+    LPC_PINCON->PINSEL4 &= ~(3u << 4);
+    LPC_PINCON->PINSEL4 |=  (1u << 4);
 
     // 3. PWM1.3 en mode single edge
     LPC_PWM1->PCR &= ~(1 << 3);

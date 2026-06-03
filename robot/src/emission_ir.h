@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file emission_ir.h
  * @brief Fichier du module emission_ir.
  */
@@ -11,7 +11,7 @@
 /* ==========================================================================
  * DÉFINITIONS (PINS)
  * ========================================================================== */
-#define PIN_SYNC_IR (1 << 29) // P1.29 - Pin de synchro oscilloscope pour l'entête IR
+#define PIN_SYNC_IR (1 << 3) // P2.3 - Pin de synchro oscilloscope pour l'entête IR
 
 /* ==========================================================================
  * PROTOTYPES DES FONCTIONS

@@ -66,7 +66,7 @@ void uart0_update(void) {
             tx_tail = (tx_tail + 1) % UART_TX_BUFFER_SIZE;
         }
     }
-}
+} 
 
 void uart0_send_char(char c) {
     uint16_t next_head = (tx_head + 1) % UART_TX_BUFFER_SIZE;
