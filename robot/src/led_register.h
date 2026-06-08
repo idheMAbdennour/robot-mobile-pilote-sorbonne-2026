@@ -15,7 +15,6 @@
  * ========================================================================== */
 #define PIN_LED_SHIFT_DATA  (1 << 9)  // P2.9
 #define PIN_LED_SHIFT_CLK   (1 << 29) // P4.29
-#define PIN_LED_SHIFT_LATCH (1 << 20) // P0.20 (Connecté au RST du CD4015, maintenu à 0)
 
 /* ==========================================================================
  * MASQUES DES LEDS
@@ -51,7 +50,7 @@ void led_register_set(uint16_t mask);
 void led_register_clr(uint16_t mask);
 
 /**
- * @brief Définit l'état complet du registre (16 bits) et met à jour le driver.
+ * @brief Définit l'état complet du registre (16 bits) et met à jour.
  * @param state Nouvel état complet.
  */
 void led_register_write_all(uint16_t state);
