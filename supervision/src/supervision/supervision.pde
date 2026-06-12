@@ -139,6 +139,9 @@ void setup() {
   computeCircuit();
   initSerial();
   frameRate(30);
+
+  initTerminal();
+  initSimulator();
 }
 
 // ── Chargement et initialisation de la configuration ──────────
@@ -1054,6 +1057,7 @@ void serialEvent(Serial p) {
       s = trim(s);
       if (s.length() > 0 && fifo_messages.size() < 100)
         fifo_messages.append(s);
+        logIncomingUART(s);
     }
   } catch (Exception e) { /* silencieux */ }
 }
@@ -1163,10 +1167,13 @@ void sendMsg1(int mi) {
   if (serialPort == null || mi < 0 || mi >= listeMission.size()) return;
   Mission m = listeMission.get(mi);
   if (m.id_livreur <= 0) return;
-  serialPort.write("R" + nf(m.id_livreur,2)
-                 + "P" + nf(m.p_depart,2)
-                 + "P" + nf(m.p_arrive,2)
-                 + "\n\r");
+  String msgOut = "R" + nf(m.id_livreur,2)
+                + "P" + nf(m.p_depart,2)
+                + "P" + nf(m.p_arrive,2)
+                + "\n\r";
+                
+  serialPort.write(msgOut);
+  logOutgoingUART(msgOut);
 }
 
 // ── Envoi message type 4 : "R[rr]V[vv]\n\r" ──────────────────
@@ -1174,9 +1181,12 @@ void sendMsg1(int mi) {
 void sendMsg2(int rid) {
   if (serialPort == null || rid <= 0 || rid > nb_robot) return;
   Robot r = listeRobot[rid];
-  serialPort.write("R" + nf(r.id_robot,2)
-                 + "V" + hex(r.vitesse,2)
-                 + "\n\r");
+  String msgOut = "R" + nf(r.id_robot,2)
+                + "V" + hex(r.vitesse,2)
+                + "\n\r";
+                
+  serialPort.write(msgOut);
+  logOutgoingUART(msgOut);
 }
 
 // ================================================================
