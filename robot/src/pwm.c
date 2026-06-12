@@ -74,8 +74,6 @@ void pwm_set_moteurs(uint8_t pourcent_gauche, uint8_t pourcent_droite) {
 
 // --- PWM IR (PWM1.3) ---
 void pwm_init_ir(void) {
-    // Note: P2.2 est configuré en mode PWM1.3 par emission_ir.c
-
     // 1. Activation de l'alimentation du bloc PWM1 (au cas où)
     LPC_SC->PCONP |= (1 << 6);
 
@@ -83,12 +81,17 @@ void pwm_init_ir(void) {
     LPC_SC->PCLKSEL0 &= ~(3 << 12);
     LPC_PWM1->PR = 0;
 
+    // 2b. *** FIX *** Router la broche P2.2 sur la fonction PWM1.3 (PINSEL4[5:4] = 01).
+    //     Sans ça, P2.2 reste en GPIO et la porteuse 38 kHz ne sort jamais sur la patte.
+    LPC_PINCON->PINSEL4 &= ~(3u << 4);
+    LPC_PINCON->PINSEL4 |=  (1u << 4);
+
     // 3. PWM1.3 en mode single edge
     LPC_PWM1->PCR &= ~(1 << 3);
 
-    // 4. Période globale et rapport cyclique (50% pour IR)
+    // 4. Période globale et rapport cyclique (Au repos à 1 pour IR)
     LPC_PWM1->MR0 = PWM_MR0_PERIOD;
-    LPC_PWM1->MR3 = PWM_MR0_PERIOD / 2;
+    LPC_PWM1->MR3 = PWM_MR0_PERIOD + 1; // Toujours à 1 au repos
 
     // 5. Reset sur Match 0
     LPC_PWM1->MCR &= ~(1 << 0);
@@ -98,22 +101,29 @@ void pwm_init_ir(void) {
     // 6. Latch
     LPC_PWM1->LER |= (1 << 0) | (1 << 3);
 
-    // 7. Sortie désactivée par défaut
-    LPC_PWM1->PCR &= ~(1 << 11);
+    // 7. Sortie activée par défaut (on garde le PWM actif pour maintenir l'état 1)
+    LPC_PWM1->PCR |= (1 << 11);
 
     // 8. Démarrer
     LPC_PWM1->TCR = (1 << 3) | (1 << 0);
 }
 
 void pwm_enable_ir_output(void) {
-    LPC_PWM1->PCR |= (1 << 11);
+    LPC_PWM1->MR3 = PWM_MR0_PERIOD / 2;
+    LPC_PWM1->LER |= (1 << 3);
 }
 
 void pwm_disable_ir_output(void) {
-    LPC_PWM1->PCR &= ~(1 << 11);
+    LPC_PWM1->MR3 = PWM_MR0_PERIOD + 1;
+    LPC_PWM1->LER |= (1 << 3);
 }
 
 void pwm_reset_counter_ir(void) {
     LPC_PWM1->TCR |= (1 << 1);  // Reset ON
+    // Attendre au moins 1 cycle PCLK (4 cycles CCLK max) de façon non-bloquante
+    __ASM volatile ("nop");
+    __ASM volatile ("nop");
+    __ASM volatile ("nop");
+    __ASM volatile ("nop");
     LPC_PWM1->TCR &= ~(1 << 1); // Reset OFF
 }

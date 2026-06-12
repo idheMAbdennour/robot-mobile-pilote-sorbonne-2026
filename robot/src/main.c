@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Fichier du module main.
+ * @brief Fichier du module main (Version restaurée et fusionnée).
  */
 
 #include <stdint.h>
@@ -22,93 +22,170 @@
 #include "uart.h"
 #include "ultrason_recep.h"
 #include "asservissement.h"
+#include "led_register.h"
+#include "son.h"
+#include "stepper.h"
+#include "BeeperMethods.h"
 
-    int main(void)
+/* ==========================================================================
+ * PROGRAMME PRINCIPAL ORIGINAL (RESTAURÉ)
+ * ========================================================================== */
+int main(void)
+{
+    // Initialisation du système
+    SystemInit();
+
+    // Initialisation partagée de l'ADC (CLKDIV = 4)
+    adc_init_shared(ADC_CLKDIV);
+
+    // Initialisations de chaque module selon la nouvelle norme (snake_case)
+    init_uart0();
+    init_pwm_ir();
+    init_timer_enveloppe(250);
+    init_moteur_pwm();
+    init_moteurs_debug();
+    stepper_init();
+    // son_init();
+    initBeepeur();
+    stepper_set_zero_manually();
+    init_proximetre();
+    init_capteur_inductif();
+    init_ultrason_recep();// Ajouté par la fusion (e7f9603)
+    init_robot_id_switches();
+    init_buttons();
+    init_status_led();
+    init_dtmf();
+    ODO_Init();
+
+    NVIC_SetPriority(TIMER3_IRQn, 0);  // servo : le plus prioritaire (impulsion nette)
+    NVIC_SetPriority(EINT3_IRQn,  1);  // capteurs (dtmf/inductif/boutons/...)
+    NVIC_SetPriority(EINT1_IRQn,  1);  // SPI FPGA
+    NVIC_SetPriority(TIMER1_IRQn, 2);  // son / stepper : tolèrent du jitter
+    NVIC_SetPriority(ADC_IRQn,    2);
+
+    // Configuration du SysTick à 50 Hz
+    SysTick_Config(SystemCoreClock / 50);
+
+    changer_pwm_moteurs(20, 80);
+
+    // Initialiser la première trame pour démarrer le timer d'enveloppe
+    preparer_trame(get_robot_number(), get_vitesse_code_ir(), (uint8_t)get_robot_status());
+
+    while (1)
     {
-        // Initialisation du système
-        SystemInit();
+        // ====================================================================
+        // TÂCHES "TEMPS RÉEL" (Boucle rapide Asynchrone / Polling)
+        // ====================================================================
 
-        // Initialisation partagée de l'ADC (CLKDIV = 4)
-        adc_init_shared(ADC_CLKDIV);
+        // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
+        capteur_inductif_update();
 
-        // Initialisations de chaque module selon la nouvelle norme (snake_case)
-        init_uart0();
-        init_pwm_ir();
-        init_timer_enveloppe(250);
-        init_moteur_pwm();
-        init_moteurs_debug();
-        init_proximetre();
-        init_capteur_inductif();
-        init_ultrason_recep();
-        init_robot_id_switches();
-        init_buttons();
-        init_status_led();
-        init_dtmf();
-        init_recep_spi();
+        // Traitement de la machine d'état DTMF
+        dtmf_service();
 
-        // Configuration du SysTick à 50 Hz
-        SysTick_Config(SystemCoreClock / 50);
+        // Traitement de l'enveloppe (réception série par fil)
+        wire_trame_t trame;
+        if (get_wire_trame(&trame)) {
+            decode_enveloppe_process_command(&trame);
+        }
 
-        while (1)
+        // Vidage non-bloquant du buffer de transmission UART
+        uart0_update();
+
+        // ====================================================================
+        // TÂCHES PÉRIODIQUES (50 Hz)
+        // ====================================================================
+        // Attente du tick de 50Hz géré par SysTick_Handler (dans interruptions.c)
+        if (!get_flag_50hz())
         {
-            // Attente du tick de 50Hz géré par SysTick_Handler (dans interruptions.c)
-            if (!get_flag_50hz())
-            {
-                continue;
-            }
+            continue;
+        }
 
-            // Acquittement du flag
-            set_flag_50hz(0);
+        // Acquittement du flag
+        set_flag_50hz(0);
 
-            // Dépilement de la FIFO des événements du capteur inductif (enveloppe et ADC)
-            capteur_inductif_update();
+        // Lecture de l'ID du robot via les switchs
+        update_robot_id_from_hardware();
 
-            // Lecture de l'ID du robot via les switchs
-            update_robot_id_from_hardware();
+        // Mise à jour de la LED RGB depuis l'état centralisé
+        set_status_led(get_robot_status());
 
-            // Mise à jour de la LED RGB depuis l'état centralisé
-            set_status_led(get_robot_status());
+        // -----------------------------------------------------
+        // Calcul de l'Odométrie (Conversion SPI -> Mètres)
+        // -----------------------------------------------------
+        // Les variables g_Vg et g_Vd sont gérées en interne par recep_spi.c via ODO_Init()
 
-            // Traitement de la machine d'état DTMF
-            dtmf_service();
 
-            // Polling pour la lecture des capteurs via SPI
-            static uint8_t spi_cs_index = 0;
-            set_spi_cs_val(spi_cs_index);
-            spi_cs_index = (spi_cs_index + 1) % 4;
+        // -----------------------------------------------------
+        // Boucle d'asservissement (calcul PID / consigne moteurs)
+        // -----------------------------------------------------
+        asservissement_update();
 
-            // -----------------------------------------------------
-            // Traitement de l'enveloppe (réception série par fil)
-            // -----------------------------------------------------
-            wire_trame_t trame;
-            if (get_wire_trame(&trame)) {
-                decode_enveloppe_process_command(&trame);
-            }
+        // Balayage du proximètre (équivalent à proximetre_tick / proximetre_run_balayage)
+        // Doit tourner même si le debug UART est désactivé.
+        proximetre_run_balayage();
 
-            // -----------------------------------------------------
-            // Boucle d'asservissement (calcul PID / consigne moteurs)
-            // -----------------------------------------------------
-            asservissement_update();
+        // Envois debug par module
+        debug_moteurs_send_frame();  // mode sur P0.4 et P0.5
+        debug_inductif_send_frame(); // mode sur P0.0, P0.1 et P0.6
+        // test_print_buffer();      // Pour test uniquement, affiche les buffer
 
-            // Balayage du proximètre (équivalent à proximetre_tick / proximetre_run_balayage)
-            // Doit tourner même si le debug UART est désactivé.
-            proximetre_run_balayage();
+        // Emission de la trame du proximètre "T/t ddd..."
+        debug_proximetre_send_frame();
 
-            // Envois debug par module
-            debug_moteurs_send_frame(); // mode sur P0.4 et P0.5
-            debug_inductif_send_frame(); // mode sur P0.0, P0.1 et P0.6
-            // test_print_buffer(); // Pour test uniquement, affiche les buffer
-
-            // Emission de la trame du proximètre "T/t ddd..."
-            debug_proximetre_send_frame();
-
-            // --- Ultrason : identification du poste ---
-            ultrason_recep_tick();
-            uint8_t poste; char cote;
-            if (ultrason_recep_lire(&poste, &cote)) {
-                char us_buf[48];
-                sprintf(us_buf, "US: poste=%u cote=%c\r\n", poste, cote);
-                uart0_send_string(us_buf);
-            }   
+        // --- Ultrason : identification du poste --- (Ajouté par la fusion e7f9603)
+        ultrason_recep_tick();
+        uint8_t poste;
+        char cote;
+        if (ultrason_recep_lire(&poste, &cote)) {
+            char us_buf[48];
+            sprintf(us_buf, "US: poste=%u cote=%c\r\n", poste, cote);
+            uart0_send_string(us_buf);
         }
     }
+}
+
+
+/* ==========================================================================
+ * ANCIEN CODE DE TEST DE RÉCEPTION SPI (MIS EN COMMENTAIRE)
+ * ==========================================================================
+
+// Récupération des variables globales du module SPI
+extern volatile uint32_t g_Vg;
+extern volatile uint32_t g_Vd;
+extern volatile uint32_t g_Pg;
+extern volatile uint32_t g_Pd;
+
+// Variables pour le stockage des valeurs filtrées
+uint32_t g_Vg_filtree = 0;
+uint32_t g_Vd_filtree = 0;
+
+// Fonction de filtrage (Moyenne glissante sur 3 échantillons)
+uint32_t filtrer_vitesse(uint32_t nouvelle_valeur, uint32_t* historique) {
+    historique[0] = historique[1];
+    historique[1] = historique[2];
+    historique[2] = nouvelle_valeur;
+    return (historique[0] + historique[1] + historique[2]) / 3;
+}
+
+int main_test_spi(void) {
+    SystemInit();
+    uint32_t hist_Vg[3] = {0, 0, 0};
+    uint32_t hist_Vd[3] = {0, 0, 0};
+    init_recep_spi();
+
+    uint32_t ancienne_Vg = 0;
+    uint32_t ancienne_Vd = 0;
+
+    while (1) {
+        if (g_Vg != ancienne_Vg || g_Vd != ancienne_Vd) {
+            ancienne_Vg = g_Vg;
+            ancienne_Vd = g_Vd;
+
+            g_Vg_filtree = filtrer_vitesse(g_Vg, hist_Vg);
+            g_Vd_filtree = filtrer_vitesse(g_Vd, hist_Vd);
+        }
+        __WFI();
+    }
+}
+*/

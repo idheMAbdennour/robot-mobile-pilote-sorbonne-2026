@@ -20,7 +20,7 @@ void init_buttons(void) {
     LPC_GPIO2->FIODIR &= ~PIN_BTN_LOAD;
     LPC_GPIO2->FIODIR &= ~PIN_BTN_UNLOAD;
 
-    // Configurer les interruptions sur front descendant (appui) pour P2.4 et P2.5
+    // Configurer les interruptions sur front descendant (appui) pour P2.6 et P2.7
     LPC_GPIOINT->IO2IntEnF |= (PIN_BTN_LOAD | PIN_BTN_UNLOAD);
 
     // Activer l'interruption EINT3 au niveau NVIC (déjà fait par d'autres modules, mais par sécurité)

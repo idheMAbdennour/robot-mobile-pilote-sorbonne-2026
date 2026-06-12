@@ -18,7 +18,7 @@
  * @param period_us La période mesurée de l'impulsion.
  * @param rest_duration_us La durée de repos l'ayant précédée.
  */
-void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us);
+void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us, float dist_av, float dist_ar);
 
 /**
  * @brief Traite une trame complètement reçue et validée selon le cahier des charges.

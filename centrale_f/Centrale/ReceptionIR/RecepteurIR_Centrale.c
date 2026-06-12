@@ -26,7 +26,7 @@ void init_recepteur_ir_centrale(void) {
     LPC_TIM1->PR = 25 - 1;               
     LPC_TIM1->TCR = 1;                   
 
-    LPC_PINCON->PINSEL1 &= ~((3 << 10) | (3 << 12));   
+    LPC_PINCON->PINSEL1 &= ~((3 << 10) | (3 << 14));   
     LPC_GPIO0->FIODIR   &= ~((1 << IR_PIN_NORTH) | (1 << IR_PIN_SOUTH));     
     
     LPC_GPIOINT->IO0IntEnR |= (1 << IR_PIN_NORTH) | (1 << IR_PIN_SOUTH); 

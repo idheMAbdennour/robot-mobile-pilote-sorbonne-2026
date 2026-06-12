@@ -21,10 +21,14 @@ static void update_pwm_state(void);
 void init_pwm_ir(void) {
     pwm_init_ir();
 
-    // Configuration de la broche de synchro (P2.3) en sortie
-    LPC_PINCON->PINSEL4 &= ~(3 << 6);
-    LPC_GPIO2->FIODIR |= PIN_SYNC_IR;
-    LPC_GPIO2->FIOCLR = PIN_SYNC_IR;
+    // Configuration de la broche P2.2 en mode PWM1.3
+    LPC_PINCON->PINSEL4 &= ~(3 << 4);
+    LPC_PINCON->PINSEL4 |=  (1 << 4);
+
+    // // Configuration de la broche de synchro (P2.3) en sortie GPIO
+    LPC_PINCON->PINSEL3 &= ~(3u << 26);   // P1.29 en GPIO
+    LPC_GPIO1->FIODIR |= PIN_SYNC_IR;
+    LPC_GPIO1->FIOCLR  = PIN_SYNC_IR;
 }
 
 void init_timer_enveloppe(uint16_t delai_us) {
@@ -71,10 +75,12 @@ void preparer_trame(uint8_t id, uint8_t vitesse, uint8_t status) {
     set_ir_seq_index(0);
 
     // Lever la patte de synchro au début de la trame (entête)
-    LPC_GPIO2->FIOSET = PIN_SYNC_IR;
+    LPC_GPIO1->FIOSET = PIN_SYNC_IR;
 
-    // Démarrer le timer d'enveloppe
-    timer0_start();
+    // Démarrer le timer d'enveloppe uniquement s'il n'est pas déjà lancé
+    if ((LPC_TIM0->TCR & 1) == 0) {
+        timer0_start();
+    }
 }
 
 void emission_ir_interrupt_routine(void) {
@@ -112,10 +118,12 @@ static void update_pwm_state(void) {
 
     // PHASE D'ÉMISSION LORS DES CYCLES 0, 1, 2
     if (get_ir_sequence_at(seq_index) == 1) {
-        // Reset le compteur pour synchroniser la phase à 38kHz
-        pwm_reset_counter_ir();
-        // Activer la sortie
         pwm_enable_ir_output();
+        // Reset le compteur pour synchroniser la phase à 38kHz
+        // Seulement si on vient d'un blanc pour ne pas casser une émission continue
+        if (seq_index == 0 || get_ir_sequence_at(seq_index - 1) == 0) {
+            pwm_reset_counter_ir();
+        }
     } else {
         // Blanc : Désactiver la sortie
         pwm_disable_ir_output();
@@ -126,7 +134,7 @@ static void update_pwm_state(void) {
 
     // Baisser la patte de synchro à la fin de l'entête (L'entête fait 2 temps : un "1" et un "0")
     if (seq_index == 2 && frame_counter < 3) {
-        LPC_GPIO2->FIOCLR = PIN_SYNC_IR;
+        LPC_GPIO1->FIOCLR = PIN_SYNC_IR;
     }
 
     if (seq_index >= seq_length) {

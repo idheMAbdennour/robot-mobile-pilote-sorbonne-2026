@@ -11,6 +11,8 @@
 #include "uart.h"
 #include "moteur.h"
 #include "capteur_inductif.h"
+#include "stepper.h"
+#include "suivi_fil.h"
 
 /* ==========================================================================
  * DÉFINITIONS ET MACROS
@@ -64,7 +66,7 @@ static Decoder_t decoder_sud = {STATE_WAIT_HEADER, 0, 0};
  * ========================================================================== */
 
 static uint8_t is_rest_duration_valid(uint16_t rest_us) {
-    // Un repos "court" est ~500us. 
+    // Un repos "court" est ~500us.
     // Un repos "long" (quand on rate les symboles de l'autre fil) peut aller jusqu'à 500us + 3250us + 500us = 4250us.
     // On fixe une fourchette généreuse : 350us à 5000us pour accepter les repos longs de trame alternée.
     return (rest_us >= 350 && rest_us <= 5000);
@@ -91,7 +93,7 @@ static uint8_t is_sud_symbol(Symbol_t sym) {
 /* ==========================================================================
  * IMPLÉMENTATION DES FONCTIONS PUBLIQUES
  * ========================================================================== */
-void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
+void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us, float dist_av, float dist_ar) {
     Symbol_t symbol = period_us_to_symbol(period_us);
 
     // L'en-tête (E ou e) peut arriver après un long silence inter-trames.
@@ -115,6 +117,7 @@ void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
     uint8_t my_id = get_robot_number();
 
     if (is_nord_symbol(symbol)) {
+        suivi_fil_update_distances(dist_av, dist_ar, 1);
         if (symbol == SYMBOL_E) {
             decoder_nord.state = STATE_COLLECT_DATA;
             decoder_nord.bit_count = 0;
@@ -122,19 +125,20 @@ void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
         } else if (decoder_nord.state == STATE_COLLECT_DATA) {
             decoder_nord.data = (decoder_nord.data << 1) | (symbol == SYMBOL_1 ? 1 : 0);
             decoder_nord.bit_count++;
-            
+
             if (decoder_nord.bit_count == 14) {
                 wire_trame_t trame_nord;
                 trame_nord.type = (decoder_nord.data >> 11) & 0x07;
                 trame_nord.robot_id = (decoder_nord.data >> 7) & 0x0F;
                 trame_nord.parameter = decoder_nord.data & 0x7F;
-                
+
                 final_trame = trame_nord;
                 decoded = 1;
                 decoder_nord.state = STATE_WAIT_HEADER;
             }
         }
     } else if (is_sud_symbol(symbol)) {
+        suivi_fil_update_distances(dist_av, dist_ar, 0);
         if (symbol == SYMBOL_e) {
             decoder_sud.state = STATE_COLLECT_DATA;
             decoder_sud.bit_count = 0;
@@ -142,13 +146,13 @@ void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
         } else if (decoder_sud.state == STATE_COLLECT_DATA) {
             decoder_sud.data = (decoder_sud.data << 1) | (symbol == SYMBOL_i ? 1 : 0);
             decoder_sud.bit_count++;
-            
+
             if (decoder_sud.bit_count == 14) {
                 wire_trame_t trame_sud;
                 trame_sud.type = (decoder_sud.data >> 11) & 0x07;
                 trame_sud.robot_id = (decoder_sud.data >> 7) & 0x0F;
                 trame_sud.parameter = decoder_sud.data & 0x7F;
-                
+
                 // Priorité au Sud si l'ID correspond, sinon on garde la dernière trame (ou Nord)
                 if (!decoded || trame_sud.robot_id == my_id) {
                     final_trame = trame_sud;
@@ -161,19 +165,24 @@ void decode_enveloppe_commande(uint16_t period_us, uint16_t rest_duration_us) {
 
     // Transmission au système principal
     if (decoded) {
+        char dbg_buf[64];
+        sprintf(dbg_buf, "Trame decodee: Type:%d Robot:%d Param:%d\r\n",
+                final_trame.type, final_trame.robot_id, final_trame.parameter);
+        uart0_send_string(dbg_buf);
+
         set_wire_trame(&final_trame);
     }
 }
 
 void decode_enveloppe_process_command(const wire_trame_t *trame) {
     char debug_buf[64];
-    
+
     if (!trame || trame->robot_id != get_robot_number()) {
         return; // Message invalide ou ne nous est pas destiné
     }
 
     // Avertir par UART qu'une trame a été validée
-    sprintf(debug_buf, "\r\n!!! TRAME RECUE !!! Type:%d Robot:%d Param:%d\r\n", 
+    sprintf(debug_buf, "\r\n!!! TRAME RECUE !!! Type:%d Robot:%d Param:%d\r\n",
             trame->type, trame->robot_id, trame->parameter);
     uart0_send_string(debug_buf);
 
@@ -183,28 +192,44 @@ void decode_enveloppe_process_command(const wire_trame_t *trame) {
             set_vitesse_centrale((int32_t)trame->parameter);
             // On ne modifie plus directement les PWM ici : c'est le rôle de la boucle d'asservissement à 50Hz.
             break;
-            
-        // @todo: implémenter
-        case 0b001: // Direction
-            // À implémenter selon la logique de direction
+
+        case 0b001: // chargement, branche Sud
+        case 0b010: // chargement, branche Nord
+        {
+            // parametre 7 bits = LL(2 bits poids fort) + poste(5 bits)
+            uint8_t ll = (trame->parameter >> 5) & 0x03;  // 00->A, 01->B, 10->C, 11->D
+            // uint8_t poste = trame->parameter & 0x1F;
+            stepper_show_letter('A' + ll);
+            set_robot_status(STATUS_RDV_EXPEDITION);
+            // @todo: mémoriser la direction (Sud/Nord) et le numéro de poste
             break;
-            
-        case 0b011: // Commande de la diode de signalisation
-            // À implémenter avec le module de statut
+        }
+
+        case 0b011: // déchargement, branche Sud
+        case 0b100: // déchargement, branche Nord
+        {
+            // parametre 7 bits = LL(2 bits poids fort) + poste(5 bits)
+            uint8_t ll = (trame->parameter >> 5) & 0x03;
+            // uint8_t poste = trame->parameter & 0x1F;
+            stepper_show_letter('A' + ll);
+            set_robot_status(STATUS_RDV_DEPOSE);
+            // @todo: mémoriser la direction (Sud/Nord) et le numéro de poste
             break;
-            
+        }
+
+        case 0b101: // Modes debug
         case 0b110: // Validation du mode Hardware pour le débuggage
             capteur_inductif_receive_wire_command(trame->type);
             moteurs_receive_wire_command(trame->type);
             break;
-            
+
         case 0b111: // Demande d'état du module de débuggage
             capteur_inductif_receive_wire_command(trame->type);
             moteurs_receive_wire_command(trame->type);
             break;
-            
+
         default:
-            // Autres commandes (servomoteurs, IR, balises) ignorées pour l'instant
+            // Autres commandes ignorées
             break;
     }
 }

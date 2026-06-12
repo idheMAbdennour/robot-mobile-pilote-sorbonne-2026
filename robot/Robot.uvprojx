@@ -134,11 +134,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>-1</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -547,6 +547,66 @@
               <FileName>uart.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\src\uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>asservissement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\asservissement.c</FilePath>
+            </File>
+            <File>
+              <FileName>asservissement.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\asservissement.h</FilePath>
+            </File>
+            <File>
+              <FileName>BeeperMethods.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BeeperMethods.c</FilePath>
+            </File>
+            <File>
+              <FileName>BeeperMethods.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\BeeperMethods.h</FilePath>
+            </File>
+            <File>
+              <FileName>ultrason_recep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\ultrason_recep.c</FilePath>
+            </File>
+            <File>
+              <FileName>ultrason_recep.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\ultrason_recep.h</FilePath>
+            </File>
+            <File>
+              <FileName>suivi_fil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\suivi_fil.c</FilePath>
+            </File>
+            <File>
+              <FileName>suivi_fil.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\suivi_fil.h</FilePath>
+            </File>
+            <File>
+              <FileName>son.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\son.c</FilePath>
+            </File>
+            <File>
+              <FileName>son.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\son.h</FilePath>
+            </File>
+            <File>
+              <FileName>stepper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\stepper.c</FilePath>
+            </File>
+            <File>
+              <FileName>stepper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\stepper.h</FilePath>
             </File>
           </Files>
         </Group>

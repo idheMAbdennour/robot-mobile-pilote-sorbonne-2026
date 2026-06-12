@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file emission_ir.h
  * @brief Fichier du module emission_ir.
  */
